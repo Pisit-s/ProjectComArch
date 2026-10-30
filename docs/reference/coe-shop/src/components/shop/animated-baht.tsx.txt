@@ -1,0 +1,51 @@
+'use client';
+
+import { animate, useReducedMotion } from 'motion/react';
+import { useLocale } from 'next-intl';
+import { useEffect, useRef, useState } from 'react';
+import { formatBaht } from '@/lib/money';
+
+/** amount that counts to its new value (about 400ms); instant under reduced motion */
+export function AnimatedBaht({
+  value,
+  decimals,
+  className,
+  ...rest
+}: {
+  value: number;
+  decimals?: boolean;
+  className?: string;
+  'data-testid'?: string;
+}) {
+  const locale = useLocale() as 'th' | 'en';
+  const reduce = useReducedMotion();
+  const [shown, setShown] = useState(value);
+  const from = useRef(value);
+
+  useEffect(() => {
+    if (reduce || from.current === value) {
+      setShown(value);
+      from.current = value;
+      return;
+    }
+    const controls = animate(from.current, value, {
+      duration: 0.4,
+      ease: 'easeOut',
+      onUpdate: (v) => setShown(Math.round(v)),
+      onComplete: () => {
+        from.current = value;
+        setShown(value);
+      },
+    });
+    return () => {
+      from.current = value;
+      controls.stop();
+    };
+  }, [value, reduce]);
+
+  return (
+    <span className={className} {...rest}>
+      {formatBaht(shown, locale, { decimals })}
+    </span>
+  );
+}

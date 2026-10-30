@@ -1,0 +1,394 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+/* Light only: no dark variant anywhere (PLAN.md 9.1). */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  --color-navy-950: #0a1a5c;
+  --color-navy-900: #102880;
+  --color-blue-600: #2563eb;
+  --color-sky-400: #38b6ff;
+  --color-sky-200: #cce7ff;
+  --color-ice-100: #ecf5ff;
+  --color-ice-50: #f5faff;
+  --color-line: #c8d6ec;
+  --color-code: #2d8fdb;
+  --color-ink: #0b1b4d;
+  --color-gsb: #eb198d;
+
+  --font-sans: var(--font-plex-sans-thai), 'IBM Plex Sans Thai', system-ui, sans-serif;
+  --font-display: var(--font-chakra-petch), 'Chakra Petch', var(--font-plex-sans-thai), sans-serif;
+  --font-heading: var(--font-display);
+  --font-mono: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace;
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --animate-shiny-text: shiny-text 8s infinite;
+  @keyframes shiny-text {
+    0%,
+    90%,
+    100% {
+      background-position: calc(-100% - var(--shiny-width)) 0;
+    }
+    30%,
+    60% {
+      background-position: calc(100% + var(--shiny-width)) 0;
+    }
+  }
+}
+
+:root {
+  color-scheme: light;
+  --background: #f5faff;
+  --foreground: #0b1b4d;
+  --card: #ffffffb8;
+  --card-foreground: #0b1b4d;
+  --popover: #ffffffee;
+  --popover-foreground: #0b1b4d;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #ecf5ff;
+  --secondary-foreground: #102880;
+  --muted: #ecf5ff;
+  --muted-foreground: #54648a;
+  --accent: #cce7ff;
+  --accent-foreground: #0a1a5c;
+  --destructive: #c62828;
+  --border: #c8d6ec;
+  --input: #c8d6ec;
+  --ring: #38b6ff;
+  --tb-border: #c8d6ec;
+  --radius: 0.625rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html {
+    @apply font-sans;
+    /* the gradient lives in LiquidBackground's fixed layer; background-attachment: fixed is costly on iOS */
+    background: #f5faff;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-transparent text-foreground;
+    overflow-x: clip;
+    line-height: 1.6;
+  }
+  /* Thai needs room for vowels and tone marks */
+  h1,
+  h2,
+  h3 {
+    line-height: 1.35;
+  }
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+@layer utilities {
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Liquid glass. Safari needs literal values on backdrop-filter, never a CSS variable. */
+  .glass {
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    backdrop-filter: blur(12px) saturate(160%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.55),
+      0 1px 2px rgb(0 0 0 / 0.05),
+      0 12px 32px -12px rgb(0 0 0 / 0.18);
+  }
+  .glass-raised {
+    -webkit-backdrop-filter: blur(16px) saturate(170%);
+    backdrop-filter: blur(16px) saturate(170%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.6),
+      0 24px 60px -20px rgb(0 0 0 / 0.3);
+  }
+  /* near-solid surface for tables and dense data (admin, size tables) */
+  .glass-solid {
+    background: rgb(255 255 255 / 0.94);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.8),
+      0 1px 2px rgb(0 0 0 / 0.05),
+      0 10px 28px -14px rgb(11 27 77 / 0.2);
+  }
+
+  /*
+   * Interactive pane: a specular highlight follows the pointer (GlassPointer writes --gx/--gy/--go on the
+   * pane under the cursor; on touch it lights up at the tap point and fades). Paint only.
+   */
+  .glass-interactive {
+    position: relative;
+    isolation: isolate;
+    transition:
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.2s ease;
+  }
+  .glass-interactive::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: var(--go, 0);
+    transition: opacity 0.3s ease;
+    mix-blend-mode: overlay;
+    background:
+      radial-gradient(
+        22rem circle at var(--gx, 50%) var(--gy, 50%),
+        rgb(255 255 255 / 0.3),
+        transparent 45%
+      ),
+      radial-gradient(
+        10rem circle at var(--gx, 50%) var(--gy, 50%),
+        var(--primary) 0%,
+        transparent 60%
+      );
+  }
+  .glass-interactive::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    opacity: var(--go, 0);
+    transition: opacity 0.3s ease;
+    background: radial-gradient(
+      14rem circle at var(--gx, 50%) var(--gy, 50%),
+      rgb(255 255 255 / 0.7),
+      transparent 60%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+  }
+  @media (hover: hover) {
+    .glass-interactive:hover {
+      transform: translateY(-2px);
+    }
+  }
+  .glass-interactive:active {
+    transform: scale(0.98);
+  }
+  .glass-interactive[data-touch-fade='1']::after,
+  .glass-interactive[data-touch-fade='1']::before {
+    transition: opacity 0.6s ease;
+  }
+
+  /* Blueprint grid, as in ThodBaan but light blue. The drift moves the layer with transform (compositor
+     only, not background-position) and is off on touch screens: everything glassy above it would have to
+     be re-blurred every frame, which is what made taps feel slow on phones. */
+  .tb-blueprint {
+    background-image:
+      linear-gradient(to right, var(--tb-border) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--tb-border) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .tb-rise {
+    animation: tb-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .tb-pop {
+    animation: tb-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  /* soft blue glow used when a bundle discount line appears */
+  .tb-glow {
+    animation: tb-glow 0.9s ease-out both;
+  }
+  .cursor-blink {
+    animation: cursor-blink 1s steps(1) infinite;
+  }
+}
+
+@keyframes tb-drift {
+  to {
+    transform: translate3d(32px, 32px, 0);
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .tb-blueprint {
+    animation: tb-drift 40s linear infinite;
+  }
+}
+@keyframes tb-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes tb-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes tb-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgb(56 182 255 / 0.55);
+    background-color: rgb(204 231 255 / 0.9);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgb(56 182 255 / 0);
+    background-color: transparent;
+  }
+}
+@keyframes cursor-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/*
+ * Touch screens: no backdrop blur and no pointer-following light. iPhone Safari re-blurs every glass
+ * surface on every scroll frame (the page scrolled at ~27fps even on a Mac's WebKit); over this already
+ * soft background the blur was barely visible anyway. Panels that float over content get a more solid
+ * fill instead (see the navbar and sticky cart bar).
+ */
+@media (hover: none) {
+  .glass,
+  .glass-raised {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .glass-interactive::before,
+  .glass-interactive::after {
+    content: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .glass-raised {
+    background: rgb(255 255 255 / 0.92);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  .glass-raised {
+    background: rgb(255 255 255 / 0.95);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tb-blueprint,
+  .tb-rise,
+  .tb-pop,
+  .tb-glow,
+  .cursor-blink {
+    animation: none;
+  }
+  .glass-interactive,
+  .glass-interactive::after,
+  .glass-interactive::before {
+    transition: none;
+  }
+  .glass-interactive:hover,
+  .glass-interactive:active {
+    transform: none;
+  }
+}
+
+@keyframes showcase-float {
+  0%,
+  100% {
+    transform: translateY(-3px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+/* BeamRing: a light running along the border. @property lets the angle animate smoothly. */
+@property --beam-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.beam-ring {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  padding: 1.5px;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0deg 250deg,
+    var(--beam-to) 315deg,
+    var(--beam-from) 352deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  animation: beam-spin var(--beam-duration, 6s) linear infinite;
+}
+@keyframes beam-spin {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .beam-ring {
+    animation: none;
+  }
+}

@@ -1,0 +1,38 @@
+import Link from 'next/link';
+import { getTranslations } from 'next-intl/server';
+import { AccountMenu, type NavUser } from './account-menu';
+import { CartButton } from './cart-button';
+import { LocaleSwitch } from './locale-switch';
+import { Logo } from './logo';
+
+export async function Navbar({ user }: { user: NavUser }) {
+  const t = await getTranslations('nav');
+  return (
+    <header className="sticky top-0 z-40 px-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+      <nav
+        aria-label={t('main')}
+        className="glass mx-auto flex max-w-6xl items-center gap-2 rounded-full bg-card px-3 py-2 ring-1 ring-foreground/10 [@media(hover:none)]:bg-white/92"
+      >
+        <Link href="/" aria-label={t('home')} className="rounded-full pr-1">
+          <Logo />
+        </Link>
+        <div className="ml-4 hidden items-center gap-1 md:flex">
+          {(['products', 'bundles', 'how', 'faq'] as const).map((k) => (
+            <Link
+              key={k}
+              href={`/#${k}`}
+              className="text-foreground/75 hover:text-foreground rounded-full px-3 py-2 text-sm font-medium transition-colors"
+            >
+              {t(k)}
+            </Link>
+          ))}
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <LocaleSwitch />
+          <CartButton />
+          <AccountMenu user={user} />
+        </div>
+      </nav>
+    </header>
+  );
+}

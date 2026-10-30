@@ -1,0 +1,32 @@
+import { getLocale, getTranslations } from 'next-intl/server';
+import Link from 'next/link';
+import { Glass } from '@/components/glass/glass';
+import { Logo } from '@/components/shop/logo';
+import { SupportEmail } from '@/components/shop/support-email';
+import { Button } from '@/components/ui/button';
+
+export default async function NotFound() {
+  const t = await getTranslations('notFound');
+  const locale = (await getLocale()) as 'th' | 'en';
+  return (
+    <main
+      className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-5 px-4 py-10"
+      data-testid="not-found"
+    >
+      <Link href="/" aria-label="CoE Shop">
+        <Logo />
+      </Link>
+      <Glass className="space-y-3 p-6">
+        <p className="font-mono text-sm text-code">404</p>
+        <h1 className="font-display text-2xl font-semibold text-navy-900">{t('title')}</h1>
+        <p>{t('body')}</p>
+        <Button asChild size="lg">
+          <Link href="/">{t('home')}</Link>
+        </Button>
+        <p className="text-muted-foreground text-sm">
+          {t('system')} <SupportEmail locale={locale} />
+        </p>
+      </Glass>
+    </main>
+  );
+}

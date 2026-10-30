@@ -1,0 +1,49 @@
+'use client';
+
+import { RotateCw } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { Glass } from '@/components/glass/glass';
+import { Logo } from '@/components/shop/logo';
+import { SupportEmail } from '@/components/shop/support-email';
+import { Button } from '@/components/ui/button';
+
+export default function ErrorPage({
+  error,
+  retry,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  retry?: () => void;
+  reset?: () => void;
+}) {
+  const t = useTranslations('errorPage');
+  const locale = useLocale() as 'th' | 'en';
+  return (
+    <main
+      className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-5 px-4 py-10"
+      data-testid="error-page"
+    >
+      <Link href="/" aria-label="CoE Shop">
+        <Logo />
+      </Link>
+      <Glass className="space-y-3 p-6">
+        <h1 className="font-display text-2xl font-semibold text-navy-900">{t('title')}</h1>
+        <p>
+          {t('body')} <SupportEmail locale={locale} />
+        </p>
+        {error.digest && (
+          <p className="text-muted-foreground font-mono text-xs">ref: {error.digest}</p>
+        )}
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Button type="button" size="lg" onClick={() => (retry ?? reset)?.()}>
+            <RotateCw className="size-4" aria-hidden /> {t('retry')}
+          </Button>
+          <Button asChild size="lg" variant="glass">
+            <Link href="/">{t('home')}</Link>
+          </Button>
+        </div>
+      </Glass>
+    </main>
+  );
+}
