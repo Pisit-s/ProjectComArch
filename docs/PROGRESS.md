@@ -34,9 +34,11 @@
 - [x] เนื้อหา + WorkedExample (render จาก engine) + IEEE 754 Converter (encode/decode tabs) + สรุป
 - [x] e2e ข้อ 4 ผ่าน (pixel7 + iphone13) · e2e ทั้งหมด 7 ข้อผ่านบน WebKit
 ## Phase 5 — บทที่ 4
-- [ ] เนื้อหา + FpSimulator (+/−) + ตัวอย่าง A1–A6 + สรุป
-- [ ] e2e ข้อ 5 (Chromium + WebKit)
+- [x] เนื้อหา + FpSimulator (+/−) + ตัวอย่าง A1–A6 (OpWorked render จาก engine) + สรุป
+- [x] e2e ข้อ 5 ผ่าน (pixel7 + iphone13)
 ## Phase 6 — บทที่ 5
+- [ ] เนื้อหา + FpSimulator (×/÷ + ค่าพิเศษ) + M1–M6, D1–D5 + M3/D3 ละเอียด + ตารางกรณีพิเศษ + สรุป
+- [ ] e2e ข้อ 6 (Chromium + WebKit)
 ## Milestone "พร้อมใช้สอน"
 ## Phase 7 — Lab + polish
 ## Phase 8 — พร้อม deploy

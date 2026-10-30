@@ -95,9 +95,11 @@ export function AlignView({ step, fmt }: { step: StepOf<'align'>; fmt: FloatForm
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-baseline gap-3">
-      <span className="w-28 shrink-0 text-xs text-muted">{label}</span>
-      <span className="inline-flex items-baseline">{children}</span>
+    <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3">
+      <span className="shrink-0 text-xs text-muted sm:w-28">{label}</span>
+      <span className="inline-flex flex-wrap items-baseline text-[0.8rem] min-[400px]:text-sm sm:text-base">
+        {children}
+      </span>
     </div>
   );
 }
@@ -111,7 +113,7 @@ export function SigAddView({ step, fmt }: { step: StepOf<'sig-add'>; fmt: FloatF
   return (
     <div className="space-y-3">
       <Box>
-        <div className="num inline-grid grid-cols-[1.5rem_auto] gap-x-1 font-mono">
+        <div className="num inline-grid grid-cols-[1.5rem_auto] gap-x-1 font-mono text-[0.8rem] min-[400px]:text-sm sm:text-base">
           <span />
           <BitLine int={a.int} frac={a.frac} kept={F} intWidth={2} />
           <span className="font-bold">{step.op === '+' ? '+' : '−'}</span>
