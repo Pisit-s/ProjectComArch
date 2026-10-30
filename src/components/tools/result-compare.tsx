@@ -1,7 +1,7 @@
 import { Num } from '@/components/ui/num';
 import { fmt } from '@/lib/display';
-import type { FpResult, Rational } from '@/lib/fp';
-import { BINARY32, exactDecimal, shortestDecimal, toHex } from '@/lib/fp';
+import type { FloatFormat, FpResult, Rational } from '@/lib/fp';
+import { BINARY32, exactDecimal, shortestDecimal, toHex, width } from '@/lib/fp';
 import { FlagBadges } from '@/components/viz/step-parts';
 
 /** Three values side by side: typed, exact result of the stored operands, and the float result. */
@@ -11,14 +11,15 @@ export function ResultCompare({
   result,
   error,
   expression,
+  fmt: f = BINARY32,
 }: {
   typed: Rational | null;
   exactStored: Rational | null;
   result: FpResult;
   error: Rational | null;
   expression: string;
+  fmt?: FloatFormat;
 }) {
-  const f = BINARY32;
   return (
     <section
       aria-label="ผลลัพธ์"
@@ -48,13 +49,13 @@ export function ResultCompare({
           </dd>
         </div>
         <div className="rounded-lg bg-primary/8 p-3 ring-1 ring-primary/30">
-          <dt className="text-xs font-semibold text-primary">ผล float (binary32)</dt>
+          <dt className="text-xs font-semibold text-primary">ผล float ({f.name})</dt>
           <dd className="mt-1">
             <b className="text-lg" data-testid="result-value">
               <Num value={shortestDecimal(f, result.bits)} />
             </b>
             <span className="num ml-2 font-mono text-sm text-muted" data-testid="result-hex">
-              {toHex(result.bits, 32)}
+              {toHex(result.bits, width(f))}
             </span>
             <span className="mt-1 block text-xs text-muted">
               เก็บจริง: <Num value={exactDecimal(f, result.bits)} />

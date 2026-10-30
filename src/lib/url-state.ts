@@ -1,7 +1,35 @@
-import { type Op, parseDecimal, parseHex, BINARY32 } from '@/lib/fp';
+import {
+  BINARY16,
+  BINARY32,
+  BINARY64,
+  type FloatFormat,
+  type Op,
+  encodeBits,
+  parseDecimal,
+  parseHex,
+  width,
+} from '@/lib/fp';
+
+export type FormatId = 'b16' | 'b32' | 'b64';
+export const FORMATS: Record<FormatId, FloatFormat> = {
+  b16: BINARY16,
+  b32: BINARY32,
+  b64: BINARY64,
+};
+
+const hexOf = (f: FloatFormat, bits: bigint) =>
+  bits
+    .toString(16)
+    .toUpperCase()
+    .padStart(Math.ceil(width(f) / 4), '0');
+
+/** Default decoder input for a format: the bits of 0.15625. */
+export const defaultHex = (id: FormatId): string =>
+  hexOf(FORMATS[id], encodeBits(FORMATS[id], '0.15625')!);
 
 /** Lab state kept in the query string so instructors can share an exact example and step. */
 export interface LabState {
+  fmt: FormatId;
   tab: 'calc' | 'conv';
   op: Op;
   a: string;
@@ -16,6 +44,7 @@ export interface LabState {
 }
 
 export const LAB_DEFAULT: LabState = {
+  fmt: 'b32',
   tab: 'calc',
   op: '*',
   a: '6.5',
@@ -36,6 +65,13 @@ type Query = { get(name: string): string | null };
 export function parseLabQuery(q: Query): { state: LabState; invalid: string[] } {
   const s: LabState = { ...LAB_DEFAULT };
   const invalid: string[] = [];
+  const fmt = q.get('fmt');
+  if (fmt !== null) {
+    if (fmt === 'b16' || fmt === 'b32' || fmt === 'b64') {
+      s.fmt = fmt;
+      s.hex = defaultHex(fmt);
+    } else invalid.push('fmt');
+  }
   const tab = q.get('tab');
   if (tab !== null) {
     if (tab === 'calc' || tab === 'conv') s.tab = tab;
@@ -59,8 +95,8 @@ export function parseLabQuery(q: Query): { state: LabState; invalid: string[] } 
   }
   const hex = q.get('hex');
   if (hex !== null) {
-    const r = parseHex(BINARY32, hex);
-    if (r.ok) s.hex = r.bits.toString(16).toUpperCase().padStart(8, '0');
+    const r = parseHex(FORMATS[s.fmt], hex);
+    if (r.ok) s.hex = hexOf(FORMATS[s.fmt], r.bits);
     else invalid.push('hex');
   }
   const step = q.get('step');
@@ -73,6 +109,7 @@ export function parseLabQuery(q: Query): { state: LabState; invalid: string[] } 
 
 export function toLabQuery(s: LabState): string {
   const p = new URLSearchParams();
+  if (s.fmt !== 'b32') p.set('fmt', s.fmt);
   p.set('tab', s.tab);
   if (s.tab === 'calc') {
     p.set('op', OP_SLUG[s.op]);

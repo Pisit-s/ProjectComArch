@@ -8,9 +8,9 @@ import { FIELD_STYLE } from '@/components/bits/field-style';
 import { usePlayerMotion } from '@/components/player/player-speed';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 import { Pow } from '@/components/ui/num';
-import { FLAG_TEXT, RANGE_TEXT, ROUND_TEXT, SPECIAL_TEXT } from '@/content/step-text';
+import { FLAG_TEXT, ROUND_TEXT, SPECIAL_TEXT, rangeText } from '@/content/step-text';
 import { bin8, fixedPoint } from '@/lib/display';
-import type { Flags, FloatFormat, StepOf } from '@/lib/fp';
+import { type Flags, type FloatFormat, type StepOf, expFieldMax } from '@/lib/fp';
 import { cn } from '@/lib/utils';
 import { BitLine } from './bit-line';
 
@@ -155,7 +155,7 @@ export function SignXor({ step }: { step: StepOf<'sign'> }) {
   );
 }
 
-export function RangeGauge({ step }: { step: StepOf<'range'> }) {
+export function RangeGauge({ step, fmt }: { step: StepOf<'range'>; fmt: FloatFormat }) {
   const { d } = usePlayerMotion();
   const lo = step.minExp;
   const hi = step.maxExp;
@@ -192,7 +192,7 @@ export function RangeGauge({ step }: { step: StepOf<'range'> }) {
       </div>
       <p className={cn('text-sm', bad && 'font-semibold')}>
         Biased exponent = <span className="num font-mono">{step.exponent}</span> ·{' '}
-        {RANGE_TEXT[step.outcome]}
+        {rangeText(step.outcome, fmt)}
         {step.denormShift > 0 && (
           <>
             {' '}
@@ -303,7 +303,7 @@ export function RoundGRS({ step, fmt }: { step: StepOf<'round'>; fmt: FloatForma
           )}
           {step.overflowAfterRound && (
             <p className="mt-2 text-sm font-semibold">
-              ตัวทดทำให้ Exponent เกิน 254 → Overflow เป็น ∞
+              ตัวทดทำให้ Exponent เกิน {expFieldMax(fmt) - 1} → Overflow เป็น ∞
             </p>
           )}
         </Box>

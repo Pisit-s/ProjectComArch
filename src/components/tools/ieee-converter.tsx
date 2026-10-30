@@ -7,12 +7,22 @@ import { Register } from '@/components/bits/register';
 import { StepPlayer } from '@/components/player/step-player';
 import { Num } from '@/components/ui/num';
 import { StepView } from '@/components/viz/step-view';
-import { DECODE_EXAMPLES, ENCODE_EXAMPLES, ENCODER_PICKS } from '@/content/examples';
-import { CLASS_TEXT, FLOWS, toPlayerSteps } from '@/content/step-text';
+import { ENCODE_EXAMPLES, ENCODER_PICKS } from '@/content/examples';
+import { CLASS_TEXT, flows, toPlayerSteps } from '@/content/step-text';
 import { fmt } from '@/lib/display';
 import {
   BINARY32,
   type BitParseError,
+  type FloatFormat,
+  emin,
+  expFieldMax,
+  fracMask,
+  hiddenBit,
+  infBits,
+  nanBits,
+  pack,
+  signMask,
+  width,
   decodeWithSteps,
   encodeBits,
   encodeDecimal,
@@ -26,8 +36,19 @@ import {
 import { cn } from '@/lib/utils';
 import { OperandInput } from './operand-input';
 
-const F = BINARY32;
-const MAX_FINITE = encodeBits(F, '3.4028235e38')!;
+const maxFinite = (f: FloatFormat) => pack(f, 0, expFieldMax(f) - 1, fracMask(f));
+const hexDigits = (f: FloatFormat) => Math.ceil(width(f) / 4);
+
+/** Decode quick picks built from the format itself (no hand-typed bit patterns). */
+const decodePicks = (f: FloatFormat): { bits: bigint; note: string }[] => [
+  { bits: encodeBits(f, '0.15625')!, note: 'ค่า normal ทั่วไป' },
+  { bits: 1n, note: 'Subnormal ที่เล็กที่สุด' },
+  { bits: hiddenBit(f), note: 'ค่า normalized ที่เล็กที่สุด' },
+  { bits: maxFinite(f), note: 'ค่าจำกัดที่มากที่สุด' },
+  { bits: signMask(f), note: 'ศูนย์ติดลบ' },
+  { bits: infBits(f, 0), note: 'Infinity' },
+  { bits: nanBits(f), note: 'NaN' },
+];
 
 export type ConverterMode = 'encode' | 'decode';
 
@@ -37,12 +58,14 @@ export function Ieee754Converter({
   initialBits,
   onChange,
   testId = 'conv',
+  fmt: F = BINARY32,
 }: {
   initialMode?: ConverterMode;
   initialInput?: string;
   initialBits?: bigint;
   onChange?: (s: { mode: ConverterMode; value: string }) => void;
   testId?: string;
+  fmt?: FloatFormat;
 }) {
   const [mode, setMode] = useState<ConverterMode>(initialMode);
   const [encodeText, setEncodeText] = useState(initialInput);
@@ -70,7 +93,7 @@ export function Ieee754Converter({
             className={cn('tab h-11', mode === m ? 'tab-active' : 'text-ink/80')}
             onClick={() => {
               setMode(m);
-              report(m, m === 'encode' ? encodeText : toHex(bits, 32).slice(2));
+              report(m, m === 'encode' ? encodeText : toHex(bits, width(F)).slice(2));
             }}
             data-testid={`${testId}-tab-${m}`}
           >
@@ -86,19 +109,21 @@ export function Ieee754Converter({
             report('encode', t);
           }}
           testId={testId}
+          fmt={F}
         />
       ) : (
         <DecodePanel
           bits={bits}
           onBits={(b) => {
             setBits(b);
-            report('decode', toHex(b, 32).slice(2));
+            report('decode', toHex(b, width(F)).slice(2));
           }}
           testId={testId}
+          fmt={F}
         />
       )}
       <p className="text-sm text-muted">
-        ข้อจำกัด: เครื่องมือนี้ใช้ Single Precision (32 บิต) และปัดแบบ round to nearest, ties to
+        ข้อจำกัด: เครื่องมือนี้ใช้ {F.name} ({width(F)} บิต) และปัดแบบ round to nearest, ties to
         even เท่านั้น · รับทศนิยม, scientific notation (เช่น 1.5e-7), inf และ nan · ไม่เกิน 200
         ตัวอักษร
       </p>
@@ -110,14 +135,16 @@ function EncodePanel({
   text,
   onText,
   testId,
+  fmt: F,
 }: {
   text: string;
   onText: (t: string) => void;
   testId: string;
+  fmt: FloatFormat;
 }) {
-  const r = useMemo(() => encodeDecimal(F, text), [text]);
+  const r = useMemo(() => encodeDecimal(F, text), [text, F]);
   const steps = useMemo(() => (r.ok ? r.steps : []), [r]);
-  const playerSteps = useMemo(() => toPlayerSteps(steps), [steps]);
+  const playerSteps = useMemo(() => toPlayerSteps(steps, undefined, F), [steps, F]);
   const range = steps.find((s) => s.kind === 'range');
   return (
     <div className="space-y-4">
@@ -147,14 +174,19 @@ function EncodePanel({
       </div>
       {r.ok && (
         <>
-          <Register bits={r.bits} label={`ผลลัพธ์ของ ${text.trim()}`} name={`${testId}-result`} />
+          <Register
+            bits={r.bits}
+            fmt={F}
+            label={`ผลลัพธ์ของ ${text.trim()}`}
+            name={`${testId}-result`}
+          />
           <div className="space-y-2" aria-live="polite">
             {range?.kind === 'range' && range.outcome === 'overflow' && (
               <div role="alert" className="alert alert-warning" data-testid={`${testId}-overflow`}>
                 <TriangleAlert className="h-5 w-5" aria-hidden />
                 <span>
-                  ค่านี้ใหญ่เกินกว่าที่ Single Precision เก็บได้ (ค่าจำกัดที่มากที่สุดประมาณ{' '}
-                  <Num value={shortestDecimal(F, MAX_FINITE)} />) จึงกลายเป็น ∞
+                  ค่านี้ใหญ่เกินกว่าที่ {F.name} เก็บได้ (ค่าจำกัดที่มากที่สุดประมาณ{' '}
+                  <Num value={shortestDecimal(F, maxFinite(F))} />) จึงกลายเป็น ∞
                 </span>
               </div>
             )}
@@ -162,7 +194,8 @@ function EncodePanel({
               <div className="alert alert-info">
                 <Info className="h-5 w-5" aria-hidden />
                 <span>
-                  ค่านี้เล็กมาก (น้อยกว่า 2⁻¹²⁶) จึงเก็บแบบ Subnormal ซึ่งมีความละเอียดน้อยลง
+                  ค่านี้เล็กมาก (น้อยกว่า 2<sup>{emin(F)}</sup>) จึงเก็บแบบ Subnormal
+                  ซึ่งมีความละเอียดน้อยลง
                 </span>
               </div>
             )}
@@ -217,11 +250,11 @@ function EncodePanel({
           <FieldLegend fields={['sign', 'exp', 'frac', 'hidden', 'grs']} />
           <StepPlayer
             steps={playerSteps}
-            flow={FLOWS.encode}
+            flow={flows(F).encode}
             label={`ขั้นตอนการแปลง ${text.trim()} เป็น IEEE 754`}
             minHeight="18rem"
             testId={`${testId}-player`}
-            render={(i) => <StepView step={steps[i]} />}
+            render={(i) => <StepView step={steps[i]} fmt={F} />}
           />
         </>
       )}
@@ -232,34 +265,37 @@ function EncodePanel({
 const BITS_MSG = (e: BitParseError): string => {
   if (e.kind === 'empty') return 'bits-empty';
   if (e.kind === 'invalid-char') return 'bits-char';
-  return `ต้องมีครบ 32 บิต แต่ตอนนี้มี ${e.got} บิต`;
+  return `ต้องมีครบ ${e.expected} บิต แต่ตอนนี้มี ${e.got} บิต`;
 };
 const HEX_MSG = (e: BitParseError): string => {
   if (e.kind === 'empty') return 'empty';
   if (e.kind === 'invalid-char') return 'hex-char';
-  return `ต้องมี 8 หลักพอดี แต่ตอนนี้มี ${e.got} หลัก`;
+  return `ต้องมี ${e.expected} หลักพอดี แต่ตอนนี้มี ${e.got} หลัก`;
 };
 
 function DecodePanel({
   bits,
   onBits,
   testId,
+  fmt: F,
 }: {
   bits: bigint;
   onBits: (b: bigint) => void;
   testId: string;
+  fmt: FloatFormat;
 }) {
-  const [bitText, setBitText] = useState(toBinaryString(bits, 32));
-  const [hexText, setHexText] = useState(toHex(bits, 32).slice(2));
+  const W = width(F);
+  const [bitText, setBitText] = useState(toBinaryString(bits, W));
+  const [hexText, setHexText] = useState(toHex(bits, W).slice(2));
   const [bitErr, setBitErr] = useState<string | null>(null);
   const [hexErr, setHexErr] = useState<string | null>(null);
-  const d = useMemo(() => decodeWithSteps(F, bits), [bits]);
-  const playerSteps = useMemo(() => toPlayerSteps(d.steps), [d]);
+  const d = useMemo(() => decodeWithSteps(F, bits), [bits, F]);
+  const playerSteps = useMemo(() => toPlayerSteps(d.steps, undefined, F), [d, F]);
 
   const apply = (b: bigint, from: 'bits' | 'hex' | 'toggle') => {
     onBits(b);
-    if (from !== 'bits') setBitText(toBinaryString(b, 32));
-    if (from !== 'hex') setHexText(toHex(b, 32).slice(2));
+    if (from !== 'bits') setBitText(toBinaryString(b, W));
+    if (from !== 'hex') setHexText(toHex(b, W).slice(2));
     setBitErr(null);
     setHexErr(null);
   };
@@ -270,13 +306,14 @@ function DecodePanel({
         <p className="mb-2 text-sm">กดที่บิตเพื่อสลับ 0/1 หรือพิมพ์บิต/hex ด้านล่าง</p>
         <Register
           bits={bits}
+          fmt={F}
           mode="edit"
-          onToggle={(i) => apply(bits ^ (1n << BigInt(31 - i)), 'toggle')}
+          onToggle={(i) => apply(bits ^ (1n << BigInt(W - 1 - i)), 'toggle')}
           name={`${testId}-edit`}
         />
         <div className="mt-3 grid gap-3 sm:grid-cols-[2fr_1fr]">
           <OperandInput
-            label="บิต 32 ตัว (เว้นวรรคหรือขีดคั่นได้)"
+            label={`บิต ${W} ตัว (เว้นวรรคหรือขีดคั่นได้)`}
             value={bitText}
             onChange={(v) => {
               setBitText(v);
@@ -288,7 +325,7 @@ function DecodePanel({
             testId={`${testId}-bits`}
           />
           <OperandInput
-            label="หรือ hex 8 หลัก"
+            label={`หรือ hex ${hexDigits(F)} หลัก`}
             value={hexText}
             onChange={(v) => {
               setHexText(v);
@@ -301,17 +338,17 @@ function DecodePanel({
           />
         </div>
         <ul className="mt-2 flex flex-wrap gap-1.5">
-          {DECODE_EXAMPLES.map((e) => {
-            const b = encodeBits(F, e.source)!;
+          {decodePicks(F).map((e) => {
+            const b = e.bits;
             return (
-              <li key={e.id}>
+              <li key={e.note}>
                 <button
                   type="button"
                   className="btn h-11 min-h-11 bg-white/80 btn-ghost font-mono font-normal ring-1 ring-line btn-sm"
                   onClick={() => apply(b, 'toggle')}
                   title={e.note}
                 >
-                  {toHex(b, 32)}
+                  {toHex(b, W)}
                 </button>
               </li>
             );
@@ -326,11 +363,11 @@ function DecodePanel({
       </p>
       <StepPlayer
         steps={playerSteps}
-        flow={FLOWS.decode}
+        flow={flows(F).decode}
         label="ขั้นตอนการถอดรหัส IEEE 754"
         minHeight="14rem"
         testId={`${testId}-dplayer`}
-        render={(i) => <StepView step={d.steps[i]} bits={bits} />}
+        render={(i) => <StepView step={d.steps[i]} bits={bits} fmt={F} />}
       />
     </div>
   );

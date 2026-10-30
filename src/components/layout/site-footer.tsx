@@ -1,4 +1,4 @@
-import { FolderGit2 } from 'lucide-react';
+import { ChartColumn, FolderGit2 } from 'lucide-react';
 import Link from 'next/link';
 import { CHAPTERS, LAB } from '@/content/chapters';
 import { site } from '@/lib/site';
@@ -67,6 +67,24 @@ export function SiteFooter() {
               </a>
             </div>
           </div>
+        </div>
+        <div className="mt-6 flex flex-col gap-3 border-t border-line/70 pt-4 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            {site.name} · สื่อการสอนวิชา {site.course}
+          </p>
+          <p
+            className="inline-flex items-center gap-2 self-start rounded-full bg-white/80 py-1.5 pr-3 pl-1.5 ring-1 ring-line sm:self-auto"
+            data-testid="analytics-badge"
+          >
+            <span className="grid h-6 w-6 place-items-center rounded-full bg-primary/10 text-primary">
+              <ChartColumn className="h-3.5 w-3.5" aria-hidden />
+            </span>
+            <span>
+              นับผู้เข้าชมด้วย{' '}
+              <span className="font-semibold text-ink/80">Vercel Web Analytics</span> · ไม่ใช้
+              cookie เก็บเฉพาะข้อมูลแบบไม่ระบุตัวตน
+            </span>
+          </p>
         </div>
       </div>
     </footer>

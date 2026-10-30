@@ -1,7 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { type KeyboardEvent, useRef, useState } from 'react';
+import { type CSSProperties, type KeyboardEvent, useRef, useState } from 'react';
 import { BINARY32, type FloatFormat, bitMeaning, toBinaryString, toHex, width } from '@/lib/fp';
 import { fmt } from '@/lib/display';
 import { cn } from '@/lib/utils';
@@ -103,8 +103,20 @@ export function Register({
         <span className="ml-1 font-normal text-muted">{to - from} บิต</span>
       </span>
       <div
-        className={cn(edit ? 'flex flex-wrap gap-1' : 'grid gap-px sm:gap-0.5')}
-        style={edit ? undefined : { gridTemplateColumns: `repeat(${to - from}, minmax(0, 1fr))` }}
+        className={cn(
+          edit
+            ? 'flex flex-wrap gap-1'
+            : 'grid grid-cols-[repeat(var(--cols-sm),minmax(0,1fr))] gap-px sm:gap-0.5 lg:grid-cols-[repeat(var(--cols),minmax(0,1fr))]',
+        )}
+        style={
+          edit
+            ? undefined
+            : // very long fields (binary64 fraction: 52 bits) use two rows below lg
+              ({
+                '--cols': to - from,
+                '--cols-sm': to - from > 26 ? Math.ceil((to - from) / 2) : to - from,
+              } as CSSProperties)
+        }
       >
         {Array.from({ length: to - from }, (_, k) => cell(from + k))}
       </div>

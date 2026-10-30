@@ -15,8 +15,13 @@
 | 8 พร้อม deploy | production build ผ่าน, ไม่มี secret, security headers ครบ, README + DEPLOY.md |
 | 9 Review 3 รอบ | ใช้งานจริง / ความสวย / ความถูกต้อง — สิ่งที่เจอและแก้อยู่ใน `docs/REVIEW.md` |
 
-### ยังไม่ได้ทำ / ข้อจำกัด
-- **binary16 / binary64 ใน Lab (Q7)** และ **โหมดนำเสนอ (Q8)** เป็นงาน stretch ที่ยังไม่ทำ — engine รองรับ binary16/binary64 แล้ว (มี test) แต่ UI ยังเป็น 32 บิต
+### เพิ่มหลังได้คำตอบคำถาม (31 ต.ค. 2569)
+- Pisit deploy แล้วที่ https://comkrub.mypisit.com → แก้ `siteUrl` ให้ตรง (OG image, sitemap, robots)
+- **Q7** Lab เลือก Half (16) / Single (32) / Double (64) บิตได้ และอยู่ในลิงก์แชร์ (`?fmt=b16`, `?fmt=b64`) · ตรวจกับ oracle จริงทั้งสอง format ก่อนเปิดใช้
+- **Q8** โหมดนำเสนอในทุก StepPlayer: เต็มจอ ตัวใหญ่ ← → Space ใช้ได้ทั้งหน้า Esc ออก
+- **Q9** Vercel Web Analytics + ป้ายมุมขวาล่างของ footer — **ต้องกด Enable ที่แท็บ Analytics ของโปรเจกต์บน Vercel หนึ่งครั้ง** (ขั้นตอนใน DEPLOY.md)
+
+### ข้อจำกัด
 - แถบควบคุม StepPlayer บนมือถือเป็น sticky ล่างจอ จึงบังท้ายภาพของขั้นที่ยาวจนกว่าจะเลื่อนลง (ตั้งใจให้กด "ถัดไป" ได้ตลอด)
 - ไฮไลต์ "บิตที่เกี่ยวข้องกับขั้นนี้" (FR-07) ทำที่ register ผลลัพธ์, G/R/S, และแถวที่โผล่ใหม่ ส่วนแถวเลขฐานสองยาว ๆ ในแต่ละขั้นใช้สีตามบทบาท (hidden/fraction/GRS) แทนการไฮไลต์รายบิต
 - คูณ/หารแสดงขั้นตรวจช่วงก่อนปัดเศษ (requirement เรียงปัดก่อน) ผลทุกบิตถูกต้องเหมือนกัน (Q12)
@@ -53,40 +58,19 @@
 ฉบับภาษาไทยทั้ง 2 ไฟล์มีเกณฑ์ตรงกับฉบับอังกฤษ (ไม่พบส่วนที่ขัดกัน)
 
 ## 3. ผล test ล่าสุด (30 ต.ค. 2569)
-- `npm test`: **160 ผ่าน** (6 ไฟล์ engine + url-state)
+- `npm test`: **172 ผ่าน** (engine 7 ไฟล์รวม oracle binary16/binary64 + url-state)
 - `npm run test:long`: **1,008,000 กรณีผ่าน** (~7 วินาที)
 - coverage `src/lib/fp/**`: statements **99.1%** · branches **98.7%** · functions **98%** · lines **99.7%**
-- `npm run test:e2e` (production build): **65 ผ่าน, 1 ข้าม** (ทดสอบ clipboard เฉพาะ Chromium) บน pixel7 + iphone13 + desktop รวม axe (ไม่มี serious/critical) และไม่มี console error ทุกหน้า
+- `npm run test:e2e` (production build): **71 ผ่าน, 1 ข้าม** (ทดสอบ clipboard เฉพาะ Chromium) บน pixel7 + iphone13 + desktop รวม axe (ไม่มี serious/critical) และไม่มี console error ทุกหน้า
 - ไม่มีหน้าไหนล้นแนวนอนที่ 360/390/430/768/1280/1920 ทั้ง Chromium และ WebKit
 - Lighthouse มือถือ: หน้าแรก 93/98/100/100 · บทที่ 4 99/100/100/100 · บทที่ 5 99/100/100/100 (Performance/Accessibility/Best Practices/SEO; หน้าแรกแก้ heading-order หลังวัดแล้ว)
 - `npm run build`: ทุก route static (○)
 
 screenshot สำคัญ (อยู่ในเครื่อง, `test-results/` ไม่ถูก commit): `test-results/shots/home-1280.png`, `home-390-top.png`, `player-390.png`, `player-1280.png`, `ch3-conv-390.png`, `ch4-round-390.png`, `og.png`, `test-results/review/r1-lab-1920.png`, `r2-ch4-1920.png`, `r2-ch5-360-webkit.png` · ถ่ายใหม่ได้ด้วย `npm run shots`
 
-## 4. คำถามทั้งหมด (เรียงตามความสำคัญ)
-
-ไม่มีข้อด่วน ทุกข้อทำงานต่อด้วยค่าที่สมมติไว้แล้ว รายละเอียดเต็มใน `docs/QUESTIONS.md`
-
-**ยืนยันค่าเริ่มต้น**
-| # | คำถาม | ค่าที่ใช้อยู่ |
-|---|---|---|
-| Q11 | ชื่อผู้จัดทำคนที่ 4 สะกด "ณัฐิวุฒิ" (ที่ Pisit แก้ใน site.ts) หรือ "ณัฐวุฒิ" (ใน PLAN.md) | ณัฐิวุฒิ ตาม site.ts |
-| Q12 | คูณ/หารแสดง "ตรวจช่วง" ก่อน "ปัดเศษ" (requirement เรียงกลับกัน) อาจารย์รับได้ไหม | ตรวจช่วงก่อนปัด |
-| Q3 | บทที่ 5 อธิบายกรณีพิเศษเต็ม บทที่ 3–4 แสดงแบบสั้น ตรงที่อาจารย์ต้องการไหม | ตามนั้น |
-| Q5 | ภาษาไทยอย่างเดียวพอไหม | ไทยอย่างเดียว |
-
-**ไม่ด่วน**
-| # | คำถาม | ค่าที่ใช้อยู่ |
-|---|---|---|
-| Q4 | ใช้ `*.vercel.app` หรือ domain เอง | ตอบแล้ว: https://comkrub.mypisit.com (แก้ `siteUrl` แล้ว) |
-| Q7 | อยากได้ binary16/binary64 ใน Lab ไหม | ยังไม่ทำ |
-| Q8 | อยากได้โหมดนำเสนอไหม | ยังไม่ทำ (ใช้คีย์บอร์ดใน player + ซูม browser ได้ จอ ≥1536px ขยายตัวอักษรให้อัตโนมัติ) |
-| Q9 | ใส่ Vercel Web Analytics ไหม | ไม่ใส่ |
-| Q10 | ใส่รหัสวิชาและชื่อภาค/มหาวิทยาลัยใน footer ไหม | ยังไม่ใส่ |
-
-**ตอบแล้ว**: Q1 ชื่อเว็บ Binary Lab · Q2 เครดิตผู้จัดทำ · Q6 ลบ prototype เก่า
+## 4. คำถามทั้งหมด
+ตอบครบทุกข้อแล้ว (31 ต.ค. 2569) รายละเอียดใน `docs/QUESTIONS.md`: Q1 Binary Lab · Q2/Q11 เครดิต (ณัฐิวุฒิ ตามที่ Pisit แก้) · Q3 โอเค · Q4 comkrub.mypisit.com · Q5 ไทยอย่างเดียว · Q6 ลบ prototype · Q7 เพิ่ม 16/64 บิตแล้ว · Q8 ทำโหมดนำเสนอแล้ว · Q9 ใส่ Analytics แล้ว · Q10 ไม่ใส่ · Q12 ตรวจช่วงก่อนปัดโอเค
 
 ## 5. ขั้นต่อไปของ Pisit
-1. ตอบคำถามข้างบน (โดยเฉพาะ Q11 ชื่อ และ Q4 URL) แล้วบอกใน session เดิมให้แก้ตามคำตอบ
-2. deploy ตาม `docs/DEPLOY.md` (Import repo บน Vercel แล้วกด Deploy ไม่ต้องตั้งค่าอะไร) จากนั้นแก้ `siteUrl` ให้ตรง URL จริงถ้าไม่ใช่ `binary-lab.vercel.app`
-3. ทดสอบบน iPhone และ Android จริงตาม checklist ในข้อ 5 ของ DEPLOY.md
+1. เปิด Web Analytics ที่ Vercel (Project → Analytics → Enable แล้ว Redeploy หนึ่งครั้ง)
+2. ทดสอบบน iPhone และ Android จริงตาม checklist ในข้อ 5 ของ DEPLOY.md รวมปุ่ม "นำเสนอ" บนจอโปรเจกเตอร์

@@ -7,12 +7,13 @@ import { BitCell } from '@/components/bits/bit-cell';
 import { FIELD_STYLE } from '@/components/bits/field-style';
 import { Register } from '@/components/bits/register';
 import { usePlayerMotion } from '@/components/player/player-speed';
-import { Num, Pow } from '@/components/ui/num';
+import { Num, Pow, minus } from '@/components/ui/num';
 import { CLASS_TEXT } from '@/content/step-text';
 import { bin8, fixedPoint, fmt as fmtR } from '@/lib/display';
 import {
   type FloatFormat,
   type StepOf,
+  bias,
   emin,
   exactDecimal,
   groupNibbles,
@@ -90,7 +91,7 @@ export function IntBinaryView({ step }: { step: StepOf<'int-binary'> }) {
   );
 }
 
-export function FracBinaryView({ step }: { step: StepOf<'frac-binary'> }) {
+export function FracBinaryView({ step, fmt }: { step: StepOf<'frac-binary'>; fmt: FloatFormat }) {
   const { d } = usePlayerMotion();
   const [all, setAll] = useShowAll();
   if (step.fracPart.num === 0n) {
@@ -153,7 +154,7 @@ export function FracBinaryView({ step }: { step: StepOf<'frac-binary'> }) {
         <p>
           {step.terminated
             ? 'เศษกลายเป็น 0 แล้ว แปลงได้พอดี'
-            : 'เศษยังไม่เป็น 0 (ค่านี้ในฐานสองไม่จบ) หยุดเมื่อได้บิตพอสำหรับ Fraction 23 บิต + Guard, Round, Sticky'}
+            : `เศษยังไม่เป็น 0 (ค่านี้ในฐานสองไม่จบ) หยุดเมื่อได้บิตพอสำหรับ Fraction ${fmt.fracBits} บิต + Guard, Round, Sticky`}
         </p>
       </Explain>
     </div>
@@ -218,7 +219,9 @@ export function PointView({ step, fmt }: { step: StepOf<'point'>; fmt: FloatForm
               data-testid="point-done"
             >
               <CheckCircle2 className="h-4 w-4" aria-hidden />
-              {step.subnormal ? 'ได้แล้ว (ใช้ Exponent ต่ำสุด −126)' : 'ได้รูป 1.xxx แล้ว'}
+              {step.subnormal
+                ? `ได้แล้ว (ใช้ Exponent ต่ำสุด ${minus(String(emin(fmt)))})`
+                : 'ได้รูป 1.xxx แล้ว'}
             </span>
           )}
         </div>
@@ -296,8 +299,8 @@ export function BiasView({ step, fmt }: { step: StepOf<'exponent'>; fmt: FloatFo
           </p>
           {sub && (
             <p>
-              เป็น Subnormal จึงเก็บ Exponent field เป็น 0 ทั้งหมด (หมายถึง Exponent −126 และไม่มี
-              hidden bit)
+              เป็น Subnormal จึงเก็บ Exponent field เป็น 0 ทั้งหมด (หมายถึง Exponent{' '}
+              {minus(String(emin(fmt)))} และไม่มี hidden bit)
             </p>
           )}
         </Explain>
@@ -314,8 +317,10 @@ export function BiasView({ step, fmt }: { step: StepOf<'exponent'>; fmt: FloatFo
       </Box>
       <Explain>
         <p>
-          Exponent จริง = ค่าใน field Exponent − 127
-          {step.ea === 1 && step.result === emin(fmt) ? ' (Subnormal ใช้ 1 − 127 = −126 เสมอ)' : ''}
+          Exponent จริง = ค่าใน field Exponent − {step.bias}
+          {step.ea === 1 && step.result === emin(fmt)
+            ? ` (Subnormal ใช้ 1 − ${step.bias} = ${minus(String(emin(fmt)))} เสมอ)`
+            : ''}
         </p>
       </Explain>
     </div>
@@ -384,15 +389,20 @@ export function FieldsView({ step, fmt }: { step: StepOf<'fields'>; fmt: FloatFo
   );
 }
 
-export function ClassifyView({ step }: { step: StepOf<'classify'> }) {
+export function ClassifyView({ step, fmt }: { step: StepOf<'classify'>; fmt: FloatFormat }) {
   const rows = [
     { cls: 'zero', exp: '0', frac: '= 0', meaning: '±0' },
-    { cls: 'subnormal', exp: '0', frac: '≠ 0', meaning: 'Subnormal: 0.Fraction × 2⁻¹²⁶' },
+    {
+      cls: 'subnormal',
+      exp: '0',
+      frac: '≠ 0',
+      meaning: `Subnormal: 0.Fraction × 2^(${minus(String(emin(fmt)))})`,
+    },
     {
       cls: 'normal',
       exp: `1–${step.expMax - 1}`,
       frac: 'อะไรก็ได้',
-      meaning: 'Normal: 1.Fraction × 2^(E−127)',
+      meaning: `Normal: 1.Fraction × 2^(E−${bias(fmt)})`,
     },
     { cls: 'infinity', exp: String(step.expMax), frac: '= 0', meaning: '±∞' },
     { cls: 'nan', exp: String(step.expMax), frac: '≠ 0', meaning: 'NaN' },

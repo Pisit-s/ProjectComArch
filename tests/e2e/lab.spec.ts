@@ -42,3 +42,44 @@ test('404 page', async ({ page }) => {
   expect(res?.status()).toBe(404);
   await expect(page.getByTestId('not-found')).toBeVisible();
 });
+
+test('lab: binary64 and binary16 formats, kept in the URL', async ({ page }) => {
+  await page.goto('/lab');
+  await page.getByTestId('example-A2').click();
+  await page.getByTestId('lab-fmt-b64').click();
+  await expect(page).toHaveURL(/fmt=b64/);
+  await expect(page.getByTestId('lab-format-note')).toContainText('binary64');
+  // the famous 0.1 + 0.2 = 0.30000000000000004 in double precision
+  await expect(page.getByTestId('sim').getByTestId('result-value')).toHaveText(
+    '0.30000000000000004',
+  );
+  await expect(page.getByTestId('sim').getByTestId('result-hex')).toHaveText('0x3FD3333333333334');
+  await page.getByTestId('lab-fmt-b16').click();
+  await expect(page.getByTestId('sim').getByTestId('result-hex')).toHaveText(/^0x[0-9A-F]{4}$/);
+  // reopening the link keeps the format
+  await page.goto('/lab?fmt=b16&tab=conv&mode=decode&hex=2E66');
+  await expect(page.getByTestId('lab-fmt-b16')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByTestId('conv-decoded')).toContainText('0.0999755859375');
+});
+
+test('presentation mode: full screen player, keys anywhere, Esc leaves', async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto('/learn/mul-div#simulator');
+  const player = page.getByTestId('sim-player');
+  await page.getByTestId('sim-player-present').click();
+  await expect(player).toHaveAttribute('data-presenting', '1');
+  const size = await page.evaluate(() => getComputedStyle(document.documentElement).fontSize);
+  expect(parseFloat(size)).toBeGreaterThanOrEqual(18);
+  // keys work even when focus moves to the page body
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+  await page.keyboard.press('ArrowRight');
+  await expect(page.getByTestId('sim-player-counter')).toHaveText(/ขั้นที่ 2\//);
+  if (!isMobile) {
+    await page.keyboard.press('Escape');
+  } else {
+    await page.getByTestId('sim-player-present').click();
+  }
+  await expect(player).not.toHaveAttribute('data-presenting', '1');
+});

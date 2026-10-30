@@ -1,9 +1,19 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Minimize2,
+  Pause,
+  Play,
+  Presentation,
+  RotateCcw,
+} from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { createPortal } from 'react-dom';
 import {
   type KeyboardEvent,
+  useState,
   type ReactNode,
   useEffect,
   useEffectEvent,
@@ -73,6 +83,8 @@ function StepPlayerInner({
   const reduced = useReducedMotion() ?? false;
   const titleId = useId();
   const stripRef = useRef<HTMLOListElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const [presenting, setPresenting] = useState(false);
   const step = steps[p.index];
 
   const notify = useEffectEvent((i: number) => onStepChange?.(i));
@@ -108,6 +120,45 @@ function StepPlayerInner({
     }
   };
 
+  // Presentation mode: arrow keys / Space work anywhere on the page, Esc leaves.
+  const onGlobalKey = useEffectEvent((e: globalThis.KeyboardEvent) => {
+    const t = e.target as HTMLElement | null;
+    if (t && sectionRef.current?.contains(t)) return; // the region handles its own keys
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+    if (e.key === 'Escape') setPresenting(false);
+    else if (e.key === 'ArrowRight' || e.key === 'PageDown') p.next();
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') p.prev();
+    else if (e.key === 'Home') p.restart();
+    else if (e.key === ' ') p.togglePlay();
+    else return;
+    e.preventDefault();
+  });
+  useEffect(() => {
+    if (!presenting) return;
+    const root = document.documentElement;
+    const prevFont = root.style.fontSize;
+    const prevOverflow = document.body.style.overflow;
+    // everything is rem-based: a larger root size enlarges text and bits for the back of the room
+    root.style.fontSize = 'clamp(18px, 1.35vw, 32px)';
+    document.body.style.overflow = 'hidden';
+    sectionRef.current?.focus();
+    root.requestFullscreen?.().catch(() => {});
+    const onKey = (e: globalThis.KeyboardEvent) => onGlobalKey(e);
+    // leaving browser fullscreen (Esc) also leaves presentation mode
+    const onFullscreen = () => {
+      if (!document.fullscreenElement) setPresenting(false);
+    };
+    window.addEventListener('keydown', onKey);
+    document.addEventListener('fullscreenchange', onFullscreen);
+    return () => {
+      root.style.fontSize = prevFont;
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKey);
+      document.removeEventListener('fullscreenchange', onFullscreen);
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    };
+  }, [presenting]);
+
   const activeFlow = step?.flow;
   const present = new Set(steps.map((s) => s.flow));
   const jumpToFlow = (id: string) => {
@@ -116,110 +167,129 @@ function StepPlayerInner({
   };
   const dur = reduced ? 0 : 0.28 / p.speed;
 
-  return (
-    <PlayerSpeedContext.Provider value={{ speed: p.speed, reduced }}>
-      <section
-        role="region"
-        aria-label={label}
-        aria-describedby={titleId}
-        tabIndex={0}
-        onKeyDown={onKeyDown}
-        onPointerEnter={autoPlay ? p.stop : undefined}
-        onPointerDown={autoPlay ? p.stop : undefined}
-        onFocusCapture={autoPlay ? p.stop : undefined}
-        data-testid={testId}
-        data-step={step?.id}
-        data-step-index={p.index}
-        className={cn(
-          'glass rounded-2xl bg-card p-3 ring-1 ring-foreground/10 focus-visible:outline-2 sm:p-4',
-          className,
+  const region = (
+    <section
+      ref={sectionRef}
+      data-presenting={presenting ? '1' : undefined}
+      role="region"
+      aria-label={label}
+      aria-describedby={titleId}
+      tabIndex={0}
+      onKeyDown={onKeyDown}
+      onPointerEnter={autoPlay ? p.stop : undefined}
+      onPointerDown={autoPlay ? p.stop : undefined}
+      onFocusCapture={autoPlay ? p.stop : undefined}
+      data-testid={testId}
+      data-step={step?.id}
+      data-step-index={p.index}
+      className={cn(
+        'glass rounded-2xl bg-card p-3 ring-1 ring-foreground/10 focus-visible:outline-2 sm:p-4',
+        className,
+        presenting && 'fixed inset-0 z-[70] overflow-y-auto rounded-none bg-ice-50 p-4 sm:p-8',
+      )}
+    >
+      <div className={cn(flow && 'lg:grid lg:grid-cols-[12.5rem_minmax(0,1fr)] lg:gap-4')}>
+        {flow && (
+          <Flowchart
+            nodes={flow}
+            active={activeFlow}
+            present={present}
+            onJump={jumpToFlow}
+            testId={`${testId}-flow`}
+          />
         )}
-      >
-        <div className={cn(flow && 'lg:grid lg:grid-cols-[12.5rem_minmax(0,1fr)] lg:gap-4')}>
-          {flow && (
-            <Flowchart
-              nodes={flow}
-              active={activeFlow}
-              present={present}
-              onJump={jumpToFlow}
-              testId={`${testId}-flow`}
-            />
-          )}
-          <div className="min-w-0">
-            {!compact && (
-              <ol
-                ref={stripRef}
-                className="scroll-x steps mb-2 w-full pb-1 text-xs"
-                aria-label="ขั้นตอนทั้งหมด"
-              >
-                {steps.map((s, i) => (
-                  <li
-                    key={s.id}
-                    className={cn('step min-w-[4.75rem]', i <= p.index && 'step-primary')}
-                    data-content={i + 1}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => p.go(i)}
-                      aria-current={i === p.index ? 'step' : undefined}
-                      aria-label={`ไปขั้นที่ ${i + 1}: ${s.title}`}
-                      className={cn(
-                        'line-clamp-2 rounded px-1 leading-snug',
-                        i === p.index ? 'font-semibold text-ink' : 'text-muted hover:text-ink',
-                      )}
-                    >
-                      {s.title}
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            )}
-
-            <h3
-              id={titleId}
-              className="flex items-baseline gap-2 font-display text-lg font-semibold"
+        <div className="min-w-0">
+          {!compact && (
+            <ol
+              ref={stripRef}
+              className="scroll-x steps mb-2 w-full pb-1 text-xs"
+              aria-label="ขั้นตอนทั้งหมด"
             >
-              <span className="num font-mono text-sm text-primary">
-                {p.index + 1}/{steps.length}
-              </span>
-              <span data-testid={`${testId}-title`}>{step?.title}</span>
-            </h3>
-            <p className="sr-only" aria-live="polite">
-              ขั้นที่ {p.index + 1} จาก {steps.length}: {step?.title}
-            </p>
-
-            <div className="relative mt-2" style={{ minHeight }}>
-              <AnimatePresence mode="wait" initial={false} custom={p.direction}>
-                <motion.div
-                  key={step?.id}
-                  custom={p.direction}
-                  initial={{ opacity: 0, x: reduced ? 0 : 24 * p.direction }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: reduced ? 0 : -16 * p.direction }}
-                  transition={{ duration: dur, ease: 'easeOut' }}
+              {steps.map((s, i) => (
+                <li
+                  key={s.id}
+                  className={cn('step min-w-[4.75rem]', i <= p.index && 'step-primary')}
+                  data-content={i + 1}
                 >
-                  {render(p.index)}
-                </motion.div>
-              </AnimatePresence>
-            </div>
+                  <button
+                    type="button"
+                    onClick={() => p.go(i)}
+                    aria-current={i === p.index ? 'step' : undefined}
+                    aria-label={`ไปขั้นที่ ${i + 1}: ${s.title}`}
+                    className={cn(
+                      'line-clamp-2 rounded px-1 leading-snug',
+                      i === p.index ? 'font-semibold text-ink' : 'text-muted hover:text-ink',
+                    )}
+                  >
+                    {s.title}
+                  </button>
+                </li>
+              ))}
+            </ol>
+          )}
+
+          <h3 id={titleId} className="flex items-baseline gap-2 font-display text-lg font-semibold">
+            <span className="num font-mono text-sm text-primary">
+              {p.index + 1}/{steps.length}
+            </span>
+            <span data-testid={`${testId}-title`}>{step?.title}</span>
+          </h3>
+          <p className="sr-only" aria-live="polite">
+            ขั้นที่ {p.index + 1} จาก {steps.length}: {step?.title}
+          </p>
+
+          <div className="relative mt-2" style={{ minHeight }}>
+            <AnimatePresence mode="wait" initial={false} custom={p.direction}>
+              <motion.div
+                key={step?.id}
+                custom={p.direction}
+                initial={{ opacity: 0, x: reduced ? 0 : 24 * p.direction }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: reduced ? 0 : -16 * p.direction }}
+                transition={{ duration: dur, ease: 'easeOut' }}
+              >
+                {render(p.index)}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
+      </div>
 
-        <Controls
-          index={p.index}
-          count={steps.length}
-          playing={p.playing}
-          speed={p.speed}
-          onPrev={p.prev}
-          onNext={p.next}
-          onToggle={p.togglePlay}
-          onRestart={p.restart}
-          onSpeed={(s) => {
-            p.setSpeed(s);
-          }}
-          testId={testId}
-        />
-      </section>
+      <Controls
+        index={p.index}
+        count={steps.length}
+        playing={p.playing}
+        speed={p.speed}
+        onPrev={p.prev}
+        onNext={p.next}
+        onToggle={p.togglePlay}
+        onRestart={p.restart}
+        onSpeed={(s) => {
+          p.setSpeed(s);
+        }}
+        presenting={presenting}
+        onPresent={() => setPresenting((x) => !x)}
+        testId={testId}
+      />
+    </section>
+  );
+
+  return (
+    <PlayerSpeedContext.Provider value={{ speed: p.speed, reduced }}>
+      {/* presentation mode leaves the glass cards: backdrop-filter would trap position: fixed */}
+      {presenting ? (
+        <>
+          <div
+            className="glass grid min-h-40 place-items-center rounded-2xl bg-card p-4 text-muted ring-1 ring-foreground/10"
+            aria-hidden
+          >
+            กำลังแสดงในโหมดนำเสนอ (กด Esc เพื่อออก)
+          </div>
+          {createPortal(region, document.body)}
+        </>
+      ) : (
+        region
+      )}
     </PlayerSpeedContext.Provider>
   );
 }
@@ -234,6 +304,8 @@ function Controls({
   onToggle,
   onRestart,
   onSpeed,
+  presenting,
+  onPresent,
   testId,
 }: {
   index: number;
@@ -245,6 +317,8 @@ function Controls({
   onToggle: () => void;
   onRestart: () => void;
   onSpeed: (s: Speed) => void;
+  presenting: boolean;
+  onPresent: () => void;
   testId: string;
 }) {
   return (
@@ -294,6 +368,21 @@ function Controls({
         data-testid={`${testId}-restart`}
       >
         <RotateCcw className="h-5 w-5" aria-hidden />
+      </button>
+      <button
+        type="button"
+        className={cn('btn h-11 min-h-11 gap-1.5 px-3', presenting ? 'btn-primary' : 'btn-ghost')}
+        onClick={onPresent}
+        aria-pressed={presenting}
+        aria-label={presenting ? 'ออกจากโหมดนำเสนอ' : 'โหมดนำเสนอ (เต็มจอ ตัวใหญ่)'}
+        data-testid={`${testId}-present`}
+      >
+        {presenting ? (
+          <Minimize2 className="h-5 w-5" aria-hidden />
+        ) : (
+          <Presentation className="h-5 w-5" aria-hidden />
+        )}
+        <span className="hidden sm:inline">{presenting ? 'ออก' : 'นำเสนอ'}</span>
       </button>
       <label className="flex items-center gap-1.5 text-sm text-muted">
         <span className="sr-only sm:not-sr-only">ความเร็ว</span>

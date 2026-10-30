@@ -48,3 +48,9 @@
 - `npm run build` ผ่าน ทุก route static (13 รายการรวม icon, OG image, sitemap, robots)
 - grep หา hex/บิตที่พิมพ์เองใน `src/app`, `src/content`, `src/components`: เหลือแค่ค่าเริ่มต้นของเครื่องมือและ input ของตัวอย่าง I1–I3 (ไม่ใช่ค่าที่เก็บจริงของ float) · ช่วงค่า 8 บิตในบทที่ 1 เปลี่ยนเป็น render จาก helper แล้ว
 - ยังไม่ได้ทำ: ไล่อ่านเนื้อหาทุกบทเทียบ requirement อีกรอบแบบละเอียด (ทำตอนเขียน FINAL_REPORT)
+
+## หลังได้คำตอบคำถาม (Q7 / Q8 / Q9)
+- **Half / Single / Double ใน Lab**: ก่อนเปิดให้ใช้ เพิ่ม oracle test — binary64 เทียบกับ double ของ JS ตรง ๆ และ binary16 เทียบกับ `Math.f16round` (ปัดสองครั้งปลอดภัยเพราะ 53 ≥ 2·11 + 2) ผ่านทั้ง 4 operation · ข้อความทุกขั้นเปลี่ยนตาม format (Bias, จำนวนบิต, Exponent ต่ำสุด) · register 64 บิตบนมือถือแบ่ง Fraction 52 บิตเป็น 2 แถว · ตัวอย่างใน e2e: Double ได้ 0.1 + 0.2 = 0.30000000000000004 (`0x3FD3333333333334`)
+- **โหมดนำเสนอ**: ปุ่ม "นำเสนอ" ในแถบควบคุมทุก player → เต็มจอ (ถ้า browser รองรับ) ตัวอักษรใหญ่ขึ้น ← → Space Home ใช้ได้ทั้งหน้า Esc ออก · เจอแล้วแก้: overlay แบบ `fixed` ถูกขังอยู่ในการ์ดกระจก (backdrop-filter สร้าง containing block ใหม่) หน้าเดิมจึงโผล่ที่ขอบล่าง → render ผ่าน portal ไปที่ `<body>` และเว้นช่องแทนที่ไว้ในหน้า
+- **Web Analytics**: โหลดเฉพาะบน Vercel (ในเครื่อง/e2e ไม่ยิง script ที่ไม่มี จึงไม่มี console error) · ป้ายมุมขวาล่างของ footer เขียนตาม docs ของ Vercel ว่าไม่ใช้ cookie และเก็บข้อมูลแบบไม่ระบุตัวตน
+- test: unit 172 ผ่าน · e2e 71 ผ่าน + 1 ข้าม บน pixel7 + iphone13 + desktop

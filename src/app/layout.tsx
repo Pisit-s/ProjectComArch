@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata, Viewport } from 'next';
 import { Chakra_Petch, IBM_Plex_Sans_Thai, JetBrains_Mono } from 'next/font/google';
 import { GlassPointer } from '@/components/glass/glass-pointer';
@@ -75,6 +76,8 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           </main>
           <SiteFooter />
         </MotionProvider>
+        {/* only on Vercel builds: elsewhere the /_vercel/insights script does not exist */}
+        {process.env.VERCEL === '1' && <Analytics />}
       </body>
     </html>
   );

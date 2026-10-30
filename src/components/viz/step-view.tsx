@@ -74,12 +74,12 @@ export function StepView({ step, fmt = BINARY32, op, bits }: { step: Step } & Ct
             <Explain>
               {step.mode === 'add-bias' ? (
                 <p>
-                  Biased exponent แต่ละตัวมี +127 อยู่แล้ว ถ้าบวกกันตรง ๆ จะได้ Bias ซ้ำ 2 ครั้ง
-                  จึงต้องลบ 127 ออกหนึ่งครั้ง
+                  Biased exponent แต่ละตัวมี +{step.bias} อยู่แล้ว ถ้าบวกกันตรง ๆ จะได้ Bias ซ้ำ 2
+                  ครั้ง จึงต้องลบ {step.bias} ออกหนึ่งครั้ง
                 </p>
               ) : (
                 <p>
-                  ลบ Biased exponent สองตัวแล้ว Bias หักล้างกันหายไปหมด จึงต้องบวก 127
+                  ลบ Biased exponent สองตัวแล้ว Bias หักล้างกันหายไปหมด จึงต้องบวก {step.bias}
                   กลับหนึ่งครั้ง
                 </p>
               )}
@@ -95,11 +95,11 @@ export function StepView({ step, fmt = BINARY32, op, bits }: { step: Step } & Ct
     case 'sig-mul':
       return <PartialProductsView step={step} />;
     case 'sig-div':
-      return <LongDivisionView step={step} />;
+      return <LongDivisionView step={step} fmt={fmt} />;
     case 'normalize':
-      return <NormalizeView step={step} op={opKind} />;
+      return <NormalizeView step={step} op={opKind} fmt={fmt} />;
     case 'range':
-      return <RangeGauge step={step} />;
+      return <RangeGauge step={step} fmt={fmt} />;
     case 'round':
       return <RoundGRS step={step} fmt={fmt} />;
     case 'encode':
@@ -107,13 +107,13 @@ export function StepView({ step, fmt = BINARY32, op, bits }: { step: Step } & Ct
     case 'int-binary':
       return <IntBinaryView step={step} />;
     case 'frac-binary':
-      return <FracBinaryView step={step} />;
+      return <FracBinaryView step={step} fmt={fmt} />;
     case 'point':
       return <PointView step={step} fmt={fmt} />;
     case 'fields':
       return <FieldsView step={step} fmt={fmt} />;
     case 'classify':
-      return <ClassifyView step={step} />;
+      return <ClassifyView step={step} fmt={fmt} />;
     case 'significand':
       return <SignificandView step={step} />;
     case 'value':
@@ -173,7 +173,8 @@ function DecodeOperandView({
             </p>
           ) : (
             <p>
-              เป็น Subnormal: hidden bit = 0 และใช้ Exponent −126 (Biased exponent 1) ในการคำนวณ
+              เป็น Subnormal: hidden bit = 0 และใช้ Exponent {minus(String(emin(fmt)))} (Biased
+              exponent 1) ในการคำนวณ
             </p>
           )}
         </Explain>

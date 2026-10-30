@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LAB_DEFAULT, parseLabQuery, toLabQuery } from '@/lib/url-state';
+import { LAB_DEFAULT, defaultHex, parseLabQuery, toLabQuery } from '@/lib/url-state';
 
 const q = (s: string) => new URLSearchParams(s);
 
@@ -24,6 +24,18 @@ describe('lab url state', () => {
     );
     expect(invalid).toEqual(['tab', 'op', 'a', 'b', 'x', 'mode', 'hex', 'step']);
     expect(state).toEqual(LAB_DEFAULT);
+  });
+  it('formats: binary16 / binary64 with matching hex length', () => {
+    const h = parseLabQuery(q('fmt=b16&tab=conv&mode=decode&hex=2e66'));
+    expect(h.invalid).toEqual([]);
+    expect(h.state).toMatchObject({ fmt: 'b16', hex: '2E66' });
+    expect(toLabQuery(h.state)).toBe('fmt=b16&tab=conv&mode=decode&hex=2E66');
+    const d = parseLabQuery(q('fmt=b64&tab=conv&mode=decode&hex=3E200000'));
+    expect(d.invalid).toEqual(['hex']);
+    expect(d.state.hex).toBe(defaultHex('b64'));
+    expect(defaultHex('b64')).toHaveLength(16);
+    expect(parseLabQuery(q('fmt=b8')).invalid).toEqual(['fmt']);
+    expect(toLabQuery(LAB_DEFAULT)).not.toContain('fmt=');
   });
   it('empty query is the default', () => {
     expect(parseLabQuery(q(''))).toEqual({ state: LAB_DEFAULT, invalid: [] });

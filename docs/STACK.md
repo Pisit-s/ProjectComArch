@@ -24,6 +24,7 @@
 | tsx | 4.23.15 | รัน `scripts/*.mts` |
 | @fontsource/chakra-petch | 5.3.0 | ฟอนต์ไทยให้ `next/og` |
 | @types/react / @types/react-dom | 19.3.0 | |
+| @vercel/analytics | 2.0.1 | เพิ่มตามคำตอบ Q9 · โหลดเฉพาะ build บน Vercel (`process.env.VERCEL === '1'`) · `npm audit --omit=dev` หลังติดตั้ง: 0 vulnerabilities |
 
 ## npm audit
 - `npm audit --omit=dev` (30 ต.ค. 2569): **found 0 vulnerabilities**

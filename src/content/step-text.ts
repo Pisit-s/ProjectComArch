@@ -1,67 +1,91 @@
 import type { FlowNode as PlayerFlowNode, PlayerStep } from '@/components/player/step-player';
-import type { Op, RangeOutcome, RoundDecision, SpecialRule, Step } from '@/lib/fp';
+import {
+  BINARY32,
+  type FloatFormat,
+  type Op,
+  type RangeOutcome,
+  type RoundDecision,
+  type SpecialRule,
+  type Step,
+  bias,
+  expFieldMax,
+  width,
+} from '@/lib/fp';
 
 /** Thai text for engine steps. The engine only produces data; every sentence lives here. */
 
 export const OP_SYMBOL: Record<Op, string> = { '+': '+', '-': '−', '*': '×', '/': '÷' };
 export const OP_NAME: Record<Op, string> = { '+': 'บวก', '-': 'ลบ', '*': 'คูณ', '/': 'หาร' };
 
-export const FLOWS: Record<'add' | 'mul' | 'div' | 'encode' | 'decode', PlayerFlowNode[]> = {
-  add: [
-    { id: 'decode', label: 'แยก Sign / Exponent / Significand' },
-    { id: 'special', label: 'ค่าพิเศษ?' },
-    { id: 'compare', label: 'เทียบ Exponent' },
-    { id: 'align', label: 'เลื่อนให้ Exponent เท่ากัน' },
-    { id: 'significand', label: 'บวก/ลบ Significand' },
-    { id: 'normalize', label: 'Normalize' },
-    { id: 'range', label: 'Overflow / Underflow?' },
-    { id: 'round', label: 'ปัดเศษ' },
-    { id: 'encode', label: 'รวมเป็น 32 บิต' },
-  ],
-  mul: [
-    { id: 'decode', label: 'แยก Sign / Exponent / Significand' },
-    { id: 'special', label: 'ค่าพิเศษ?' },
-    { id: 'sign', label: 'Sign = XOR' },
-    { id: 'exponent', label: 'EA + EB − 127' },
-    { id: 'significand', label: 'คูณ Significand' },
-    { id: 'normalize', label: 'Normalize' },
-    { id: 'range', label: 'Overflow / Underflow?' },
-    { id: 'round', label: 'ปัดเศษ + ยัง normalized?' },
-    { id: 'encode', label: 'รวมเป็น 32 บิต' },
-  ],
-  div: [
-    { id: 'decode', label: 'แยก Sign / Exponent / Significand' },
-    { id: 'special', label: 'ค่าพิเศษ?' },
-    { id: 'sign', label: 'Sign = XOR' },
-    { id: 'exponent', label: 'EA − EB + 127' },
-    { id: 'significand', label: 'หาร Significand' },
-    { id: 'normalize', label: 'Normalize' },
-    { id: 'range', label: 'Overflow / Underflow?' },
-    { id: 'round', label: 'ปัดเศษ + ยัง normalized?' },
-    { id: 'encode', label: 'รวมเป็น 32 บิต' },
-  ],
-  encode: [
-    { id: 'to-binary', label: 'แปลงเป็นฐานสอง' },
-    { id: 'normalize', label: 'Normalize' },
-    { id: 'sign', label: 'Sign' },
-    { id: 'exponent', label: 'Biased exponent' },
-    { id: 'range', label: 'อยู่ในช่วงไหม?' },
-    { id: 'round', label: 'Fraction 23 บิต + ปัดเศษ' },
-    { id: 'encode', label: 'รวมเป็น 32 บิต' },
-  ],
-  decode: [
-    { id: 'fields', label: 'แยก 3 ส่วน' },
-    { id: 'classify', label: 'ดูประเภท' },
-    { id: 'sign', label: 'Sign' },
-    { id: 'exponent', label: 'Exponent − 127' },
-    { id: 'significand', label: 'Significand' },
-    { id: 'value', label: 'คำนวณค่า' },
-  ],
+type FlowName = 'add' | 'mul' | 'div' | 'encode' | 'decode';
+
+/** Flowchart boxes of each process; numbers come from the format (binary32: bias 127, 32 bits). */
+export function flows(fmt: FloatFormat = BINARY32): Record<FlowName, PlayerFlowNode[]> {
+  const b = bias(fmt);
+  const all = `รวมเป็น ${width(fmt)} บิต`;
+  return {
+    add: [
+      { id: 'decode', label: 'แยก Sign / Exponent / Significand' },
+      { id: 'special', label: 'ค่าพิเศษ?' },
+      { id: 'compare', label: 'เทียบ Exponent' },
+      { id: 'align', label: 'เลื่อนให้ Exponent เท่ากัน' },
+      { id: 'significand', label: 'บวก/ลบ Significand' },
+      { id: 'normalize', label: 'Normalize' },
+      { id: 'range', label: 'Overflow / Underflow?' },
+      { id: 'round', label: 'ปัดเศษ' },
+      { id: 'encode', label: all },
+    ],
+    mul: [
+      { id: 'decode', label: 'แยก Sign / Exponent / Significand' },
+      { id: 'special', label: 'ค่าพิเศษ?' },
+      { id: 'sign', label: 'Sign = XOR' },
+      { id: 'exponent', label: `EA + EB − ${b}` },
+      { id: 'significand', label: 'คูณ Significand' },
+      { id: 'normalize', label: 'Normalize' },
+      { id: 'range', label: 'Overflow / Underflow?' },
+      { id: 'round', label: 'ปัดเศษ + ยัง normalized?' },
+      { id: 'encode', label: all },
+    ],
+    div: [
+      { id: 'decode', label: 'แยก Sign / Exponent / Significand' },
+      { id: 'special', label: 'ค่าพิเศษ?' },
+      { id: 'sign', label: 'Sign = XOR' },
+      { id: 'exponent', label: `EA − EB + ${b}` },
+      { id: 'significand', label: 'หาร Significand' },
+      { id: 'normalize', label: 'Normalize' },
+      { id: 'range', label: 'Overflow / Underflow?' },
+      { id: 'round', label: 'ปัดเศษ + ยัง normalized?' },
+      { id: 'encode', label: all },
+    ],
+    encode: [
+      { id: 'to-binary', label: 'แปลงเป็นฐานสอง' },
+      { id: 'normalize', label: 'Normalize' },
+      { id: 'sign', label: 'Sign' },
+      { id: 'exponent', label: 'Biased exponent' },
+      { id: 'range', label: 'อยู่ในช่วงไหม?' },
+      { id: 'round', label: `Fraction ${fmt.fracBits} บิต + ปัดเศษ` },
+      { id: 'encode', label: all },
+    ],
+    decode: [
+      { id: 'fields', label: 'แยก 3 ส่วน' },
+      { id: 'classify', label: 'ดูประเภท' },
+      { id: 'sign', label: 'Sign' },
+      { id: 'exponent', label: `Exponent − ${b}` },
+      { id: 'significand', label: 'Significand' },
+      { id: 'value', label: 'คำนวณค่า' },
+    ],
+  };
+}
+
+/** binary32 flows used by the chapters. */
+export const FLOWS = flows();
+
+export const flowFor = (op: Op, fmt: FloatFormat = BINARY32) => {
+  const f = flows(fmt);
+  return op === '*' ? f.mul : op === '/' ? f.div : f.add;
 };
 
-export const flowFor = (op: Op) => (op === '*' ? FLOWS.mul : op === '/' ? FLOWS.div : FLOWS.add);
-
-export function stepTitle(s: Step, op?: Op): string {
+export function stepTitle(s: Step, op?: Op, fmt: FloatFormat = BINARY32): string {
   switch (s.kind) {
     case 'decode':
       return `แยกส่วนของ ${s.operand}`;
@@ -100,7 +124,7 @@ export function stepTitle(s: Step, op?: Op): string {
     case 'round':
       return 'ปัดเศษด้วย G/R/S';
     case 'encode':
-      return 'รวมเป็น 32 บิต';
+      return `รวมเป็น ${width(fmt)} บิต`;
     case 'int-binary':
       return 'ส่วนจำนวนเต็มเป็นฐานสอง';
     case 'frac-binary':
@@ -119,8 +143,8 @@ export function stepTitle(s: Step, op?: Op): string {
   return (s as Step).id;
 }
 
-export function toPlayerSteps(steps: Step[], op?: Op): PlayerStep[] {
-  return steps.map((s) => ({ id: s.id, title: stepTitle(s, op), flow: s.flow }));
+export function toPlayerSteps(steps: Step[], op?: Op, fmt: FloatFormat = BINARY32): PlayerStep[] {
+  return steps.map((s) => ({ id: s.id, title: stepTitle(s, op, fmt), flow: s.flow }));
 }
 
 export const SPECIAL_TEXT: Record<SpecialRule, { rule: string; why: string }> = {
@@ -217,14 +241,19 @@ export const ROUND_TEXT: Record<RoundDecision, { short: string; why: string }> =
   },
 };
 
-export const RANGE_TEXT: Record<RangeOutcome, string> = {
-  ok: 'Biased exponent อยู่ในช่วง 1–254 เก็บเป็นค่า normalized ได้',
-  overflow: 'Biased exponent เกิน 254 ใหญ่เกินกว่าที่เก็บได้ → Overflow ผลเป็น ±∞',
-  'underflow-subnormal':
-    'Biased exponent ต่ำกว่า 1 เล็กกว่าค่า normalized ที่เล็กที่สุด → Underflow เลื่อน Significand ไปทางขวาเพื่อเก็บเป็น Subnormal (Exponent field = 0)',
-  'underflow-zero':
-    'Biased exponent ต่ำกว่า 1 มากจนเลื่อนแล้วไม่เหลือบิตไหนเลย → Underflow ผลเป็น ±0',
-};
+export function rangeText(outcome: RangeOutcome, fmt: FloatFormat = BINARY32): string {
+  const max = expFieldMax(fmt) - 1;
+  switch (outcome) {
+    case 'ok':
+      return `Biased exponent อยู่ในช่วง 1–${max} เก็บเป็นค่า normalized ได้`;
+    case 'overflow':
+      return `Biased exponent เกิน ${max} ใหญ่เกินกว่าที่เก็บได้ → Overflow ผลเป็น ±∞`;
+    case 'underflow-subnormal':
+      return 'Biased exponent ต่ำกว่า 1 เล็กกว่าค่า normalized ที่เล็กที่สุด → Underflow เลื่อน Significand ไปทางขวาเพื่อเก็บเป็น Subnormal (Exponent field = 0)';
+    case 'underflow-zero':
+      return 'Biased exponent ต่ำกว่า 1 มากจนเลื่อนแล้วไม่เหลือบิตไหนเลย → Underflow ผลเป็น ±0';
+  }
+}
 
 export const FLAG_TEXT = {
   inexact: 'Inexact (ปัดเศษแล้วไม่ตรง)',

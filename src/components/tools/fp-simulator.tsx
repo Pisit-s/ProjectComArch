@@ -9,8 +9,8 @@ import { Num } from '@/components/ui/num';
 import { StepView } from '@/components/viz/step-view';
 import { type OpExample, SPECIAL_OPERANDS } from '@/content/examples';
 import { OP_NAME, OP_SYMBOL, flowFor, toPlayerSteps } from '@/content/step-text';
-import { fmt } from '@/lib/display';
-import { BINARY32, type Op, simulate } from '@/lib/fp';
+import { fmt as fmtR } from '@/lib/display';
+import { BINARY32, type FloatFormat, type Op, simulate } from '@/lib/fp';
 import { cn } from '@/lib/utils';
 import { OperandInput } from './operand-input';
 import { ResultCompare } from './result-compare';
@@ -31,6 +31,8 @@ type Props = {
   onChange?: (s: SimState) => void;
   onStepChange?: (stepId: string, index: number) => void;
   testId?: string;
+  /** Number format (the Lab offers binary16 / binary32 / binary64). */
+  fmt?: FloatFormat;
 };
 
 /**
@@ -46,10 +48,11 @@ export function FpSimulator({
   onChange,
   onStepChange,
   testId = 'sim',
+  fmt = BINARY32,
 }: Props) {
   const [state, setState] = useState<SimState>(initial);
   const [target, setTarget] = useState<'a' | 'b'>('a');
-  const sim = useMemo(() => simulate(BINARY32, state.op, state.a, state.b), [state]);
+  const sim = useMemo(() => simulate(fmt, state.op, state.a, state.b), [state, fmt]);
   const update = (patch: Partial<SimState>) => {
     const next = { ...state, ...patch };
     setState(next);
@@ -57,7 +60,7 @@ export function FpSimulator({
   };
 
   const steps = useMemo(() => (sim.ok ? sim.result.steps : []), [sim]);
-  const playerSteps = useMemo(() => toPlayerSteps(steps, state.op), [steps, state.op]);
+  const playerSteps = useMemo(() => toPlayerSteps(steps, state.op, fmt), [steps, state.op, fmt]);
   const expression = `${state.a} ${OP_SYMBOL[state.op]} ${state.b}`;
 
   return (
@@ -178,6 +181,7 @@ export function FpSimulator({
                 <div key={k} className="space-y-1.5">
                   <Register
                     bits={e.bits}
+                    fmt={fmt}
                     label={`${k.toUpperCase()} = ${state[k]}`}
                     name={`${testId}-reg-${k}`}
                   />
@@ -187,9 +191,7 @@ export function FpSimulator({
                       data-testid={`${testId}-${k}-overflow`}
                     >
                       <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
-                      <span>
-                        ค่านี้ใหญ่เกินกว่าที่ Single Precision เก็บได้ จึงเก็บเป็น ∞ ก่อนคำนวณ
-                      </span>
+                      <span>ค่านี้ใหญ่เกินกว่าที่ {fmt.name} เก็บได้ จึงเก็บเป็น ∞ ก่อนคำนวณ</span>
                     </p>
                   )}
                   {!e.equal && e.stored && (
@@ -199,7 +201,7 @@ export function FpSimulator({
                     >
                       <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
                       <span>
-                        เก็บได้ไม่พอดี ค่าที่เก็บจริงคือ <Num value={fmt(e.stored, 20)} />
+                        เก็บได้ไม่พอดี ค่าที่เก็บจริงคือ <Num value={fmtR(e.stored, 20)} />
                       </span>
                     </p>
                   )}
@@ -210,13 +212,13 @@ export function FpSimulator({
           <FieldLegend fields={['sign', 'exp', 'frac', 'hidden', 'grs']} />
           <StepPlayer
             steps={playerSteps}
-            flow={flowFor(state.op)}
+            flow={flowFor(state.op, fmt)}
             label={`ขั้นตอนการ${OP_NAME[state.op]} ${expression}`}
             initialStep={initialStep}
             onStepChange={(i) => onStepChange?.(steps[i]?.id ?? '', i)}
             minHeight="18rem"
             testId={`${testId}-player`}
-            render={(i) => <StepView step={steps[i]} op={state.op} />}
+            render={(i) => <StepView step={steps[i]} op={state.op} fmt={fmt} />}
           />
           <ResultCompare
             typed={sim.typed}
@@ -224,6 +226,7 @@ export function FpSimulator({
             result={sim.result}
             error={sim.error}
             expression={expression}
+            fmt={fmt}
           />
         </>
       ) : (

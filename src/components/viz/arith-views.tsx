@@ -7,7 +7,7 @@ import { usePlayerMotion } from '@/components/player/player-speed';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 import { Pow } from '@/components/ui/num';
 import { fixedPoint } from '@/lib/display';
-import type { FloatFormat, StepOf } from '@/lib/fp';
+import { type FloatFormat, type StepOf, bias, precision } from '@/lib/fp';
 import { cn } from '@/lib/utils';
 import { BitLine, MovingPoint } from './bit-line';
 import { Box, Explain } from './step-parts';
@@ -28,7 +28,7 @@ export function AlignView({ step, fmt }: { step: StepOf<'align'>; fmt: FloatForm
       <Box className="space-y-1">
         <Row label="ตัวใหญ่">
           <BitLine int={big.int} frac={big.frac} kept={F} hiddenLead intWidth={2} />
-          <Pow exp={`${step.exponent}−127`} className="ml-2 text-sm text-muted" />
+          <Pow exp={`${step.exponent}−${bias(fmt)}`} className="ml-2 text-sm text-muted" />
         </Row>
         <Row label="ตัวเล็ก (เดิม)">
           <BitLine int={orig.int} frac={orig.frac} kept={F} intWidth={2} className="opacity-60" />
@@ -42,7 +42,7 @@ export function AlignView({ step, fmt }: { step: StepOf<'align'>; fmt: FloatForm
           >
             <BitLine int={cur.int} frac={cur.frac} kept={F} intWidth={2} testId="align-current" />
           </motion.span>
-          <Pow exp={`${step.exponent}−127`} className="ml-2 text-sm text-muted" />
+          <Pow exp={`${step.exponent}−${bias(fmt)}`} className="ml-2 text-sm text-muted" />
         </Row>
       </Box>
       <div className="flex flex-wrap items-center gap-2">
@@ -236,7 +236,7 @@ export function PartialProductsView({ step }: { step: StepOf<'sig-mul'> }) {
   );
 }
 
-export function LongDivisionView({ step }: { step: StepOf<'sig-div'> }) {
+export function LongDivisionView({ step, fmt }: { step: StepOf<'sig-div'>; fmt: FloatFormat }) {
   const { d } = usePlayerMotion();
   const F = step.operandFracBits;
   const [showAll, setShowAll] = useState(false);
@@ -320,8 +320,9 @@ export function LongDivisionView({ step }: { step: StepOf<'sig-div'> }) {
           แล้วเลื่อนเศษไปทางซ้าย 1 บิตเพื่อทำรอบต่อไป
         </p>
         <p>
-          ทำ {step.rows.length} รอบ ได้ 24 บิตของ Significand + บิตสำรองสำหรับ Normalize + Guard +
-          Round ส่วนเศษที่เหลือบอก Sticky ผลหารของ Significand อยู่ในช่วง (0.5, 2)
+          ทำ {step.rows.length} รอบ ได้ {precision(fmt)} บิตของ Significand + บิตสำรองสำหรับ
+          Normalize + Guard + Round ส่วนเศษที่เหลือบอก Sticky ผลหารของ Significand อยู่ในช่วง (0.5,
+          2)
         </p>
       </Explain>
     </div>
@@ -332,9 +333,11 @@ export function LongDivisionView({ step }: { step: StepOf<'sig-div'> }) {
 export function NormalizeView({
   step,
   op,
+  fmt,
 }: {
   step: StepOf<'normalize'>;
   op: 'add' | 'mul' | 'div';
+  fmt: FloatFormat;
 }) {
   const { d, reduced } = usePlayerMotion();
   const [moved, setMoved] = useState(reduced || step.direction === 'none');
@@ -375,8 +378,8 @@ export function NormalizeView({
           <span className="text-sm text-muted">× 2</span>
           <span className="num font-mono text-sm">
             <sup>
-              <AnimatedNumber value={moved ? step.expAfter : step.expBefore} duration={d(0.4)} />
-              −127
+              <AnimatedNumber value={moved ? step.expAfter : step.expBefore} duration={d(0.4)} />−
+              {bias(fmt)}
             </sup>
           </span>
         </div>

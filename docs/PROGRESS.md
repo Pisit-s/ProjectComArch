@@ -52,7 +52,8 @@
 - [x] icon, OG image (ไทยแสดงถูก), sitemap, robots, 404, error
 - [x] Lighthouse ผ่านเป้าทั้ง 3 หน้า (REVIEW.md) · e2e ข้อ 7–10 ผ่าน · e2e รวม 65 ข้อผ่านบน pixel7 + iphone13 + desktop
 - [x] stretch: print stylesheet
-- [ ] stretch ที่ยังไม่ทำ: binary16/64 ใน Lab (Q7) · โหมดนำเสนอ (Q8) — engine รองรับ format อื่นแล้ว แต่ UI ยังผูกกับ 32 บิตหลายจุด จึงเลือกใช้เวลากับ review 3 รอบก่อน
+- [x] stretch (ทำหลังได้คำตอบ Q7/Q8): Half/Single/Double ใน Lab (`?fmt=b16|b64`, oracle binary16 `Math.f16round` + binary64 native) · โหมดนำเสนอใน StepPlayer (เต็มจอ ตัวใหญ่ ลูกศร/Space ได้ทั้งหน้า Esc ออก)
+- [x] Q9: Vercel Web Analytics + ป้ายมุมขวาล่างของ footer (Pisit ต้องกด Enable ใน Vercel ตาม DEPLOY.md)
 ## Phase 8 — พร้อม deploy
 - [x] build + start production ผ่าน · ไม่มี secret · security headers ครบ (ไม่มี X-Frame-Options ตามแผน) · DEPLOY.md + README ตรงงานล่าสุด
 ## Phase 9 — Review 3 รอบ
@@ -60,7 +61,7 @@
 - [x] ไล่อ่านเนื้อหาทุกบทเทียบ requirement แบบละเอียด · เพิ่มตัวอย่างแปลงฐานสองเป็นฐานสิบในบทที่ 1–2 (requirement ขอตัวอย่างหลายข้อ) · e2e 65 ผ่านอีกรอบ
 ## Phase 10 — รายงานสุดท้าย
 - [x] docs/FINAL_REPORT.md: สรุปตาม phase, ตาราง acceptance criteria, ผล test/coverage/Lighthouse, path screenshot, คำถามทั้งหมดเรียงตามความสำคัญ
-- งานตามแผนเสร็จครบ · ที่เหลือรอ Pisit ตอบคำถาม (docs/QUESTIONS.md) และ deploy
+- งานตามแผนเสร็จครบ · Pisit deploy แล้วที่ https://comkrub.mypisit.com และตอบคำถามครบทุกข้อแล้ว
 
 ## บันทึกการตัดสินใจ / ต่างจากแผน
 - Tailwind ใช้ `@tailwindcss/turbopack` แทน `@tailwindcss/postcss` (ค่าเริ่มต้นของ create-next-app 16.4.3)
