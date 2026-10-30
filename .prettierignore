@@ -1,0 +1,8 @@
+docs/
+floating_website_requirement/
+PLAN.md
+package-lock.json
+.next/
+coverage/
+test-results/
+playwright-report/
