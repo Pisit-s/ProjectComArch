@@ -54,8 +54,13 @@
 - [x] stretch: print stylesheet
 - [ ] stretch ที่ยังไม่ทำ: binary16/64 ใน Lab (Q7) · โหมดนำเสนอ (Q8) — engine รองรับ format อื่นแล้ว แต่ UI ยังผูกกับ 32 บิตหลายจุด จึงเลือกใช้เวลากับ review 3 รอบก่อน
 ## Phase 8 — พร้อม deploy
+- [x] build + start production ผ่าน · ไม่มี secret · security headers ครบ (ไม่มี X-Frame-Options ตามแผน) · DEPLOY.md + README ตรงงานล่าสุด
 ## Phase 9 — Review 3 รอบ
+- [x] รอบ 1 ใช้งานจริง · [x] รอบ 2 ความสวย/interface · [x] รอบ 3 ความถูกต้อง (รายละเอียดใน docs/REVIEW.md)
+- [ ] ไล่อ่านเนื้อหาทุกบทเทียบ requirement แบบละเอียดอีกครั้ง
 ## Phase 10 — รายงานสุดท้าย
+- [ ] docs/FINAL_REPORT.md: สรุปตาม phase, ตาราง acceptance criteria ครบ 4 ไฟล์, ผล test/coverage/Lighthouse, path screenshot, คำถามทั้งหมดเรียงตามความสำคัญ
+- หยุดพักตามที่ Pisit ขอ (30 ต.ค. 2569) — ทำต่อจากข้อนี้
 
 ## บันทึกการตัดสินใจ / ต่างจากแผน
 - Tailwind ใช้ `@tailwindcss/turbopack` แทน `@tailwindcss/postcss` (ค่าเริ่มต้นของ create-next-app 16.4.3)

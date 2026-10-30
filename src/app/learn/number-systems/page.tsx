@@ -10,6 +10,7 @@ import {
 import { ToolBoundary } from '@/components/tools/tool-boundary';
 import { Base, Pow } from '@/components/ui/num';
 import { chapterBySlug } from '@/content/chapters';
+import { uintMax, uintTerms, uintToBits } from '@/lib/fp';
 
 const ch = chapterBySlug('number-systems');
 export const metadata: Metadata = { title: `บทที่ 1 ${ch.title}`, description: ch.blurb };
@@ -113,11 +114,14 @@ export default function NumberSystemsPage() {
         </p>
         <ul className="list-disc space-y-1 pl-5">
           <li>
-            ค่าน้อยที่สุด: <span className="num font-mono">00000000</span> = 0
+            ค่าน้อยที่สุด: <span className="num font-mono">{uintToBits(0)}</span> = 0
           </li>
           <li>
-            ค่ามากที่สุด: <span className="num font-mono">11111111</span> = 128 + 64 + 32 + 16 + 8 +
-            4 + 2 + 1 = 255 = <Pow exp={8} /> − 1
+            ค่ามากที่สุด: <span className="num font-mono">{uintToBits(uintMax())}</span> ={' '}
+            {uintTerms(uintToBits(uintMax()))
+              .map((t) => t.weight)
+              .join(' + ')}{' '}
+            = {uintMax()} = <Pow exp={8} /> − 1
           </li>
         </ul>
         <Callout tone="tip">

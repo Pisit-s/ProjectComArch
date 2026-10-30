@@ -41,3 +41,10 @@
 - ไม่มี emoji ในทุกไฟล์ (สแกน unicode) · ไม่มีสำนวนต้องห้าม · ใช้คำ mantissa เฉพาะในคำอธิบาย Fraction ตาม PLAN.md 7.9
 - สีบิตเหมือนกันทุกบท (ใช้ `FIELD_STYLE` ตัวเดียว) · reduced motion: e2e เปลี่ยนขั้นได้ครบ
 - ข้อสังเกตที่ไม่แก้: แถบควบคุม player เป็น sticky bottom บนมือถือจึงบังท้ายภาพของขั้นที่ยาวจนกว่าจะเลื่อนลง — ตั้งใจเพื่อให้กด "ถัดไป" ได้ตลอด
+
+## Phase 9 — Review รอบ 3: ความถูกต้อง (30 ต.ค. 2569)
+- `npm test` 160 ผ่าน · `npm run test:long` 1,008,000 กรณีผ่าน (7.0 s) · coverage engine: statements 99.1% / branches 98.7% / functions 98% / lines 99.7%
+- e2e 65 ผ่าน + 1 skip (ทดสอบ clipboard เฉพาะ Chromium) บน pixel7 + iphone13 + desktop กับ production build · ไม่มี console error · axe ไม่มี serious/critical
+- `npm run build` ผ่าน ทุก route static (13 รายการรวม icon, OG image, sitemap, robots)
+- grep หา hex/บิตที่พิมพ์เองใน `src/app`, `src/content`, `src/components`: เหลือแค่ค่าเริ่มต้นของเครื่องมือและ input ของตัวอย่าง I1–I3 (ไม่ใช่ค่าที่เก็บจริงของ float) · ช่วงค่า 8 บิตในบทที่ 1 เปลี่ยนเป็น render จาก helper แล้ว
+- ยังไม่ได้ทำ: ไล่อ่านเนื้อหาทุกบทเทียบ requirement อีกรอบแบบละเอียด (ทำตอนเขียน FINAL_REPORT)
