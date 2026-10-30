@@ -1,0 +1,119 @@
+import fc from 'fast-check';
+import { describe, expect, it } from 'vitest';
+import { OPS, type Op, type Step, encodeDecimal, operate, precision, simulate } from '@/lib/fp';
+import { F32, stepOf } from './helpers';
+import { PAIR_KINDS } from './oracle-gen';
+
+const anyPair = fc.oneof(...PAIR_KINDS.map(([, arb]) => arb));
+
+function checkCommon(steps: Step[], bits: bigint): void {
+  const ids = steps.map((s) => s.id);
+  expect(new Set(ids).size).toBe(ids.length);
+  const last = steps.at(-1)!;
+  expect(last.kind).toBe('encode');
+  if (last.kind === 'encode') expect(last.bits).toBe(bits);
+}
+
+function checkOp(op: Op, a: bigint, b: bigint): boolean {
+  const r = operate(F32, op, a, b);
+  checkCommon(r.steps, r.bits);
+  for (const s of r.steps) {
+    if (s.kind === 'sig-mul') {
+      expect(s.rows.reduce((acc, row) => acc + row.value, 0n)).toBe(s.product);
+      expect(s.rows.every((row) => ((s.multiplier >> BigInt(row.bitIndex)) & 1n) === 1n)).toBe(
+        true,
+      );
+    }
+    if (s.kind === 'sig-div') {
+      const q = s.rows.reduce((acc, row) => (acc << 1n) | BigInt(row.qBit), 0n);
+      expect(q).toBe(s.quotient);
+      expect(s.quotient).toBe((s.dividend << BigInt(precision(F32) + 2)) / s.divisor);
+      expect(s.rows).toHaveLength(precision(F32) + 3);
+    }
+    if (s.kind === 'normalize' && (op === '*' || op === '/')) {
+      expect(s.amount).toBeLessThanOrEqual(1);
+      expect(s.direction).not.toBe(op === '*' ? 'left' : 'right');
+    }
+    if (s.kind === 'round' && s.decision.startsWith('tie')) {
+      expect([s.guard, s.round, s.sticky]).toEqual([1, 0, 0]);
+    }
+  }
+  return true;
+}
+
+describe('step invariants', () => {
+  for (const op of OPS) {
+    it(`op ${op}`, () => {
+      fc.assert(
+        fc.property(anyPair, ([a, b]) => checkOp(op, a, b)),
+        { numRuns: 5_000 },
+      );
+    });
+  }
+
+  it('encode steps', () => {
+    for (const text of ['5.75', '0.1', '-0', '1e-40', '3.5e38', 'nan', '123456.789', '7e-46']) {
+      const r = encodeDecimal(F32, text);
+      if (!r.ok) throw new Error(text);
+      checkCommon(r.steps, r.bits);
+    }
+  });
+
+  it('add/sub of opposite values cancels to +0', () => {
+    const r = operate(F32, '-', 0x40490fdbn, 0x40490fdbn);
+    expect(r.bits).toBe(0n);
+    expect(stepOf(r, 'sig-add').result).toBe(0n);
+  });
+
+  it('add overflow and subnormal results report a range step', () => {
+    const big = operate(F32, '+', 0x7f7fffffn, 0x7f7fffffn);
+    expect(big.bits).toBe(0x7f800000n);
+    expect(stepOf(big, 'range').outcome).toBe('overflow');
+    const tiny = operate(F32, '-', 0x00800001n, 0x00800000n);
+    expect(tiny.bits).toBe(1n);
+    expect(stepOf(tiny, 'range').outcome).toBe('underflow-subnormal');
+  });
+
+  it('special rules for add/sub', () => {
+    const rule = (op: Op, a: bigint, b: bigint) => stepOf(operate(F32, op, a, b), 'special').rule;
+    expect(rule('+', 0x7fc00000n, 1n)).toBe('nan-operand');
+    expect(rule('-', 0x7f800000n, 0x7f800000n)).toBe('inf-minus-inf');
+    expect(rule('+', 0x7f800000n, 0x7f800000n)).toBe('inf-operand');
+    expect(rule('+', 0x3f800000n, 0xff800000n)).toBe('inf-operand');
+    expect(rule('+', 0x80000000n, 0x80000000n)).toBe('zero-plus-zero');
+    expect(operate(F32, '+', 0x80000000n, 0x80000000n).bits).toBe(0x80000000n);
+    expect(operate(F32, '-', 0x80000000n, 0n).bits).toBe(0x80000000n);
+    expect(rule('+', 0n, 0x3f800000n)).toBe('add-zero');
+    expect(rule('+', 0x3f800000n, 0n)).toBe('add-zero');
+  });
+
+  it('special rules for mul/div', () => {
+    const rule = (op: Op, a: bigint, b: bigint) => stepOf(operate(F32, op, a, b), 'special').rule;
+    expect(rule('*', 0x7f800000n, 0xbf800000n)).toBe('inf-times');
+    expect(operate(F32, '*', 0x7f800000n, 0xbf800000n).bits).toBe(0xff800000n);
+    expect(rule('*', 0x7fc00001n, 0n)).toBe('nan-operand');
+    expect(rule('/', 0x7f800000n, 0xff800000n)).toBe('inf-div-inf');
+    expect(rule('/', 0xff800000n, 0x40000000n)).toBe('inf-div');
+    expect(rule('/', 0x40000000n, 0xff800000n)).toBe('div-inf');
+    expect(operate(F32, '/', 0x40000000n, 0xff800000n).bits).toBe(0x80000000n);
+    expect(rule('/', 0x80000000n, 0x40000000n)).toBe('zero-div');
+    expect(rule('/', 0x7fc00000n, 0x40000000n)).toBe('nan-operand');
+  });
+});
+
+describe('simulate', () => {
+  it('reports parse errors per operand', () => {
+    expect(simulate(F32, '+', '1,5', '2')).toEqual({
+      ok: false,
+      errorA: { kind: 'comma' },
+      errorB: null,
+    });
+    expect(simulate(F32, '/', '1', '')).toEqual({
+      ok: false,
+      errorA: null,
+      errorB: { kind: 'empty' },
+    });
+    const ok = simulate(F32, '*', '6.5', '2.75');
+    expect(ok.ok && ok.result.bits).toBe(0x418f0000n);
+  });
+});

@@ -12,12 +12,12 @@
 - [x] Playwright config + browsers · push
 
 ## Phase 1 — Engine
-- [ ] format, bits, rational, parse, decode, round, encode
-- [ ] add, mul, div, special
-- [ ] fraction, integer, format-number
-- [ ] examples.ts
-- [ ] golden vectors · oracle · exhaustive MINI8 · encode random · round-trip · invariants · parse
-- [ ] test:long 1M · coverage ≥ 95% · docs/ENGINE.md
+- [x] format, bits, rational, parse, decode, round, encode
+- [x] add, mul, div, special, simulate
+- [x] fraction, integer, format-number
+- [x] src/content/examples.ts (input ของตัวอย่างทั้งหมด · decode ใช้ทศนิยมต้นทางแทน hex)
+- [x] golden vectors 91 test ผ่าน · oracle 480k ผ่าน · exhaustive MINI8 262k ผ่าน · encode random · round-trip · invariants · parse
+- [x] test:long 1,008,000 ผ่าน (6.5 s) · coverage 98.9% · docs/ENGINE.md
 
 ## Phase 2 — Design system + StepPlayer
 - [ ] globals.css + ฟอนต์ + glass port
@@ -37,3 +37,5 @@
 
 ## บันทึกการตัดสินใจ / ต่างจากแผน
 - Tailwind ใช้ `@tailwindcss/turbopack` แทน `@tailwindcss/postcss` (ค่าเริ่มต้นของ create-next-app 16.4.3)
+- คูณ/หาร: ขั้น range อยู่ก่อน round ตาม flowchart ใน PLAN.md 8.2 (requirement เขียน round ก่อน range) — เหตุผลใน docs/ENGINE.md
+- `parseDecimal` คืน `magnitude` + `negative` แยกกัน (แผนเขียน `value`) เพื่อเก็บ −0 ได้
