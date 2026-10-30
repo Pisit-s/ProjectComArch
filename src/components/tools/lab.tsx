@@ -80,8 +80,10 @@ export function Lab() {
             examples={ALL_OP_EXAMPLES}
             specials
             onChange={(s) => write({ ...stateRef.current, ...s, step: null })}
-            onStepChange={(id) => {
-              if (stateRef.current.step !== id) write({ ...stateRef.current, step: id });
+            onStepChange={(id, index) => {
+              // the first step is the default and stays out of the URL
+              const step = index === 0 ? null : id;
+              if (stateRef.current.step !== step) write({ ...stateRef.current, step });
             }}
             testId="sim"
           />

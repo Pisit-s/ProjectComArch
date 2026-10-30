@@ -29,7 +29,7 @@ type Props = {
   specials?: boolean;
   initialStep?: number;
   onChange?: (s: SimState) => void;
-  onStepChange?: (stepId: string) => void;
+  onStepChange?: (stepId: string, index: number) => void;
   testId?: string;
 };
 
@@ -202,7 +202,7 @@ export function FpSimulator({
             flow={flowFor(state.op)}
             label={`ขั้นตอนการ${OP_NAME[state.op]} ${expression}`}
             initialStep={initialStep}
-            onStepChange={(i) => onStepChange?.(steps[i]?.id ?? '')}
+            onStepChange={(i) => onStepChange?.(steps[i]?.id ?? '', i)}
             minHeight="18rem"
             testId={`${testId}-player`}
             render={(i) => <StepView step={steps[i]} op={state.op} />}

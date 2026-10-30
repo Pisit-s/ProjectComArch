@@ -14,10 +14,14 @@ describe('lab url state', () => {
     const { state } = parseLabQuery(q('tab=conv&mode=decode&hex=0x40b80000'));
     expect(state).toMatchObject({ tab: 'conv', mode: 'decode', hex: '40B80000' });
     expect(toLabQuery(state)).toBe('tab=conv&mode=decode&hex=40B80000');
-    expect(toLabQuery({ ...state, mode: 'encode', x: '-1e-8' })).toBe('tab=conv&mode=encode&x=-1e-8');
+    expect(toLabQuery({ ...state, mode: 'encode', x: '-1e-8' })).toBe(
+      'tab=conv&mode=encode&x=-1e-8',
+    );
   });
   it('falls back to defaults for bad values', () => {
-    const { state, invalid } = parseLabQuery(q('tab=x&op=pow&a=1,5&b=abc&mode=zz&hex=XYZ&step=<b>&x='));
+    const { state, invalid } = parseLabQuery(
+      q('tab=x&op=pow&a=1,5&b=abc&mode=zz&hex=XYZ&step=<b>&x='),
+    );
     expect(invalid).toEqual(['tab', 'op', 'a', 'b', 'x', 'mode', 'hex', 'step']);
     expect(state).toEqual(LAB_DEFAULT);
   });

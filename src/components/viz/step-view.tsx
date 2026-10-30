@@ -1,10 +1,10 @@
 'use client';
 
 import { Register } from '@/components/bits/register';
-import { Num, Pow } from '@/components/ui/num';
+import { Num, Pow, minus } from '@/components/ui/num';
 import { CLASS_TEXT } from '@/content/step-text';
 import { fmt as fmtR } from '@/lib/display';
-import { type FloatFormat, type Op, type Step, type StepOf, BINARY32, emin } from '@/lib/fp';
+import { type FloatFormat, type Op, type Step, type StepOf, BINARY32, bias, emin } from '@/lib/fp';
 import {
   AlignView,
   LongDivisionView,
@@ -148,7 +148,8 @@ function DecodeOperandView({
           <>
             <p>
               Sign = <b className="num font-mono">{step.fields.sign}</b> · Biased exponent ={' '}
-              <b className="num font-mono">{step.exponent}</b> (Exponent จริง {step.exponent - 127})
+              <b className="num font-mono">{step.exponent}</b> (Exponent จริง{' '}
+              {minus(String(step.exponent - bias(fmt)))})
             </p>
             <p className="flex flex-wrap items-baseline gap-x-2">
               Significand ={' '}

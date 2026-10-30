@@ -15,3 +15,13 @@
 - ปุ่มเมนูมือถือเคยเป็น `<label aria-label>` (aria-prohibited-attr) → เปลี่ยนเป็น `<button aria-expanded>` ควบคุม drawer
 - หัวตาราง daisyUI สี 60% contrast ไม่พอ → ตั้งเป็นสี muted · ตัวเลข `text-muted/60` → `text-muted` · tab ที่ไม่ได้เลือก `text-ink/80`
 - กล่องตารางที่เลื่อนแนวนอนได้ใส่ `tabIndex={0}` ให้ใช้คีย์บอร์ดเลื่อนได้
+
+## Phase 7 — Lighthouse (mobile, production build, 30 ต.ค. 2569)
+| หน้า | Performance | Accessibility | Best Practices | SEO |
+|---|---|---|---|---|
+| `/` | 93 | 98 → แก้ heading-order แล้ว | 100 | 100 |
+| `/learn/add-sub` | 99 | 100 | 100 | 100 |
+| `/learn/mul-div` | 99 | 100 | 100 | 100 |
+- ผ่านเป้า (≥ 90 / ≥ 95 / ≥ 95 / ≥ 90) ทุกหน้า · ไฟล์ผลอยู่ที่ `test-results/lh-*.json` (gitignore)
+- หน้าแรก: ชื่อขั้นใน player เป็น h3 อยู่ก่อน h2 → เปลี่ยนหัวข้อ "ตัวอย่างสด" เป็น h2
+- OG image: register 32 บิตเคยตกบรรทัด → ลดความกว้างช่องให้อยู่แถวเดียว · ภาษาไทยแสดงถูก (โหลด Chakra Petch subset thai)

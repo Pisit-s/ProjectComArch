@@ -391,8 +391,31 @@
   color: var(--color-muted);
 }
 
+/* Print: reading content and chapter summaries only, on plain white */
 @media print {
-  .no-print {
+  .no-print,
+  footer,
+  [role='region'][data-step],
+  [data-testid='chapter-nav'],
+  aside {
     display: none !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  .fixed {
+    display: none !important;
+  }
+  .glass,
+  .glass-raised,
+  .glass-solid {
+    background: #fff !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  section {
+    break-inside: avoid-page;
   }
 }

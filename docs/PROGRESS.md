@@ -47,11 +47,12 @@
 - [x] build ผ่าน ทุก route static · README + docs/DEPLOY.md
 - หมายเหตุ: e2e ข้อ 7 (share link ของ Lab) อยู่ใน Phase 7 ตามแผน · หน้าแรกยังเป็นแบบโครง (ฉบับเต็มใน Phase 7)
 ## Phase 7 — Lab + polish
-- [ ] /lab: tabs Converter / Calculator + share link (query string) + Suspense
-- [ ] หน้าแรกฉบับเต็ม (demo สด 0.1 + 0.2, timeline, ทางลัด + BeamRing)
-- [ ] icon, OG image, sitemap, robots, 404, error
-- [ ] Lighthouse ตามเป้า · e2e ข้อ 7
-- [ ] stretch: binary16/64 ใน Lab · โหมดนำเสนอ · print stylesheet
+- [x] /lab: tabs Calculator / Converter + share link (query string, `src/lib/url-state.ts` + unit test) + Suspense
+- [x] หน้าแรกฉบับเต็ม (demo สด 0.1 + 0.2 เล่นเอง หยุดเมื่อแตะ/hover/โฟกัส, timeline, ทางลัด + BeamRing)
+- [x] icon, OG image (ไทยแสดงถูก), sitemap, robots, 404, error
+- [x] Lighthouse ผ่านเป้าทั้ง 3 หน้า (REVIEW.md) · e2e ข้อ 7–10 ผ่าน · e2e รวม 65 ข้อผ่านบน pixel7 + iphone13 + desktop
+- [x] stretch: print stylesheet
+- [ ] stretch ที่ยังไม่ทำ: binary16/64 ใน Lab (Q7) · โหมดนำเสนอ (Q8) — engine รองรับ format อื่นแล้ว แต่ UI ยังผูกกับ 32 บิตหลายจุด จึงเลือกใช้เวลากับ review 3 รอบก่อน
 ## Phase 8 — พร้อม deploy
 ## Phase 9 — Review 3 รอบ
 ## Phase 10 — รายงานสุดท้าย
