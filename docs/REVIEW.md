@@ -10,3 +10,8 @@
 - Integer Explorer 390px: บิต 8 ตัวแบ่ง 4+4 แถว ปุ่ม 44px ขึ้นไป (จอ ≥ 420px เป็นแถวเดียว) · ค่าฐานสิบใหญ่ อ่านง่าย
 - Fraction Converter: ช่องบิตเติมทีละช่องตามขั้น · ผลแสดงวงซ้ำด้วยเส้นด้านบนสีชมพู
 - ข้อสังเกต (ไว้ดูรอบ 2): แถบควบคุมของ StepPlayer เป็น sticky bottom ตอน player เพิ่งโผล่จากขอบล่างจอ แถบจะทับตัวบอกขั้น/ชื่อขั้นชั่วครู่
+
+## Milestone — accessibility (axe) ที่แก้แล้ว
+- ปุ่มเมนูมือถือเคยเป็น `<label aria-label>` (aria-prohibited-attr) → เปลี่ยนเป็น `<button aria-expanded>` ควบคุม drawer
+- หัวตาราง daisyUI สี 60% contrast ไม่พอ → ตั้งเป็นสี muted · ตัวเลข `text-muted/60` → `text-muted` · tab ที่ไม่ได้เลือก `text-ink/80`
+- กล่องตารางที่เลื่อนแนวนอนได้ใส่ `tabIndex={0}` ให้ใช้คีย์บอร์ดเลื่อนได้

@@ -1,3 +1,5 @@
+พร้อม deploy แล้ว (Milestone "พร้อมใช้สอน" ผ่านเมื่อ 30 ต.ค. 2569 · วิธี deploy: docs/DEPLOY.md)
+
 # ความคืบหน้า Binary Lab
 
 > session ใหม่: อ่าน CLAUDE.md แล้วดูงานแรกที่ยังไม่ติ๊กด้านล่าง
@@ -37,10 +39,19 @@
 - [x] เนื้อหา + FpSimulator (+/−) + ตัวอย่าง A1–A6 (OpWorked render จาก engine) + สรุป
 - [x] e2e ข้อ 5 ผ่าน (pixel7 + iphone13)
 ## Phase 6 — บทที่ 5
-- [ ] เนื้อหา + FpSimulator (×/÷ + ค่าพิเศษ) + M1–M6, D1–D5 + M3/D3 ละเอียด + ตารางกรณีพิเศษ + สรุป
-- [ ] e2e ข้อ 6 (Chromium + WebKit)
+- [x] เนื้อหา + FpSimulator (×/÷ + ค่าพิเศษ) + M1–M6, D1–D5 + M3/D3 ละเอียด (OpDetail) + ตารางกรณีพิเศษ + สรุป
+- [x] e2e ข้อ 6 ผ่าน (pixel7 + iphone13)
 ## Milestone "พร้อมใช้สอน"
+- [x] acceptance criteria ของ requirement 4 ไฟล์ครบ (ตรวจละเอียดอีกครั้งในรอบ review 3)
+- [x] e2e 36 ข้อผ่านบน pixel7 + iphone13 กับ production build (นำทาง, บท 1–5, player, reduced motion, ไม่มี console error, axe ไม่มี serious/critical ทุกหน้า)
+- [x] build ผ่าน ทุก route static · README + docs/DEPLOY.md
+- หมายเหตุ: e2e ข้อ 7 (share link ของ Lab) อยู่ใน Phase 7 ตามแผน · หน้าแรกยังเป็นแบบโครง (ฉบับเต็มใน Phase 7)
 ## Phase 7 — Lab + polish
+- [ ] /lab: tabs Converter / Calculator + share link (query string) + Suspense
+- [ ] หน้าแรกฉบับเต็ม (demo สด 0.1 + 0.2, timeline, ทางลัด + BeamRing)
+- [ ] icon, OG image, sitemap, robots, 404, error
+- [ ] Lighthouse ตามเป้า · e2e ข้อ 7
+- [ ] stretch: binary16/64 ใน Lab · โหมดนำเสนอ · print stylesheet
 ## Phase 8 — พร้อม deploy
 ## Phase 9 — Review 3 รอบ
 ## Phase 10 — รายงานสุดท้าย

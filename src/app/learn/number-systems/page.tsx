@@ -59,7 +59,7 @@ export default function NumberSystemsPage() {
           ค่าประจำหลักของบิตเรียกว่า <Term k="weight" /> นับตำแหน่งจากขวาสุดเป็นตำแหน่งที่ 0
           บิตตำแหน่งที่ k มีน้ำหนัก <Pow exp="k" />
         </p>
-        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10">
+        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10" tabIndex={0}>
           <table className="table table-sm text-center">
             <thead>
               <tr>

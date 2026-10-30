@@ -94,7 +94,7 @@ export default function AddSubPage() {
         <p>
           IEEE 754 ปัดแบบ <Term k="roundEven" /> เป็นค่าเริ่มต้น ดูจาก G, R, S:
         </p>
-        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10">
+        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10" tabIndex={0}>
           <table className="table table-sm">
             <thead>
               <tr>

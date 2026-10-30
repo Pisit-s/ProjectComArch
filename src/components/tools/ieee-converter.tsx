@@ -67,7 +67,7 @@ export function Ieee754Converter({
             type="button"
             role="tab"
             aria-selected={mode === m}
-            className={cn('tab h-11', mode === m && 'tab-active')}
+            className={cn('tab h-11', mode === m ? 'tab-active' : 'text-ink/80')}
             onClick={() => {
               setMode(m);
               report(m, m === 'encode' ? encodeText : toHex(bits, 32).slice(2));

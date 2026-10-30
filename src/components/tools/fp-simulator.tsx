@@ -77,7 +77,7 @@ export function FpSimulator({
                 aria-selected={state.op === o}
                 className={cn(
                   'tab h-11 min-w-14 text-lg font-semibold',
-                  state.op === o && 'tab-active',
+                  state.op === o ? 'tab-active' : 'text-ink/80',
                 )}
                 onClick={() => update({ op: o })}
                 data-testid={`${testId}-op-${o === '*' ? 'mul' : o === '/' ? 'div' : o === '+' ? 'add' : 'sub'}`}

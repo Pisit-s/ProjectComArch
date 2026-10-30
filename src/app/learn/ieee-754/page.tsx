@@ -179,7 +179,7 @@ export default function Ieee754Page() {
       </Section>
 
       <Section id="special" title="Exponent 0 และ 255 มีความหมายพิเศษ">
-        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10">
+        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10" tabIndex={0}>
           <table className="table table-sm">
             <thead>
               <tr>

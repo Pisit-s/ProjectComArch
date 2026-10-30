@@ -385,6 +385,12 @@
   }
 }
 
+/* daisyUI table headers are 60% ink by default: too light on glass (outside layers to win) */
+.table thead,
+.table tfoot {
+  color: var(--color-muted);
+}
+
 @media print {
   .no-print {
     display: none !important;

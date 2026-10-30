@@ -354,7 +354,7 @@ function Flowchart({
                     ? 'bg-primary font-semibold text-white ring-primary'
                     : enabled
                       ? 'bg-white/80 text-ink ring-line hover:bg-ice-100'
-                      : 'bg-white/40 text-muted/70 ring-line/50',
+                      : 'bg-white/40 text-muted ring-line/50',
                 )}
               >
                 {isActive && <BeamRing duration={3} from="#ffffff" to="#38b6ff" />}

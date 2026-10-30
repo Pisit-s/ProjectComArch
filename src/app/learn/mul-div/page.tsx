@@ -57,7 +57,7 @@ export default function MulDivPage() {
           แล้ว <b>บวก</b> เลขชี้กำลัง ไม่ต้องปรับเลขชี้กำลังให้เท่ากันก่อน
           ส่วนการหารก็หารตัวเลขสำคัญแล้ว <b>ลบ</b> เลขชี้กำลัง
         </p>
-        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10">
+        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10" tabIndex={0}>
           <table className="table table-sm" data-testid="compare-table">
             <thead>
               <tr>
@@ -157,7 +157,7 @@ export default function MulDivPage() {
           กรณีเหล่านี้ไม่ต้องไล่ทุกขั้น ใช้กฎสั้น ๆ ได้ผลทันที และ IEEE 754 ไม่ได้หยุดโปรแกรม
           แต่ให้ค่าพิเศษพร้อมแจ้ง exception
         </p>
-        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10">
+        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10" tabIndex={0}>
           <table className="table table-sm" data-testid="special-table">
             <thead>
               <tr>

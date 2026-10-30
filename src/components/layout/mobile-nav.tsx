@@ -33,20 +33,31 @@ export function MobileNav() {
         className="drawer-toggle"
         checked={open}
         onChange={(e) => setOpen(e.target.checked)}
-        aria-label="เปิดเมนูบทเรียน"
+        tabIndex={-1}
+        aria-hidden
       />
       <div className="drawer-content">
-        <label
-          htmlFor="mobile-nav"
+        <button
+          type="button"
           className="btn btn-circle h-11 w-11 btn-ghost"
           aria-label="เมนูบทเรียน"
+          aria-expanded={open}
+          aria-controls="mobile-nav-panel"
+          onClick={() => setOpen(true)}
         >
           <Menu className="h-5 w-5" aria-hidden />
-        </label>
+        </button>
       </div>
       <div className="drawer-side z-50">
-        <label htmlFor="mobile-nav" aria-label="ปิดเมนู" className="drawer-overlay" />
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label="ปิดเมนู"
+          className="drawer-overlay"
+          onClick={() => setOpen(false)}
+        />
         <nav
+          id="mobile-nav-panel"
           aria-label="บทเรียนทั้งหมด"
           className="glass-raised flex min-h-dvh w-[min(22rem,86vw)] flex-col gap-2 bg-white/95 p-4 pt-[max(1rem,env(safe-area-inset-top))]"
         >

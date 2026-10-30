@@ -136,7 +136,7 @@ export function BinaryToDecimalDemo({ bits = '1011' }: { bits?: string }) {
                       <span
                         className={cn(
                           'num font-mono text-sm',
-                          used ? 'font-bold text-primary' : 'text-muted/60',
+                          used ? 'font-bold text-primary' : 'text-muted',
                         )}
                       >
                         {t.bit ? `+${t.weight}` : '0'}
@@ -236,7 +236,7 @@ export function IntegerExplorer() {
               <span
                 className={cn(
                   'num font-mono text-sm',
-                  t.bit ? 'font-bold text-primary' : 'text-muted/60',
+                  t.bit ? 'font-bold text-primary' : 'text-muted',
                 )}
                 aria-label={`เพิ่มค่า ${t.contribution}`}
               >

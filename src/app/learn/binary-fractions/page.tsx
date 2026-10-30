@@ -53,7 +53,7 @@ export default function BinaryFractionsPage() {
           </span>{' '}
           โดย b<sub>1</sub> คือบิตแรกหลังจุด
         </p>
-        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10">
+        <div className="glass-solid scroll-x rounded-xl ring-1 ring-foreground/10" tabIndex={0}>
           <table className="table table-sm text-center">
             <thead>
               <tr>
