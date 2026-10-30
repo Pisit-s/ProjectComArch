@@ -9,7 +9,7 @@ import { usePlayerMotion } from '@/components/player/player-speed';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 import { Pow } from '@/components/ui/num';
 import { FLAG_TEXT, RANGE_TEXT, ROUND_TEXT, SPECIAL_TEXT } from '@/content/step-text';
-import { fixedPoint } from '@/lib/display';
+import { bin8, fixedPoint } from '@/lib/display';
 import type { Flags, FloatFormat, StepOf } from '@/lib/fp';
 import { cn } from '@/lib/utils';
 import { BitLine } from './bit-line';
@@ -50,10 +50,6 @@ export function SigLine({
   const { int, frac } = fixedPoint(sig, fracBits);
   const f = trim ? frac.replace(/0+$/, '') || '0' : frac;
   return <BitLine int={int} frac={f} kept={f.length} hiddenLead={hidden} className={className} />;
-}
-
-export function bin8(n: number, bits = 8): string | null {
-  return n >= 0 && n < 2 ** bits ? n.toString(2).padStart(bits, '0') : null;
 }
 
 /** Exponent arithmetic in decimal and 8-bit binary (Chapter 5 requirement 7.4). */

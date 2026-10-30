@@ -46,8 +46,8 @@ export default function BinaryFractionsPage() {
 
       <Section id="binary" title="น้ำหนักหลังจุดฐานสอง">
         <p>
-          ฐานสองก็เหมือนกัน แต่ลดลงทีละครึ่ง บิตที่ k หลังจุดมี<Term k="weight">น้ำหนัก</Term> <Pow exp="−k" />{' '}
-          เราเขียนเศษส่วนฐานสองในรูป{' '}
+          ฐานสองก็เหมือนกัน แต่ลดลงทีละครึ่ง บิตที่ k หลังจุดมี<Term k="weight">น้ำหนัก</Term>{' '}
+          <Pow exp="−k" /> เราเขียนเศษส่วนฐานสองในรูป{' '}
           <span className="num font-mono">
             0.b<sub>1</sub>b<sub>2</sub>b<sub>3</sub>…
           </span>{' '}

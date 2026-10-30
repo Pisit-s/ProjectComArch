@@ -49,6 +49,8 @@ export interface EncodeResult extends FpResult {
   stored: Rational | null;
   /** Stored value equals the input exactly (special inputs count as equal). */
   equal: boolean;
+  /** stored - input (null when the result is infinity / NaN or the input is special). */
+  error: Rational | null;
 }
 
 export type EncodeOutcome = ({ ok: true } & EncodeResult) | { ok: false; error: ParseError };
@@ -127,6 +129,7 @@ export function encodeParsed(fmt: FloatFormat, parsed: ParsedNumber): EncodeResu
       input: parsed,
       stored,
       equal: true,
+      error: stored ? ZERO : null,
     };
   }
 
@@ -211,5 +214,6 @@ export function encodeParsed(fmt: FloatFormat, parsed: ParsedNumber): EncodeResu
     input: parsed,
     stored,
     equal: stored !== null && eq(stored, input),
+    error: stored ? sub(stored, input) : null,
   };
 }

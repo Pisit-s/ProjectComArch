@@ -31,9 +31,11 @@
 - [x] บทที่ 2: เนื้อหา + FractionExplorer + NumberLine + FractionConverter + สรุป
 - [x] e2e ข้อ 2–3 ผ่าน (pixel7) · screenshot 390 ดูแล้ว
 ## Phase 4 — บทที่ 3
-- [ ] เนื้อหา + WorkedExample (render จาก engine) + IEEE 754 Converter (encode/decode tabs) + สรุป
-- [ ] e2e ข้อ 4 (Chromium + WebKit)
+- [x] เนื้อหา + WorkedExample (render จาก engine) + IEEE 754 Converter (encode/decode tabs) + สรุป
+- [x] e2e ข้อ 4 ผ่าน (pixel7 + iphone13) · e2e ทั้งหมด 7 ข้อผ่านบน WebKit
 ## Phase 5 — บทที่ 4
+- [ ] เนื้อหา + FpSimulator (+/−) + ตัวอย่าง A1–A6 + สรุป
+- [ ] e2e ข้อ 5 (Chromium + WebKit)
 ## Phase 6 — บทที่ 5
 ## Milestone "พร้อมใช้สอน"
 ## Phase 7 — Lab + polish

@@ -25,3 +25,8 @@ export const fmt = (r: Rational | null, maxSignificant?: number): string =>
   r === null ? '' : formatRational(r, maxSignificant ? { maxSignificant } : {});
 
 export const isZero = (r: Rational | null): boolean => r !== null && R.isZero(r);
+
+/** Unsigned binary of an exponent field value, or null when it does not fit. */
+export function bin8(n: number, bits = 8): string | null {
+  return n >= 0 && n < 2 ** bits ? n.toString(2).padStart(bits, '0') : null;
+}

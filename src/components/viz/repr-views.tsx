@@ -9,7 +9,7 @@ import { Register } from '@/components/bits/register';
 import { usePlayerMotion } from '@/components/player/player-speed';
 import { Num, Pow } from '@/components/ui/num';
 import { CLASS_TEXT } from '@/content/step-text';
-import { fixedPoint, fmt as fmtR } from '@/lib/display';
+import { bin8, fixedPoint, fmt as fmtR } from '@/lib/display';
 import {
   type FloatFormat,
   type StepOf,
@@ -22,7 +22,7 @@ import {
 } from '@/lib/fp';
 import { cn } from '@/lib/utils';
 import { BitLine, MovingPoint } from './bit-line';
-import { Box, Explain, bin8 } from './step-parts';
+import { Box, Explain } from './step-parts';
 
 const FIRST_ROWS = 10;
 
