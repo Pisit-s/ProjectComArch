@@ -20,12 +20,16 @@
 - [x] test:long 1,008,000 ผ่าน (6.5 s) · coverage 98.9% · docs/ENGINE.md
 
 ## Phase 2 — Design system + StepPlayer
-- [ ] globals.css + ฟอนต์ + glass port
-- [ ] SiteHeader / MobileNav / SiteFooter / หน้าแรกโครง / ChapterHeader / Toc / ChapterNav / Summary
-- [ ] bits/* · player/*
-- [ ] screenshot 390 + 1280 · REVIEW.md
+- [x] globals.css + ฟอนต์ + glass port
+- [x] SiteHeader / MobileNav / SiteFooter / หน้าแรกโครง / ChapterLayout (header, Toc, Section, Summary, ChapterNav)
+- [x] bits/* (BitCell, Register + BitInfo, FieldLegend) · player/* (StepPlayer, Flowchart, usePlayer, speed context)
+- [x] viz/* ครบทุก step kind (StepView) + FpSimulator + ResultCompare (ใช้ชั่วคราวใน /lab)
+- [x] screenshot 390 + 1280 · REVIEW.md · e2e player 4 ข้อผ่าน (pixel7)
 
 ## Phase 3 — บทที่ 1–2
+- [ ] บทที่ 1: เนื้อหา + PlaceValue + ตัวอย่าง 1011 + IntegerExplorer + สรุป
+- [ ] บทที่ 2: เนื้อหา + FractionExplorer + NumberLine + FractionConverter + สรุป
+- [ ] e2e ข้อ 2–3 · screenshot 390
 ## Phase 4 — บทที่ 3
 ## Phase 5 — บทที่ 4
 ## Phase 6 — บทที่ 5
