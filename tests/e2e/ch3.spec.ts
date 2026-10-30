@@ -10,7 +10,9 @@ test('chapter 3: encode, inexact warning, decode and bit errors', async ({ page 
   await input.fill('-13.25');
   await expect(conv.getByTestId('conv-result-hex')).toHaveText('0xC1540000');
   await input.fill('0.1');
-  await expect(conv.getByTestId('conv-inexact')).toContainText('ค่าที่เก็บจริงไม่เท่ากับค่าที่ป้อน');
+  await expect(conv.getByTestId('conv-inexact')).toContainText(
+    'ค่าที่เก็บจริงไม่เท่ากับค่าที่ป้อน',
+  );
   await input.fill('1,5');
   await expect(conv.getByText('ใช้จุด (.) เป็นจุดทศนิยม')).toBeVisible();
   await input.fill('3.5e38');

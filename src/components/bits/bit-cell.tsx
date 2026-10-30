@@ -67,7 +67,11 @@ export function BitCell({
     );
   }
   return (
-    <span className={classes} aria-label={rest['aria-label']}>
+    <span
+      className={classes}
+      aria-label={rest['aria-label']}
+      data-testid={(rest as Record<string, unknown>)['data-testid'] as string | undefined}
+    >
       {face}
     </span>
   );

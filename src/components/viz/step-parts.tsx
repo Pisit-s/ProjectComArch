@@ -25,9 +25,20 @@ export function Explain({ children, className }: { children: ReactNode; classNam
   );
 }
 
-export function Box({ children, className }: { children: ReactNode; className?: string }) {
+export function Box({
+  children,
+  className,
+  ...rest
+}: {
+  children: ReactNode;
+  className?: string;
+  'data-testid'?: string;
+}) {
   return (
-    <div className={cn('glass-solid scroll-x rounded-xl p-3 ring-1 ring-foreground/10', className)}>
+    <div
+      className={cn('glass-solid scroll-x rounded-xl p-3 ring-1 ring-foreground/10', className)}
+      {...rest}
+    >
       {children}
     </div>
   );

@@ -10,7 +10,10 @@ test('chapter 4: 0.1 + 0.2, player controls and flowchart', async ({ page }) => 
   await expect(counter).toHaveText(/ขั้นที่ 2\//);
   await page.getByTestId('sim-player-prev').click();
   await expect(counter).toHaveText(/ขั้นที่ 1\//);
-  await page.getByTestId('sim-player').getByRole('button', { name: /^ไปขั้นที่ 4/ }).click();
+  await page
+    .getByTestId('sim-player')
+    .getByRole('button', { name: /^ไปขั้นที่ 4/ })
+    .click();
   await expect(page.getByTestId('sim-player')).toHaveAttribute('data-step', 'align');
   // shift one bit at a time inside the align step
   await page.getByTestId('align-shift-one').isDisabled();
@@ -20,7 +23,9 @@ test('chapter 4: 0.1 + 0.2, player controls and flowchart', async ({ page }) => 
   await page.getByTestId('sim-player-flow').locator('[data-flow="round"]').click();
   await expect(page.getByTestId('round-decision')).toHaveAttribute('data-decision', 'up');
   await page.getByTestId('sim-player-play').click();
-  await expect(page.getByTestId('sim-player')).toHaveAttribute('data-step', 'encode', { timeout: 6000 });
+  await expect(page.getByTestId('sim-player')).toHaveAttribute('data-step', 'encode', {
+    timeout: 6000,
+  });
   // subtraction with cancellation
   await page.getByTestId('example-A6').click();
   await expect(sim.getByTestId('result-hex')).toHaveText('0x34000000');

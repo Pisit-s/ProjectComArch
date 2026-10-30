@@ -224,8 +224,18 @@ describe('bitMeaning', () => {
   it('explains sign, exponent and fraction bits', () => {
     const bits = 0x40b80000n; // 5.75 = 1.0111 x 2^2
     expect(bitMeaning(F32, bits, 0)).toMatchObject({ field: 'sign', bit: 0, bitNumber: 31 });
-    expect(bitMeaning(F32, bits, 1)).toMatchObject({ field: 'exp', position: 7, bit: 1, expContribution: 128 });
-    expect(bitMeaning(F32, bits, 8)).toMatchObject({ field: 'exp', position: 0, bit: 1, expContribution: 1 });
+    expect(bitMeaning(F32, bits, 1)).toMatchObject({
+      field: 'exp',
+      position: 7,
+      bit: 1,
+      expContribution: 128,
+    });
+    expect(bitMeaning(F32, bits, 8)).toMatchObject({
+      field: 'exp',
+      position: 0,
+      bit: 1,
+      expContribution: 1,
+    });
     const f2 = bitMeaning(F32, bits, 10); // second fraction bit: 2^-2 of significand, adds 2^0 = 1
     expect(f2).toMatchObject({ field: 'frac', position: 2, bit: 1, scaleExponent: 2 });
     expect(f2.valueContribution).toEqual(R.rat(1n));

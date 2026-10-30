@@ -150,3 +150,129 @@ export function OpWorked({ id }: { id: string }) {
     </div>
   );
 }
+
+function trimCols(values: bigint[], fracBits: number): number {
+  let need = 1;
+  for (const v of values) {
+    if (v === 0n) continue;
+    const s = v.toString(2);
+    need = Math.max(need, fracBits - (s.length - s.replace(/0+$/, '').length));
+  }
+  return Math.min(need, fracBits);
+}
+
+/** Every step of a multiplication or division example in one static card (M3, D3 in Chapter 5). */
+export function OpDetail({ id }: { id: string }) {
+  const ex = findExample(id);
+  if (!ex) return null;
+  const s = simulate(F, ex.op, ex.a, ex.b);
+  if (!s.ok) return null;
+  const st = s.result.steps;
+  const decA = find(st, 'decode') as StepOf<'decode'>;
+  const decB = st.filter((x) => x.kind === 'decode')[1] as StepOf<'decode'>;
+  const sign = find(st, 'sign') as StepOf<'sign'>;
+  const exp = find(st, 'exponent') as StepOf<'exponent'>;
+  const norm = find(st, 'normalize') as StepOf<'normalize'>;
+  const rd = find(st, 'round') as StepOf<'round'>;
+  const mulStep = st.find((x) => x.kind === 'sig-mul') as StepOf<'sig-mul'> | undefined;
+  const divStep = st.find((x) => x.kind === 'sig-div') as StepOf<'sig-div'> | undefined;
+  const fa = splitFields(F, decA.bits);
+  const fb = splitFields(F, decB.bits);
+  const fr = splitFields(F, s.result.bits);
+  const sig = (v: bigint, frac: number) => {
+    const p = fixedPoint(v, frac);
+    return <BitLine int={p.int} frac={p.frac.replace(/0+$/, '') || '0'} />;
+  };
+  const isMul = ex.op === '*';
+  const fields = (f: { sign: string; exp: string; frac: string }) => (
+    <span className="num font-mono break-all">
+      <span className={FIELD_STYLE.sign.text}>{f.sign}</span>{' '}
+      <span className={FIELD_STYLE.exp.text}>{f.exp}</span>{' '}
+      <span className={FIELD_STYLE.frac.text}>{f.frac}</span>
+    </span>
+  );
+  return (
+    <figure
+      className="glass-solid space-y-3 rounded-xl p-4 ring-1 ring-foreground/10"
+      data-testid={`detail-${id}`}
+    >
+      <figcaption className="font-display text-lg font-semibold">
+        ตัวอย่าง {id} แบบละเอียด: {ex.a} {OP_SYMBOL[ex.op]} {ex.b}
+      </figcaption>
+      <ol className="list-decimal space-y-2 pl-5 text-[0.95rem]">
+        <li>
+          {ex.a} = {fields(fa)} → Significand {sig(decA.significand, F.fracBits)}, Biased exponent{' '}
+          {decA.exponent}
+          <br />
+          {ex.b} = {fields(fb)} → Significand {sig(decB.significand, F.fracBits)}, Biased exponent{' '}
+          {decB.exponent}
+        </li>
+        <li>
+          Sign: {sign.a} XOR {sign.b} = <b>{sign.result}</b>
+        </li>
+        <li>
+          Exponent: {exp.ea} {isMul ? '+' : '−'} {exp.eb} {isMul ? '−' : '+'} {exp.bias} ={' '}
+          <b>{exp.result}</b>
+        </li>
+        {mulStep && (
+          <li>
+            Significand: ตัวคูณ {sig(mulStep.multiplier, F.fracBits)} มีบิต 1 อยู่{' '}
+            {mulStep.rows.length} ตัว จึงมี partial product {mulStep.rows.length} แถว
+            <pre className="num mt-1 overflow-x-auto rounded-lg bg-ice-50 p-2 font-mono text-sm leading-relaxed">
+              {(() => {
+                const cols = trimCols(
+                  [...mulStep.rows.map((r) => r.value), mulStep.product],
+                  mulStep.fracBits,
+                );
+                const line = (v: bigint) => {
+                  const p = fixedPoint(v, mulStep.fracBits);
+                  return `${p.int.padStart(2, ' ')}.${p.frac.slice(0, cols)}`;
+                };
+                return [
+                  ...mulStep.rows.map((r, i) => `${i === 0 ? '  ' : '+ '}${line(r.value)}`),
+                  `= ${line(mulStep.product)}`,
+                ].join('\n');
+              })()}
+            </pre>
+          </li>
+        )}
+        {divStep && (
+          <li>
+            Significand: {sig(divStep.dividend, F.fracBits)} ÷ {sig(divStep.divisor, F.fracBits)}{' '}
+            ด้วยการหารยาว {divStep.rows.length} รอบ ได้ผลหาร{' '}
+            <span className="num font-mono break-all">
+              {(() => {
+                const q = divStep.quotient.toString(2).padStart(divStep.rows.length, '0');
+                return `${q[0]}.${q.slice(1)}`;
+              })()}
+            </span>{' '}
+            เศษสุดท้าย{divStep.remainder === 0n ? ' = 0' : ' ≠ 0 (ไม่มีวันเป็น 0)'}
+          </li>
+        )}
+        <li>
+          Normalize:{' '}
+          {norm.direction === 'none'
+            ? 'อยู่ในรูป 1.xxx แล้ว ไม่ต้องเลื่อน'
+            : norm.direction === 'right'
+              ? `ผล ≥ 2 เลื่อนขวา 1 บิต Exponent ${norm.expBefore} + 1 = ${norm.expAfter}`
+              : `ผล < 1 เลื่อนซ้าย 1 บิต Exponent ${norm.expBefore} − 1 = ${norm.expAfter}`}
+        </li>
+        <li>
+          ปัดเศษ: G = {rd.guard}, R = {rd.round}, S = {rd.sticky}
+          {divStep && divStep.remainder !== 0n && ' (S มาจากเศษที่ไม่เป็นศูนย์)'} →{' '}
+          {ROUND_TEXT[rd.decision].short}
+        </li>
+        <li>
+          ผลลัพธ์: {fields(fr)} = <b className="num font-mono">{toHex(s.result.bits, 32)}</b> ={' '}
+          <Num value={shortestDecimal(F, s.result.bits)} />
+          {s.stored && s.typed && s.error && s.error.num !== 0n && (
+            <span className="text-muted">
+              {' '}
+              (ค่าที่เก็บจริง <Num value={exactDecimal(F, s.result.bits)} />)
+            </span>
+          )}
+        </li>
+      </ol>
+    </figure>
+  );
+}
