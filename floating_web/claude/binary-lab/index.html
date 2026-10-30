@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Binary Lab — เรียนรู้เลขฐานสองและ Floating-Point</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+<nav class="side" aria-label="เมนูบทเรียน">
+  <div class="brand">Binary<span>Lab</span></div>
+  <a href="#home">หน้าแรก</a>
+  <a href="#ch1">บทที่ 1 เลขฐานและจำนวนเต็ม</a>
+  <a href="#ch2">บทที่ 2 เศษส่วนฐานสอง</a>
+  <a href="#ch3">บทที่ 3 IEEE 754</a>
+  <a href="#ch4">บทที่ 4 บวก/ลบ Float</a>
+  <a href="#lab">Interactive Lab</a>
+</nav>
+<main>
+
+<!-- ===================== HOME ===================== -->
+<section class="page" id="home" aria-labelledby="t-home">
+  <h1 id="t-home">Binary <span style="color:var(--purple)">Lab</span></h1>
+  <p>ห้องทดลองสำหรับนักศึกษา Computer Architecture เพื่อเข้าใจว่า <b>คอมพิวเตอร์เก็บและคำนวณตัวเลขอย่างไร</b> ด้วยเลขฐานสองและ Floating-Point (มาตรฐาน IEEE 754) ทุกบทมีคำอธิบาย ตัวอย่างทีละขั้น และเครื่องมือที่ลองเล่นได้จริง</p>
+  <div class="box note">เรียนตามลำดับ 1 → 4 จะเข้าใจง่ายที่สุด: จำนวนเต็มฐานสอง → เศษส่วนฐานสอง → IEEE 754 → การบวก/ลบ</div>
+  <div class="grid4">
+    <div class="card chcard"><span class="n">บทที่ 1</span><b>ระบบเลขฐานและจำนวนเต็มฐานสอง</b><span>ค่าประจำหลัก น้ำหนักของบิต และ Unsigned 8-bit</span><a class="btn primary" href="#ch1">เริ่มเรียน</a></div>
+    <div class="card chcard"><span class="n">บทที่ 2</span><b>เศษส่วนฐานสิบและฐานสอง</b><span>น้ำหนัก 2⁻¹ ถึง 2⁻¹⁶ การคูณ 2 ซ้ำ และความคลาดเคลื่อน</span><a class="btn primary" href="#ch2">เริ่มเรียน</a></div>
+    <div class="card chcard"><span class="n">บทที่ 3</span><b>IEEE 754 Single Precision</b><span>Sign / Exponent / Fraction, Bias 127, Encode และ Decode</span><a class="btn primary" href="#ch3">เริ่มเรียน</a></div>
+    <div class="card chcard"><span class="n">บทที่ 4</span><b>บวกและลบ Floating-Point</b><span>ปรับ Exponent, Normalize, Rounding ทีละขั้น</span><a class="btn primary" href="#ch4">เริ่มเรียน</a></div>
+  </div>
+  <p style="margin-top:20px"><a class="btn" href="#lab">ไปที่ Interactive Lab (รวมเครื่องมือทุกบท) →</a></p>
+</section>
+
+<!-- ===================== CHAPTER 1 ===================== -->
+<section class="page" id="ch1" aria-labelledby="t-ch1">
+  <h1 id="t-ch1">บทที่ 1: ระบบเลขฐานและจำนวนเต็มฐานสอง</h1>
+  <div class="box objectives"><b>Learning Objectives</b><ul>
+    <li>เข้าใจค่าประจำหลัก (Place Value) ของระบบเลขฐาน</li>
+    <li>อธิบายความสัมพันธ์ระหว่างเลขฐานสิบ (Base 10) และเลขฐานสอง (Base 2)</li>
+    <li>แปลงจำนวนเต็มฐานสองแบบไม่มีเครื่องหมาย (Unsigned) เป็นฐานสิบได้</li>
+    <li>บอกได้ว่าแต่ละบิตมีส่วนต่อค่ารวมอย่างไร</li></ul></div>
+  <h2>1.1 ระบบเลขฐานสิบและค่าประจำหลัก</h2>
+  <p>เลขฐานสิบใช้ตัวเลข 0–9 และแต่ละหลักมี <b>ค่าประจำหลัก</b> เป็นกำลังของ 10 เช่น <code>10⁰</code> (หลักหน่วย), <code>10¹</code> (หลักสิบ), <code>10²</code> (หลักร้อย)</p>
+  <div class="formula">345 = 3×10² + 4×10¹ + 5×10⁰ = 300 + 40 + 5</div>
+  <h2>1.2 ระบบเลขฐานสอง</h2>
+  <p>เลขฐานสองใช้เพียง <code>0</code> และ <code>1</code> แต่ละตำแหน่งเรียกว่า <b>บิต (bit)</b> มีน้ำหนักเป็นกำลังของ 2: <code>2⁰=1, 2¹=2, 2²=4, 2³=8, …, 2⁷=128</code></p>
+  <p>วิธีแปลงเป็นฐานสิบ: คูณบิตแต่ละตำแหน่งด้วยน้ำหนัก แล้วรวมผล บิตที่เป็น <code>0</code> ไม่เพิ่มค่า ส่วนบิตที่เป็น <code>1</code> เพิ่มค่าเท่ากับน้ำหนักของตำแหน่งนั้น</p>
+  <div class="formula">ตัวอย่าง 00001010₂
+= 0×128 + 0×64 + 0×32 + 0×16 + 1×8 + 0×4 + 1×2 + 0×1
+= 8 + 2 = 10₁₀</div>
+  <h2>1.3 Unsigned 8-bit Integer</h2>
+  <p>จำนวนเต็มไม่มีเครื่องหมายขนาด 8 บิตเก็บได้ <code>2⁸ = 256</code> ค่า คือ <b>0 ถึง 255</b> (<code>00000000₂</code> ถึง <code>11111111₂</code> โดย 255 = 128+64+32+16+8+4+2+1)</p>
+  <div class="tool"><h3>Interactive: 8-bit Binary Integer Explorer</h3><p>คลิกที่บิตเพื่อสลับ 0/1 แล้วดูว่าแต่ละบิตเพิ่มค่าเท่าไร</p><div data-tool="bits8"></div></div>
+  <div class="box summary"><b>Summary / สรุปท้ายบท</b><ul>
+    <li>ค่าประจำหลักของฐานสิบคือกำลังของ 10 และของฐานสองคือกำลังของ 2</li>
+    <li>ค่าฐานสิบ = ผลรวมของ (บิต × น้ำหนักประจำหลัก) บิต 0 ไม่เพิ่มค่า บิต 1 เพิ่มค่าเท่าน้ำหนัก</li>
+    <li>น้ำหนักของ 8 บิตคือ 128, 64, 32, 16, 8, 4, 2, 1 จึงแทนค่า 0–255 ได้</li></ul></div>
+  <div class="pn"><a class="btn" href="#home">← หน้าแรก</a><a class="btn primary" href="#ch2">บทถัดไป →</a></div>
+</section>
+
+<!-- ===================== CHAPTER 2 ===================== -->
+<section class="page" id="ch2" aria-labelledby="t-ch2">
+  <h1 id="t-ch2">บทที่ 2: เศษส่วนฐานสิบและเศษส่วนฐานสอง</h1>
+  <div class="box objectives"><b>Learning Objectives</b><ul>
+    <li>เข้าใจค่าประจำหลักของเศษส่วนทั้งฐานสิบและฐานสอง</li>
+    <li>คำนวณค่าฐานสิบจากเศษส่วนฐานสองได้</li>
+    <li>แปลงเศษส่วนฐานสิบเป็นฐานสองด้วยการคูณ 2 ซ้ำ ๆ</li>
+    <li>เข้าใจว่าเศษส่วนบางค่าแทนด้วยบิตจำนวนจำกัดไม่ได้พอดี</li></ul></div>
+  <h2>2.1 ค่าประจำหลักของเศษส่วน</h2>
+  <p>หลังจุดทศนิยม ค่าประจำหลักเป็นกำลังติดลบ: ฐานสิบคือ <code>10⁻¹=0.1, 10⁻²=0.01, 10⁻³=0.001</code> ส่วนฐานสองคือ <code>2⁻¹=0.5, 2⁻²=0.25, 2⁻³=0.125, …</code> เขียนเศษส่วนฐานสองเป็น <code>0.b₁b₂b₃…₂</code></p>
+  <div class="formula">0.101₂ = 1×2⁻¹ + 0×2⁻² + 1×2⁻³ = 0.5 + 0 + 0.125 = 0.625₁₀</div>
+  <div class="tool"><h3>Interactive A: 16-bit Binary Fraction Explorer</h3><div data-tool="frac16"></div></div>
+  <h2>2.2 แปลงเศษส่วนฐานสิบเป็นฐานสอง</h2>
+  <p>คูณเศษส่วนด้วย 2 ซ้ำ ๆ: <b>ส่วนจำนวนเต็ม</b> ของผลคูณคือบิตถัดไป (b₁, b₂, …) แล้วนำ <b>เศษส่วนที่เหลือ</b> ไปคูณต่อ จนเหลือ 0 หรือครบจำนวนบิตที่ต้องการ</p>
+  <div class="formula">0.375 × 2 = 0.75 → บิต 0, เหลือ 0.75
+0.75  × 2 = 1.5  → บิต 1, เหลือ 0.5
+0.5   × 2 = 1.0  → บิต 1, เหลือ 0  (จบ)
+ดังนั้น 0.375₁₀ = 0.011₂</div>
+  <h2>2.3 ทำไม 0.1 จึงแทนไม่ได้พอดี</h2>
+  <p>ค่า <code>0.1₁₀ = 0.0001100110011…₂</code> เป็นรูปแบบ <b>ซ้ำไม่สิ้นสุด</b> (เหมือน 1/3 = 0.333… ในฐานสิบ) เมื่อเก็บบิตจำกัด จึงได้ <b>ค่าประมาณ (Approximation)</b> และมี <b>Absolute Error = |ค่าจริง − ค่าประมาณ|</b> เครื่องมือนี้ตัดบิตที่เกินทิ้ง (Truncate) ส่วน Float32 ในบทถัดไปจะปัดเศษ</p>
+  <div class="tool"><h3>Interactive B: Decimal Fraction Converter</h3><div data-tool="conv"></div></div>
+  <div class="box summary"><b>Summary / สรุปท้ายบท</b><ul>
+    <li>น้ำหนักบิตเศษส่วนคือ 2⁻¹, 2⁻², 2⁻³, … (ครึ่งหนึ่งของบิตก่อนหน้า)</li>
+    <li>แปลงฐานสิบ → ฐานสองด้วยการคูณ 2 ซ้ำ เก็บส่วนจำนวนเต็มเป็นบิต</li>
+    <li>เศษส่วนที่ตัวส่วน (หลังย่อ) มีตัวประกอบอื่นนอกจาก 2 เช่น 0.1 จะซ้ำไม่สิ้นสุดในฐานสอง จึงต้องประมาณและมีความคลาดเคลื่อน</li></ul></div>
+  <div class="pn"><a class="btn" href="#ch1">← บทก่อนหน้า</a><a class="btn primary" href="#ch3">บทถัดไป →</a></div>
+</section>
+
+<!-- ===================== CHAPTER 3 ===================== -->
+<section class="page" id="ch3" aria-labelledby="t-ch3">
+  <h1 id="t-ch3">บทที่ 3: IEEE 754 Single Precision</h1>
+  <div class="box objectives"><b>Learning Objectives</b><ul>
+    <li>อธิบายเหตุผลที่ต้องใช้ Floating-Point</li>
+    <li>เชื่อมโยง Scientific Notation ฐานสิบกับรูปแบบฐานสอง <code>1.xxx × 2ᵉ</code></li>
+    <li>ระบุ Sign, Exponent, Fraction ของ Float32 ได้</li>
+    <li>Encode ค่าฐานสิบเป็น 32 บิต และ Decode กลับได้</li></ul></div>
+  <h2>3.1 ทำไมต้อง Floating-Point</h2>
+  <p>จำนวนเต็มและ Fixed-point เก็บได้ในช่วงแคบ แต่เราต้องการเก็บทั้งค่ามหาศาล (เช่น 6.02×10²³) และค่าเล็กจิ๋ว (เช่น 1.6×10⁻¹⁹) ด้วยจำนวนบิตคงที่ Floating-Point จึงเก็บ “เลขนัยสำคัญ” แยกจาก “ตำแหน่งจุดทศนิยม” เหมือน Scientific Notation <code>1.25 × 10³</code> ฐานสองใช้รูป <b>Normalized</b> <code>1.xxxxx × 2ᵉ</code></p>
+  <h2>3.2 โครงสร้าง 32 บิต</h2>
+  <div class="formula"><span class="s">Sign 1 บิต</span> | <span class="e">Exponent 8 บิต</span> | <span class="f">Fraction 23 บิต</span>
+ค่า = (−1)^Sign × (1 + Fraction/2²³) × 2^(Exponent − 127)</div>
+  <ul><li><b class="s">Sign</b>: 0 = บวก, 1 = ลบ</li>
+  <li><b class="e">Exponent</b>: เก็บ e + <b>Bias 127</b> (Biased Exponent) ทำให้เก็บเลขชี้กำลังติดลบโดยไม่ต้องมีบิตเครื่องหมาย</li>
+  <li><b class="f">Fraction</b>: เก็บเฉพาะบิตหลัง “1.” เพราะบิต 1 นำหน้าของเลข Normalized เป็น <b>Hidden Leading 1</b> ไม่ต้องเก็บ</li></ul>
+  <h2>3.3 ขั้นตอน Encode (ตัวอย่าง 5.75)</h2>
+  <div class="formula">1) เครื่องหมายบวก, |x| = 5.75
+2) ฐานสอง: 5 = 101, 0.75 = 0.11 → 101.11₂
+3) Normalize: 101.11₂ = 1.0111₂ × 2²  (e = 2)
+4) Sign = 0
+5) Biased Exponent = 2 + 127 = 129 = 10000001₂
+6) Fraction = 0111 แล้วเติม 0 ให้ครบ 23 บิต (ถ้ายาวเกินให้ปัดเศษ)
+7) 0 10000001 01110000000000000000000 = 0x40B80000</div>
+  <h3>Decode</h3><p>ย้อนกลับ: แยก 1+8+23 บิต → หา e = Exponent − 127 → Significand = 1 + Fraction/2²³ → คูณ (−1)^Sign × Significand × 2ᵉ</p>
+  <div class="box note"><b>ขอบเขตของเครื่องมือ:</b> รองรับ Single Precision แบบ Normalized (และค่า 0) เท่านั้น <b>ไม่รองรับ</b> Subnormal, Infinity, NaN และ Double Precision — หากป้อนค่าเหล่านี้จะแสดงข้อความแจ้งเตือน เลขทศนิยมส่วนมาก (เช่น 0.1) จัดเก็บได้เพียงค่าประมาณ</div>
+  <div class="tool"><h3>Interactive: IEEE 754 Encoder / Decoder</h3><div data-tool="ieee"></div></div>
+  <div class="box summary"><b>Summary / สรุปท้ายบท</b><ul>
+    <li>Float32 = Sign 1 + Exponent 8 + Fraction 23 บิต; ค่า = (−1)^S × 1.F × 2^(E−127)</li>
+    <li>Bias = 127, Normalization ทำให้มี Hidden 1 จึงได้ความแม่นยำ 24 บิตนัยสำคัญ</li>
+    <li>Encode: ฐานสอง → Normalize → หา Biased Exponent → เก็บ Fraction; Decode ทำย้อนกลับ</li>
+    <li>ความแม่นยำจำกัด จึงต้องปัดเศษ ค่าที่เก็บจริงอาจต่างจากค่าที่ป้อน</li></ul></div>
+  <div class="pn"><a class="btn" href="#ch2">← บทก่อนหน้า</a><a class="btn primary" href="#ch4">บทถัดไป →</a></div>
+</section>
+
+<!-- ===================== CHAPTER 4 ===================== -->
+<section class="page" id="ch4" aria-labelledby="t-ch4">
+  <h1 id="t-ch4">บทที่ 4: การบวกและการลบ Floating-Point</h1>
+  <div class="box objectives"><b>Learning Objectives</b><ul>
+    <li>เข้าใจว่าการบวก/ลบ Floating-Point มีหลายขั้นตอนกว่าเลขจำนวนเต็ม</li>
+    <li>ติดตามขั้นตอน: ปรับ Exponent → บวก/ลบ Significand → Normalize → Rounding</li>
+    <li>เข้าใจผลของการปัดเศษและความแม่นยำที่จำกัด</li></ul></div>
+  <h2>4.1 ขั้นตอนหลัก</h2>
+  <ol><li>แปลง Operand ทั้งสองเป็น Float32 ก่อน (ค่าที่เก็บจริงคือค่าที่ใช้คำนวณ)</li>
+  <li>แยก Sign, Exponent, Significand (ใส่ Hidden 1 กลับ)</li>
+  <li>ปรับ Exponent ให้เท่ากัน โดยเลื่อน Significand ของค่าที่ Exponent น้อยกว่าไปทางขวา</li>
+  <li>บวกหรือลบ Significand ตามเครื่องหมายและ Operation</li>
+  <li>Normalize ให้อยู่ในรูป 1.xxx</li>
+  <li>ปัดเศษให้พอดี 23 บิต Fraction (Round to Nearest, Ties to Even)</li>
+  <li>Encode เป็น Float32</li></ol>
+  <div class="formula">ตัวอย่าง 1.5 + 0.25
+1.5 = 1.1₂ × 2⁰,  0.25 = 1.0₂ × 2⁻²
+เลื่อน 0.25 ขวา 2 บิต → 0.01₂ × 2⁰
+1.10 + 0.01 = 1.11₂ × 2⁰ = 1.75</div>
+  <div class="box note">ขั้นตอนเป็น <b>แบบจำลองเพื่อการเรียนรู้</b> ใช้ Significand 24 บิต + 3 บิตเสริม (Guard, Round, Sticky) ไม่ใช่รายละเอียดวงจรของ CPU ทุกรุ่น เครื่องมือนี้ไม่รองรับ Overflow/Underflow/ค่าพิเศษ และผลลัพธ์ถูกตรวจเทียบกับ <code>Math.fround</code> ทุกครั้ง</div>
+  <div class="tool"><h3>Interactive: Float32 Arithmetic Simulator</h3><p>ลองกรณีคลาสสิก: <code>0.1 + 0.2</code> หรือ <code>16777216 + 1</code></p><div data-tool="arith"></div></div>
+  <div class="box summary"><b>Summary / สรุปท้ายบท</b><ul>
+    <li>ต้องปรับ Exponent ให้เท่ากันก่อน โดยเลื่อน Significand ของค่าที่เล็กกว่า</li>
+    <li>จากนั้นบวก/ลบ Significand (ลบ = บวกด้วยค่าที่กลับเครื่องหมาย), Normalize แล้ว Rounding</li>
+    <li>บิตที่หลุดจากการเลื่อนและการปัดเศษทำให้ผลต่างจากค่าทางคณิตศาสตร์ เช่น 0.1+0.2 ≠ 0.3 พอดี</li></ul></div>
+  <div class="pn"><a class="btn" href="#ch3">← บทก่อนหน้า</a><a class="btn primary" href="#lab">ไป Interactive Lab →</a></div>
+</section>
+
+<!-- ===================== LAB ===================== -->
+<section class="page" id="lab" aria-labelledby="t-lab">
+  <h1 id="t-lab">Interactive Lab</h1>
+  <p>รวมเครื่องมือทดลองของทุกบทไว้ที่เดียว</p>
+  <div class="tool"><h3>บทที่ 1 — 8-bit Binary Integer</h3><div data-tool="bits8"></div></div>
+  <div class="tool"><h3>บทที่ 2A — 16-bit Binary Fraction</h3><div data-tool="frac16"></div></div>
+  <div class="tool"><h3>บทที่ 2B — Decimal Fraction Converter</h3><div data-tool="conv"></div></div>
+  <div class="tool"><h3>บทที่ 3 — IEEE 754 Encoder / Decoder</h3><div data-tool="ieee"></div></div>
+  <div class="tool"><h3>บทที่ 4 — Float32 Arithmetic Simulator</h3><div data-tool="arith"></div></div>
+</section>
+
+</main>
+</div>
+<script src="js/core.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

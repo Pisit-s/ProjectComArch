@@ -1,0 +1,127 @@
+/* ===== Theme variables — Binary Lab Dark Technical Lab ===== */
+:root {
+  --bg: #0B1020;
+  --bg-elevated: #111a30;
+  --bg-panel: #142042;
+  --bg-input: #0e1730;
+  --accent-cyan: #38BDF8;
+  --accent-purple: #A78BFA;
+  --text: #E2E8F0;
+  --text-muted: #94A3B8;
+  --border: #263355;
+  --border-strong: #38507d;
+
+  /* Bitfield semantic colors — used consistently site-wide */
+  --sign-color: #F87171;      /* red-ish for sign */
+  --sign-bg: rgba(248, 113, 113, 0.16);
+  --exp-color: #FBBF24;       /* amber for exponent */
+  --exp-bg: rgba(251, 191, 36, 0.16);
+  --frac-color: #34D399;      /* green for fraction */
+  --frac-bg: rgba(52, 211, 153, 0.16);
+
+  --success: #34D399;
+  --danger: #F87171;
+  --warning: #FBBF24;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+
+  --font-sans: "IBM Plex Sans Thai", "Noto Sans Thai", "Sarabun", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(1200px 600px at 80% -10%, rgba(56, 189, 248, 0.08), transparent 60%), var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 { line-height: 1.35; margin: 1.4em 0 0.5em; }
+h1 { font-size: clamp(1.5rem, 2.4vw + 1rem, 2.2rem); margin-top: 0.4em; }
+h2 { font-size: clamp(1.25rem, 1.6vw + 0.9rem, 1.6rem); }
+h3 { font-size: 1.15rem; }
+
+p { margin: 0.6em 0; }
+a { color: var(--accent-cyan); text-decoration: none; }
+a:hover, a:focus-visible { text-decoration: underline; }
+
+code, .mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  background: rgba(56, 189, 248, 0.10);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  color: #bae6fd;
+}
+
+pre.formula {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-cyan);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  color: #c7d2fe;
+  line-height: 1.6;
+}
+
+ul, ol { padding-left: 1.4em; }
+li { margin: 0.35em 0; }
+
+:focus-visible {
+  outline: 3px solid var(--accent-cyan);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: absolute; top: -48px; left: 12px; z-index: 100;
+  background: var(--accent-cyan); color: #06121f;
+  padding: 8px 14px; border-radius: var(--radius-sm); font-weight: 600;
+}
+.skip-link:focus { top: 12px; }
+
+/* Field / color semantic pills */
+.pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.15em 0.55em;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  vertical-align: middle;
+}
+.pill-sign { color: var(--sign-color); background: var(--sign-bg); }
+.pill-exp  { color: var(--exp-color);  background: var(--exp-bg); }
+.pill-frac { color: var(--frac-color); background: var(--frac-bg); }
+
+/* Text helpers */
+.text-muted { color: var(--text-muted); }
+.note {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  border-left: 3px solid var(--border-strong);
+  padding-left: 0.9rem;
+  margin: 1rem 0;
+}

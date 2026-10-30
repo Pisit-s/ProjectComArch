@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <meta name="description" content="Binary Lab ห้องทดลองเรียนรู้ระบบเลขฐาน เศษส่วนฐานสอง และ IEEE 754 แบบ Interactive">
+  <title>Binary Lab — ห้องทดลองเลขฐานสอง</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#home" aria-label="Binary Lab หน้าแรก">
+        <span class="brand-mark">01</span><span><b>Binary Lab</b><small>COMPUTER ARCHITECTURE</small></span>
+      </a>
+      <div class="nav-label">LEARNING PATH</div>
+      <nav class="main-nav" aria-label="เมนูหลัก">
+        <a href="#home" data-page="home" class="nav-link active"><span class="nav-icon">⌂</span> ภาพรวม <span class="nav-index">00</span></a>
+        <a href="#chapter1" data-page="chapter1" class="nav-link"><span class="nav-icon">01</span> ระบบเลขฐาน <span class="nav-index">01</span></a>
+        <a href="#chapter2" data-page="chapter2" class="nav-link"><span class="nav-icon">½</span> เศษส่วนฐานสอง <span class="nav-index">02</span></a>
+        <a href="#chapter3" data-page="chapter3" class="nav-link"><span class="nav-icon">32</span> IEEE 754 <span class="nav-index">03</span></a>
+        <a href="#chapter4" data-page="chapter4" class="nav-link"><span class="nav-icon">±</span> Float Arithmetic <span class="nav-index">04</span></a>
+        <a href="#lab" data-page="lab" class="nav-link"><span class="nav-icon">⌘</span> Interactive Lab <span class="nav-index">LAB</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="status-dot"></div><span>Offline-ready learning tools</span>
+        <div class="sidebar-note">เรียนรู้ทีละบิต<br><strong>เข้าใจทุกขั้นตอน</strong></div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="เปิดเมนู" aria-expanded="false">☰</button>
+        <div class="breadcrumb"><span>Binary Lab</span><span class="crumb-sep">/</span><strong id="currentCrumb">ภาพรวม</strong></div>
+        <div class="topbar-right"><span class="live-indicator"></span><span>INTERACTIVE MODE</span></div>
+      </header>
+
+      <section class="page active" id="page-home" data-title="ภาพรวม">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow"><span class="eyebrow-line"></span> DIGITAL NUMBER SYSTEMS / 001</div>
+            <h1>ตัวเลขที่คุณเห็น<br>ไม่ใช่สิ่งที่คอมพิวเตอร์<span class="gradient-text">เก็บไว้</span></h1>
+            <p class="hero-lead">เปิดห้องทดลองเพื่อสำรวจว่าคอมพิวเตอร์แทนค่าตัวเลขด้วยบิตอย่างไร ตั้งแต่จำนวนเต็ม เศษส่วน ไปจนถึงมาตรฐาน IEEE 754 และการคำนวณ Floating-Point</p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#chapter1">เริ่มเรียนรู้ <span>↗</span></a>
+              <a class="btn btn-ghost" href="#lab">เปิด Interactive Lab <span>⌘</span></a>
+            </div>
+            <div class="hero-meta"><span>◈ 4 บทเรียน</span><span>◈ ทดลองได้ทันที</span><span>◈ ไม่ต้องติดตั้ง</span></div>
+          </div>
+          <div class="hero-visual" aria-label="ภาพแสดงโครงสร้างบิต 32 บิต">
+            <div class="visual-top"><span>FLOAT32 / MEMORY VIEW</span><span class="tiny-live">● LIVE</span></div>
+            <div class="float-number">5.75<span>₁₀</span></div>
+            <div class="binary-preview"><span class="sign-bit">0</span><span class="exp-bit">10000001</span><span class="frac-bit">01110000000000000000000</span></div>
+            <div class="field-labels"><span class="sign-label">SIGN · 1 BIT</span><span class="exp-label">EXPONENT · 8 BITS</span><span class="frac-label">FRACTION · 23 BITS</span></div>
+            <div class="visual-divider"></div>
+            <div class="visual-equation"><span>1.0111₂ × 2²</span><b>→</b><span class="equation-result">5.75</span></div>
+            <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+          </div>
+        </div>
+
+        <div class="section-heading">
+          <div><div class="eyebrow">YOUR LEARNING PATH</div><h2>จากบิตแรกสู่การคำนวณจริง</h2><p>เรียนตามลำดับเพื่อสร้างความเข้าใจทีละชั้น</p></div>
+          <span class="section-count">04 MODULES</span>
+        </div>
+        <div class="chapter-grid">
+          <article class="chapter-card"><div class="card-top"><span class="chapter-number cyan">01</span><span class="card-symbol">▦</span></div><div class="card-tag">FOUNDATION</div><h3>ระบบเลขฐานและจำนวนเต็ม</h3><p>ทำความเข้าใจค่าประจำหลักและเปลี่ยนบิต 8 บิตให้เป็นค่าฐานสิบแบบ Real-time</p><div class="card-bottom"><span>8-bit Explorer</span><a href="#chapter1" aria-label="เริ่มบทที่ 1">↗</a></div></article>
+          <article class="chapter-card"><div class="card-top"><span class="chapter-number purple">02</span><span class="card-symbol">½</span></div><div class="card-tag">FRACTION</div><h3>เศษส่วนฐานสิบและฐานสอง</h3><p>คูณเศษส่วนด้วย 2 ซ้ำ ๆ และสังเกตว่าทำไม 0.1 จึงแทนค่าได้ไม่พอดี</p><div class="card-bottom"><span>Fraction Explorer</span><a href="#chapter2" aria-label="เริ่มบทที่ 2">↗</a></div></article>
+          <article class="chapter-card"><div class="card-top"><span class="chapter-number amber">03</span><span class="card-symbol">▤</span></div><div class="card-tag">IEEE STANDARD</div><h3>IEEE 754 Single Precision</h3><p>แยก Sign, Exponent, Fraction และทดลอง Encode / Decode ข้อมูล 32 บิต</p><div class="card-bottom"><span>Binary32 Encoder</span><a href="#chapter3" aria-label="เริ่มบทที่ 3">↗</a></div></article>
+          <article class="chapter-card"><div class="card-top"><span class="chapter-number green">04</span><span class="card-symbol">±</span></div><div class="card-tag">ARITHMETIC</div><h3>การบวกและลบ Floating-Point</h3><p>จำลองการปรับ Exponent บวก Significand และปัดเศษตามความแม่นยำ Float32</p><div class="card-bottom"><span>Arithmetic Simulator</span><a href="#chapter4" aria-label="เริ่มบทที่ 4">↗</a></div></article>
+        </div>
+        <div class="home-footer"><div class="footer-icon">⌘</div><div><strong>พร้อมทดลองหรือยัง?</strong><p>เปลี่ยนค่าด้วยตัวเอง แล้วดูว่าบิตแต่ละตัวส่งผลต่อคำตอบอย่างไร</p></div><a class="btn btn-secondary" href="#lab">เข้าสู่ Interactive Lab <span>→</span></a></div>
+      </section>
+
+      <section class="page" id="page-chapter1" data-title="บทที่ 1 · ระบบเลขฐาน">
+        <div class="page-heading"><div class="eyebrow">CHAPTER 01 / FOUNDATION</div><h1>ระบบเลขฐานและ<span class="gradient-text">จำนวนเต็มฐานสอง</span></h1><p>ทุกข้อมูลดิจิทัลเริ่มต้นจากบิต เรียนรู้ค่าประจำหลักและวิธีที่บิตแต่ละตัวสร้างจำนวนเต็ม</p></div>
+        <div class="objective-box"><div class="objective-icon">◎</div><div><h3>เป้าหมายการเรียนรู้</h3><p>เข้าใจค่าประจำหลัก • แปลง Binary เป็น Decimal • อธิบายช่วงค่าของ Unsigned 8-bit Integer ได้</p></div></div>
+        <div class="lesson-grid">
+          <article class="panel lesson-panel"><div class="panel-kicker">01.1 · CORE CONCEPT</div><h2>ค่าประจำหลักคืออะไร?</h2><p>ระบบเลขฐานสิบ (Base 10) ใช้ตัวเลข 0–9 โดยแต่ละตำแหน่งมีน้ำหนักเป็นกำลังของ 10 เช่น 347 = 3×10² + 4×10¹ + 7×10⁰</p><div class="place-value decimal-places"><div><small>หลักร้อย</small><b>10²</b><span>100</span></div><div><small>หลักสิบ</small><b>10¹</b><span>10</span></div><div><small>หลักหน่วย</small><b>10⁰</b><span>1</span></div></div><div class="formula-box"><span class="formula-label">ตัวอย่างฐานสิบ</span><code>347 = 3×100 + 4×10 + 7×1</code></div><p>ระบบเลขฐานสอง (Base 2) ใช้เพียง <strong>0 และ 1</strong> แต่ละตำแหน่งมีน้ำหนักเป็นกำลังของ 2 เช่น 1010₂ = 1×2³ + 0×2² + 1×2¹ + 0×2⁰ = 10₁₀</p><div class="place-value binary-places"><div><small>บิต b3</small><b>2³</b><span>8</span></div><div><small>บิต b2</small><b>2²</b><span>4</span></div><div><small>บิต b1</small><b>2¹</b><span>2</span></div><div><small>บิต b0</small><b>2⁰</b><span>1</span></div></div></article>
+          <article class="panel lesson-panel"><div class="panel-kicker">01.2 · KEY IDEA</div><h2>Unsigned 8-bit Integer</h2><p>จำนวนเต็มแบบไม่มีเครื่องหมายใช้ทั้ง 8 บิตแทนค่าที่ไม่ติดลบ ตั้งแต่ 0 ถึง 2⁸−1 = 255</p><div class="range-visual"><div><span>MINIMUM</span><strong>0</strong><code>00000000</code></div><div class="range-arrow">→</div><div><span>MAXIMUM</span><strong>255</strong><code>11111111</code></div></div><div class="callout"><b>จำไว้</b><p>บิตที่เป็น 0 มีส่วนเพิ่มเป็น 0 ส่วนบิตที่เป็น 1 จะเพิ่มค่าตามน้ำหนักประจำหลักของตำแหน่งนั้น</p></div><div class="formula-box"><span class="formula-label">สูตรทั่วไป</span><code>ค่า = Σ (บิตᵢ × 2ⁱ), i = 0 ถึง 7</code></div></article>
+        </div>
+        <div class="panel interactive-panel"><div class="panel-header"><div><div class="panel-kicker">INTERACTIVE TOOL 01</div><h2>8-bit Binary Integer Explorer</h2><p>คลิกบิตเพื่อสลับ 0 ↔ 1 แล้วดูผลรวมเปลี่ยนทันที</p></div><span class="tool-badge">LIVE CALCULATION</span></div>
+          <div class="bit-explorer" id="integerBits" aria-label="ตัวเลือกบิตจำนวนเต็ม 8 บิต"></div>
+          <div class="tool-controls"><div class="preset-group"><span>ลองตัวอย่าง</span><button class="chip" data-int="0">0</button><button class="chip" data-int="10">10</button><button class="chip" data-int="128">128</button><button class="chip" data-int="255">255</button></div><button class="btn btn-small btn-ghost" id="resetInteger">↺ รีเซ็ต</button></div>
+          <div class="result-grid"><div class="result-tile"><span>BINARY STRING</span><strong class="mono" id="integerBinary">00000000</strong><small>8 บิต</small></div><div class="result-tile result-primary"><span>DECIMAL RESULT</span><strong id="integerDecimal">0</strong><small>ผลรวมฐานสิบ</small></div></div>
+          <div class="contribution-wrap"><h3>แต่ละบิตมีส่วนร่วมเท่าไร?</h3><div class="table-scroll"><table><thead><tr><th>ตำแหน่ง</th><th>บิต</th><th>น้ำหนัก (2ⁱ)</th><th>Contribution</th></tr></thead><tbody id="integerContributions"></tbody></table></div></div>
+        </div>
+        <div class="summary-box"><div class="summary-mark">✓</div><div><h2>Summary / สรุปท้ายบท</h2><ul><li>เลขฐานสิบใช้น้ำหนักกำลังของ 10 ส่วนเลขฐานสองใช้น้ำหนักกำลังของ 2</li><li>ค่าเลขฐานสองหาได้จากผลรวมของบิตแต่ละตัวคูณน้ำหนักประจำหลัก</li><li>Unsigned 8-bit แทนค่าได้ 0–255 เพราะมีรูปแบบบิตทั้งหมด 2⁸ รูปแบบ</li></ul></div></div>
+        <div class="chapter-nav"><a class="btn btn-ghost" href="#home">← ภาพรวม</a><a class="btn btn-primary" href="#chapter2">บทถัดไป: เศษส่วนฐานสอง →</a></div>
+      </section>
+
+      <section class="page" id="page-chapter2" data-title="บทที่ 2 · เศษส่วนฐานสอง">
+        <div class="page-heading"><div class="eyebrow">CHAPTER 02 / FRACTIONS</div><h1>เศษส่วนฐานสิบและ<span class="gradient-text">เศษส่วนฐานสอง</span></h1><p>สำรวจน้ำหนักบิตหลังจุดฐาน และดูการแปลงเศษส่วนด้วยการคูณ 2 ซ้ำ ๆ</p></div>
+        <div class="objective-box"><div class="objective-icon">◎</div><div><h3>เป้าหมายการเรียนรู้</h3><p>คำนวณค่าจาก Binary Fraction • แปลงเศษส่วนฐานสิบ • อธิบาย Approximation และ Absolute Error ได้</p></div></div>
+        <div class="lesson-grid">
+          <article class="panel lesson-panel"><div class="panel-kicker">02.1 · PLACE VALUE</div><h2>น้ำหนักหลังจุดฐาน</h2><p>หลังจุดทศนิยมของฐานสิบ น้ำหนักจะเป็น 10⁻¹ = 0.1, 10⁻² = 0.01 และ 10⁻³ = 0.001 ส่วนฐานสองใช้ 2⁻¹, 2⁻², 2⁻³ ตามลำดับ</p><div class="place-value binary-places"><div><small>บิต b1</small><b>2⁻¹</b><span>0.5</span></div><div><small>บิต b2</small><b>2⁻²</b><span>0.25</span></div><div><small>บิต b3</small><b>2⁻³</b><span>0.125</span></div><div><small>บิต b4</small><b>2⁻⁴</b><span>0.0625</span></div></div><div class="formula-box"><span class="formula-label">ตัวอย่าง 0.101₂</span><code>1×2⁻¹ + 0×2⁻² + 1×2⁻³ = 0.625₁₀</code></div><p>การแปลงจากฐานสิบใช้วิธีคูณเศษส่วนด้วย 2 ซ้ำ ๆ บิตถัดไปคือส่วนจำนวนเต็มของผลคูณ แล้วนำเศษส่วนที่เหลือไปทำขั้นต่อไป</p></article>
+          <article class="panel lesson-panel"><div class="panel-kicker">02.2 · APPROXIMATION</div><h2>ทำไม 0.1 ถึงไม่พอดี?</h2><p>เศษส่วนบางค่า เช่น 0.1₁₀ มีรูปแบบฐานสองที่ซ้ำไม่สิ้นสุด คล้ายกับ 1/3 = 0.3333… ในฐานสิบ</p><div class="formula-box"><span class="formula-label">แนวคิด</span><code>0.1₁₀ ≈ 0.0001100110011…₂</code></div><p>เมื่อมีจำนวนบิตจำกัด เราต้องเก็บเพียงบางส่วน จึงเกิด <strong>Absolute Error</strong> หรือค่าสัมบูรณ์ของผลต่างระหว่างค่าเดิมกับค่าที่ประมาณได้</p><div class="callout"><b>Approximation · ค่าประมาณ</b><p>การประมาณไม่จำเป็นต้องผิดพลาดมากเสมอไป แต่ต้องแยกค่าจริงทางคณิตศาสตร์ออกจากค่าที่จัดเก็บได้</p></div></article>
+        </div>
+        <div class="panel interactive-panel"><div class="panel-header"><div><div class="panel-kicker">INTERACTIVE TOOL 02A</div><h2>16-bit Binary Fraction Explorer</h2><p>คลิกบิตเศษส่วนเพื่อเพิ่มหรือลดค่าฐานสิบ</p></div><span class="tool-badge">16 FRACTION BITS</span></div>
+          <div class="fraction-bits" id="fractionBits" aria-label="ตัวเลือกบิตเศษส่วน 16 บิต"></div>
+          <div class="tool-controls"><div class="preset-group"><span>ลองตัวอย่าง</span><button class="chip" data-frac="0">0</button><button class="chip" data-frac="0.375">0.375</button><button class="chip" data-frac="0.625">0.625</button><button class="chip" data-frac="0.1">0.1 (ประมาณ)</button></div><button class="btn btn-small btn-ghost" id="resetFraction">↺ รีเซ็ต</button></div>
+          <div class="result-grid"><div class="result-tile"><span>BINARY FRACTION</span><strong class="mono small-mono" id="fractionBinary">0.0000000000000000₂</strong><small>16 บิตหลังจุดฐาน</small></div><div class="result-tile result-primary"><span>DECIMAL VALUE</span><strong id="fractionDecimal">0</strong><small>ผลรวมของน้ำหนักบิต</small></div></div>
+          <div class="contribution-wrap"><h3>ค่าน้ำหนักและ Contribution</h3><div class="table-scroll"><table><thead><tr><th>ตำแหน่ง</th><th>บิต</th><th>น้ำหนัก</th><th>Contribution</th></tr></thead><tbody id="fractionContributions"></tbody></table></div></div>
+        </div>
+        <div class="panel interactive-panel"><div class="panel-header"><div><div class="panel-kicker">INTERACTIVE TOOL 02B</div><h2>Decimal Fraction Converter</h2><p>ป้อนค่าในช่วง 0 ถึงน้อยกว่า 1 เพื่อดูการคูณด้วย 2 ทีละขั้น</p></div><span class="tool-badge">STEP-BY-STEP</span></div>
+          <form id="fractionForm" class="input-form"><label class="field">เศษส่วนฐานสิบ<input id="fractionInput" type="number" step="any" min="0" max="0.9999999999999999" value="0.1" required><small>รองรับค่า 0 ≤ x &lt; 1</small></label><label class="field">จำนวนบิตผลลัพธ์<select id="fractionLength"><option>8</option><option>16</option><option selected>23</option><option>32</option></select></label><button class="btn btn-primary" type="submit">แปลงเป็นฐานสอง →</button></form>
+          <div id="fractionConvertError" class="error-message" role="alert" hidden></div><div id="fractionConvertResult" aria-live="polite"></div>
+        </div>
+        <div class="summary-box"><div class="summary-mark">✓</div><div><h2>Summary / สรุปท้ายบท</h2><ul><li>น้ำหนักบิตเศษส่วนฐานสองเริ่มจาก 2⁻¹ = 0.5 แล้วลดลงครึ่งหนึ่งทุกตำแหน่ง</li><li>วิธีคูณเศษส่วนด้วย 2 ให้บิตจากส่วนจำนวนเต็มของผลคูณแต่ละรอบ</li><li>เศษส่วนฐานสิบที่ไม่สิ้นสุดในฐานสองต้องเก็บเป็นค่าประมาณ และอาจมี Absolute Error</li></ul></div></div>
+        <div class="chapter-nav"><a class="btn btn-ghost" href="#chapter1">← บทก่อนหน้า</a><a class="btn btn-primary" href="#chapter3">บทถัดไป: IEEE 754 →</a></div>
+      </section>
+
+      <section class="page" id="page-chapter3" data-title="บทที่ 3 · IEEE 754">
+        <div class="page-heading"><div class="eyebrow">CHAPTER 03 / FLOAT32</div><h1>IEEE 754 <span class="gradient-text">Single Precision</span></h1><p>จำนวนจริงในคอมพิวเตอร์ถูกเข้ารหัสเป็นบิต 32 บิตด้วย Sign, Exponent และ Fraction</p></div>
+        <div class="objective-box"><div class="objective-icon">◎</div><div><h3>เป้าหมายการเรียนรู้</h3><p>เข้าใจ Scientific Notation • อธิบาย Bias 127 • เข้ารหัสและถอดรหัส Float32 ได้</p></div></div>
+        <div class="lesson-grid">
+          <article class="panel lesson-panel"><div class="panel-kicker">03.1 · SCIENTIFIC NOTATION</div><h2>Normalize ก่อนจัดเก็บ</h2><p>Scientific Notation ฐานสิบเขียน 1250 เป็น 1.25 × 10³ ส่วนเลขฐานสองแบบ Normalized เขียนเป็น 1.xxxxx₂ × 2ᵉ เช่น 5.75₁₀ = 101.11₂ = 1.0111₂ × 2²</p><div class="formula-box"><span class="formula-label">Biased Exponent</span><code>E = e + Bias = 2 + 127 = 129 = 10000001₂</code></div><p>สำหรับค่าปกติ (Normalized) เลข 1 ตัวแรกของ Significand ไม่ต้องเก็บซ้ำ เพราะเป็น 1 เสมอ จึงเรียกว่า <strong>Hidden Leading 1</strong></p></article>
+          <article class="panel lesson-panel"><div class="panel-kicker">03.2 · 32-BIT STRUCTURE</div><h2>โครงสร้าง Binary32</h2><div class="field-structure"><div class="field-block sign-field"><span>SIGN</span><strong>1</strong><small>เครื่องหมาย</small></div><div class="field-block exp-field"><span>EXPONENT</span><strong>8</strong><small>เลขชี้กำลัง + Bias</small></div><div class="field-block frac-field"><span>FRACTION</span><strong>23</strong><small>ส่วนเศษของ significand</small></div></div><div class="formula-box"><span class="formula-label">สูตรสำหรับ Normalized</span><code>(−1)ˢ × 1.F × 2^(E−127)</code></div><p class="muted">เวอร์ชันนี้แสดงรายละเอียดพิเศษของ Subnormal, Infinity, NaN และ Signed Zero ผ่านผลการถอดรหัส แต่การไล่ขั้นตอน Normalize แบบละเอียดเน้นค่าปกติที่รองรับ</p></article>
+        </div>
+        <div class="panel interactive-panel"><div class="panel-header"><div><div class="panel-kicker">INTERACTIVE TOOL 03</div><h2>IEEE 754 Encoder / Decoder</h2><p>แปลงเลขฐานสิบเป็นบิต 32 บิต หรือถอดรหัสบิตกลับเป็นตัวเลข</p></div><span class="tool-badge">BINARY32</span></div>
+          <div class="mode-switch" role="tablist" aria-label="โหมด IEEE 754"><button class="mode-btn active" id="encodeMode" role="tab" aria-selected="true">Decimal → IEEE 754</button><button class="mode-btn" id="decodeMode" role="tab" aria-selected="false">IEEE 754 → Decimal</button></div>
+          <div id="encoderPane"><form id="encoderForm" class="input-form"><label class="field grow">ตัวเลขฐานสิบ<input id="encodeInput" type="text" inputmode="decimal" value="5.75" placeholder="เช่น 5.75 หรือ -0.1" required><small>รองรับเลข Float32 ที่เป็น finite number</small></label><button class="btn btn-primary" type="submit">Encode →</button></form><div id="encodeError" class="error-message" role="alert" hidden></div><div id="encodeResult" aria-live="polite"></div></div>
+          <div id="decoderPane" hidden><form id="decoderForm" class="input-form"><label class="field grow">Bit String (32 บิต)<input id="decodeInput" type="text" class="mono" value="01000000101110000000000000000000" placeholder="ป้อนบิต 32 ตัว จะเว้นวรรคแบ่งกลุ่มก็ได้" required><small>อนุญาตให้มีช่องว่าง แต่ต้องมี 0 หรือ 1 รวม 32 บิต</small></label><button class="btn btn-primary" type="submit">Decode →</button></form><div id="decodeError" class="error-message" role="alert" hidden></div><div id="decodeResult" aria-live="polite"></div></div>
+        </div>
+        <div class="summary-box"><div class="summary-mark">✓</div><div><h2>Summary / สรุปท้ายบท</h2><ul><li>Binary32 แบ่งเป็น Sign 1 บิต, Exponent 8 บิต และ Fraction 23 บิต</li><li>Exponent ที่จัดเก็บใช้ Bias 127; สำหรับค่าปกติ e = E − 127</li><li>ค่าทศนิยมบางค่าไม่สามารถแทนได้ตรงทั้งหมด เพราะจำนวนบิตมีจำกัดและต้องปัดเศษ</li></ul></div></div>
+        <div class="chapter-nav"><a class="btn btn-ghost" href="#chapter2">← บทก่อนหน้า</a><a class="btn btn-primary" href="#chapter4">บทถัดไป: Arithmetic →</a></div>
+      </section>
+
+      <section class="page" id="page-chapter4" data-title="บทที่ 4 · Floating-Point Arithmetic">
+        <div class="page-heading"><div class="eyebrow">CHAPTER 04 / ARITHMETIC</div><h1>การบวกและการลบ<span class="gradient-text"> Floating-Point</span></h1><p>เรียนรู้ว่าทำไมการบวกเลขแบบ Float32 จึงต้องจัดแนวเลขชี้กำลังก่อนคำนวณ</p></div>
+        <div class="objective-box"><div class="objective-icon">◎</div><div><h3>เป้าหมายการเรียนรู้</h3><p>แยกส่วนประกอบ • ปรับ Exponent • บวก/ลบ Significand • เข้าใจผลของ Rounding</p></div></div>
+        <div class="lesson-grid">
+          <article class="panel lesson-panel"><div class="panel-kicker">04.1 · ALIGN EXPONENTS</div><h2>ทำไมต้องปรับ Exponent?</h2><p>ก่อนบวกหรือลบ Significand ต้องเขียนตัวเลขให้อยู่ในรูปที่มีเลขชี้กำลังเท่ากัน โดยเลื่อนจุดฐานของ significand ของค่าที่มี Exponent น้อยกว่า</p><div class="formula-box"><span class="formula-label">ตัวอย่างแนวคิด</span><code>1.0 × 2³ + 1.0 × 2¹<br> = 1.0 × 2³ + 0.01 × 2³</code></div><p>เมื่อ Exponent เท่ากัน จึงนำ significand มาบวกหรือลบตามเครื่องหมาย จากนั้น Normalize ผลลัพธ์และปัดให้พอดีกับความละเอียดที่มี</p></article>
+          <article class="panel lesson-panel"><div class="panel-kicker">04.2 · ROUNDING</div><h2>ค่าที่คาดหวังอาจต่างกัน</h2><p>ตัวถูกดำเนินการแต่ละตัวถูกปัดเป็น Float32 ก่อนคำนวณ เครื่องมือจึงใช้ค่าที่เก็บได้จริง ไม่ใช่ค่าทศนิยมเดิมที่พิมพ์เข้ามา</p><div class="formula-box"><span class="formula-label">ตัวอย่าง</span><code>fround(fround(0.1) + fround(0.2))<br>≈ 0.30000001192092896</code></div><div class="callout"><b>แบบจำลองเพื่อการเรียนรู้</b><p>ขั้นตอนในหน้านี้แสดงแนวคิดหลักของการคำนวณ Floating-Point ไม่ใช่รายละเอียดวงจรภายในของ CPU ทุกสถาปัตยกรรม</p></div></article>
+        </div>
+        <div class="panel interactive-panel"><div class="panel-header"><div><div class="panel-kicker">INTERACTIVE TOOL 04</div><h2>Float32 Arithmetic Simulator</h2><p>Operand ทั้งสองจะถูกแปลงเป็น Float32 ก่อนคำนวณทุกครั้ง</p></div><span class="tool-badge">FLOAT32 ALU MODEL</span></div>
+          <form id="arithmeticForm" class="input-form arithmetic-form"><label class="field grow">Operand A<input id="operandA" type="text" inputmode="decimal" value="0.1" required></label><label class="field operation-field">Operation<select id="operation"><option value="+">บวก (+)</option><option value="-">ลบ (−)</option></select></label><label class="field grow">Operand B<input id="operandB" type="text" inputmode="decimal" value="0.2" required></label><button class="btn btn-primary" type="submit">Calculate →</button><button class="btn btn-ghost" type="button" id="resetArithmetic">Reset</button></form>
+          <div id="arithmeticError" class="error-message" role="alert" hidden></div><div id="arithmeticResult" aria-live="polite"></div>
+        </div>
+        <div class="summary-box"><div class="summary-mark">✓</div><div><h2>Summary / สรุปท้ายบท</h2><ul><li>แปลง Operand เป็น Float32 ก่อนคำนวณ เพื่อให้ตรงกับความแม่นยำของชนิดข้อมูล</li><li>การบวก/ลบต้องปรับ Exponent ให้เท่ากันก่อนดำเนินการกับ Significand</li><li>ผลลัพธ์อาจถูก Normalize และปัดเศษ ทำให้ต่างจากผลทางคณิตศาสตร์ที่คาดหวัง</li></ul></div></div>
+        <div class="chapter-nav"><a class="btn btn-ghost" href="#chapter3">← บทก่อนหน้า</a><a class="btn btn-primary" href="#lab">ไปยัง Interactive Lab →</a></div>
+      </section>
+
+      <section class="page" id="page-lab" data-title="Interactive Lab">
+        <div class="page-heading"><div class="eyebrow">OPEN EXPERIMENTS / LAB</div><h1>Interactive <span class="gradient-text">Lab</span></h1><p>พื้นที่ทดลองรวมเครื่องมือสำคัญทั้งหมด เลือกเครื่องมือที่ต้องการแล้วเริ่มสำรวจได้ทันที</p></div>
+        <div class="lab-grid">
+          <a href="#chapter1" class="lab-card"><span class="lab-icon cyan">01</span><div><h3>Binary Integer Explorer</h3><p>เปลี่ยนบิต 8 บิตและคำนวณค่าฐานสิบ</p></div><span class="lab-arrow">↗</span></a>
+          <a href="#chapter2" class="lab-card"><span class="lab-icon purple">½</span><div><h3>Binary Fraction Explorer</h3><p>สำรวจน้ำหนักบิตเศษส่วน 16 บิต</p></div><span class="lab-arrow">↗</span></a>
+          <a href="#chapter2" class="lab-card"><span class="lab-icon amber">×2</span><div><h3>Decimal Fraction Converter</h3><p>ดูขั้นตอนคูณเศษส่วนด้วย 2 ซ้ำ ๆ</p></div><span class="lab-arrow">↗</span></a>
+          <a href="#chapter3" class="lab-card"><span class="lab-icon green">32</span><div><h3>IEEE 754 Encoder / Decoder</h3><p>สร้างและอ่านข้อมูล Float32 แบบ 32 บิต</p></div><span class="lab-arrow">↗</span></a>
+          <a href="#chapter4" class="lab-card"><span class="lab-icon cyan">±</span><div><h3>Float32 Arithmetic Simulator</h3><p>จำลองการบวกและลบพร้อมแสดงขั้นตอน</p></div><span class="lab-arrow">↗</span></a>
+        </div>
+        <div class="callout lab-callout"><b>ขอบเขตการทดลอง</b><p>เครื่องมือนี้ทำงานในเบราว์เซอร์โดยไม่ส่งข้อมูลไปยังเซิร์ฟเวอร์ การคำนวณ IEEE 754 ใช้ Float32 ของ JavaScript ผ่าน DataView และ Math.fround() รองรับ finite number เป็นหลัก และแจ้งเตือนเมื่อเจอค่าที่ไม่รองรับในขั้นตอนจำลอง</p></div>
+      </section>
+
+      <footer class="site-footer"><span>© Binary Lab · Computer Architecture Learning</span><span>BUILT FOR CURIOSITY <b>✦</b></span></footer>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Lab — สื่อการเรียนรู้ระบบเลขฐานและ Floating-Point (IEEE 754)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0B1020',
+                        panelBg: '#151D36',
+                        panelBorder: '#232E4A',
+                        accentCyan: '#38BDF8',
+                        accentPurple: '#A78BFA',
+                        signColor: '#EF4444',     /* Red for Sign */
+                        expColor: '#3B82F6',      /* Blue for Exponent */
+                        fracColor: '#10B981',     /* Green for Fraction */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Kanit', 'Prompt', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0B1020;
+            color: #E2E8F0;
+            font-family: 'Kanit', sans-serif;
+            overflow-x: hidden;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B1020;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #232E4A;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #38BDF8;
+        }
+        .tab-btn.active {
+            border-bottom: 2px solid #38BDF8;
+            color: #38BDF8;
+            background-rgba: rgba(56, 189, 248, 0.08);
+        }
+        /* Bit Toggle Styles */
+        .bit-btn {
+            transition: all 0.15s ease-in-out;
+        }
+        .bit-btn:hover {
+            transform: translateY(-2px);
+        }
+        .bit-btn.active-1 {
+            background-color: #38BDF8;
+            color: #0B1020;
+            font-weight: 700;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+        }
+        .bit-btn.active-0 {
+            background-color: #1E293B;
+            color: #64748B;
+            border: 1px solid #334155;
+        }
+        /* Tooltip style */
+        .step-card {
+            border-left: 4px solid #38BDF8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Header / Navigation -->
+    <header class="sticky top-0 z-50 bg-[#0B1020]/90 backdrop-blur border-b border-panelBorder px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('dashboard')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accentCyan to-accentPurple flex items-center justify-center font-bold text-darkBg text-xl shadow-lg shadow-accentCyan/20">
+                        BL
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                            Binary Lab <span class="text-xs font-normal px-2 py-0.5 rounded-full bg-accentCyan/10 text-accentCyan border border-accentCyan/30">v1.0</span>
+                        </h1>
+                        <p class="text-xs text-slate-400">Educational Floating-Point & Binary Architecture Lab</p>
+                    </div>
+                </div>
+                <!-- Mobile Menu Button toggle -->
+                <button id="mobileMenuBtn" class="md:hidden text-slate-400 hover:text-white p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav id="navMenu" class="hidden md:flex flex-wrap items-center gap-1 text-sm font-medium">
+                <button onclick="switchTab('dashboard')" class="tab-btn px-3 py-2 rounded-lg text-slate-300 hover:text-white transition" id="tab-btn-dashboard">หน้าหลัก</button>
+                <button onclick="switchTab('chap1')" class="tab-btn px-3 py-2 rounded-lg text-slate-300 hover:text-white transition" id="tab-btn-chap1">บทที่ 1: เลขฐานสอง</button>
+                <button onclick="switchTab('chap2')" class="tab-btn px-3 py-2 rounded-lg text-slate-300 hover:text-white transition" id="tab-btn-chap2">บทที่ 2: เศษส่วนฐานสอง</button>
+                <button onclick="switchTab('chap3')" class="tab-btn px-3 py-2 rounded-lg text-slate-300 hover:text-white transition" id="tab-btn-chap3">บทที่ 3: IEEE 754</button>
+                <button onclick="switchTab('chap4')" class="tab-btn px-3 py-2 rounded-lg text-slate-300 hover:text-white transition" id="tab-btn-chap4">บทที่ 4: Arithmetic</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
+
+        <!-- DASHBOARD PAGE -->
+        <section id="page-dashboard" class="tab-page space-y-8">
+            <!-- Hero Banner -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-panelBg via-[#1A2544] to-panelBg border border-panelBorder p-8 md:p-12">
+                <div class="relative z-10 max-w-2xl">
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-accentCyan/20 text-accentCyan border border-accentCyan/30 mb-4 inline-block">Computer Architecture & Digital Logic</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4 leading-tight">
+                        เรียนรู้ <span class="text-transparent bg-clip-text bg-gradient-to-r from-accentCyan to-accentPurple">Binary & Floating-Point</span> แบบเห็นภาพจริง
+                    </h2>
+                    <p class="text-slate-300 text-base md:text-lg mb-6 leading-relaxed">
+                        สื่อการเรียนรู้แบบโต้ตอบ (Interactive Lab) ที่ออกแบบมาเพื่อให้นักศึกษาเข้าใจหลักการทำงานของคอมพิวเตอร์ในการแทนค่าและคำนวณตัวเลขฐานสอง, เศษส่วน, IEEE 754 Single Precision (32-bit) และขั้นตอนการบวกลบ Float32 ทีละ step
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="switchTab('chap1')" class="px-6 py-3 rounded-xl bg-accentCyan text-darkBg font-bold hover:bg-cyan-300 transition shadow-lg shadow-accentCyan/20 flex items-center gap-2">
+                            เริ่มบทที่ 1
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </button>
+                        <button onclick="switchTab('chap3')" class="px-6 py-3 rounded-xl bg-panelBg border border-accentPurple/40 text-accentPurple hover:bg-accentPurple/10 font-medium transition flex items-center gap-2">
+                            ทดลอง IEEE 754 Lab
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chapters Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Chapter 1 Card -->
+                <div class="bg-panelBg border border-panelBorder hover:border-accentCyan/40 rounded-2xl p-6 transition flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="w-10 h-10 rounded-lg bg-accentCyan/10 text-accentCyan font-bold flex items-center justify-center text-lg">01</span>
+                            <span class="text-xs text-slate-400 border border-slate-700 px-2 py-1 rounded">Unsigned Int</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-accentCyan transition">บทที่ 1: ระบบเลขฐานและจำนวนเต็มฐานสอง</h3>
+                        <p class="text-slate-400 text-sm mb-4">
+                            ศึกษาความต่างของ Base-10 และ Base-2, ค่าน้ำหนักประจำหลัก (2⁰ ถึง 2⁷) และการคำนวณ Unsigned 8-bit Integer (ช่วง 0-255)
+                        </p>
+                    </div>
+                    <button onclick="switchTab('chap1')" class="mt-4 w-full py-2.5 rounded-lg bg-darkBg border border-panelBorder text-slate-200 hover:text-accentCyan hover:border-accentCyan/50 text-sm font-medium transition flex items-center justify-center gap-2">
+                        เข้าสู่บทเรียน
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Chapter 2 Card -->
+                <div class="bg-panelBg border border-panelBorder hover:border-accentCyan/40 rounded-2xl p-6 transition flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="w-10 h-10 rounded-lg bg-accentPurple/10 text-accentPurple font-bold flex items-center justify-center text-lg">02</span>
+                            <span class="text-xs text-slate-400 border border-slate-700 px-2 py-1 rounded">Binary Fractions</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-accentCyan transition">บทที่ 2: เศษส่วนฐานสิบและเศษส่วนฐานสอง</h3>
+                        <p class="text-slate-400 text-sm mb-4">
+                            เข้าใจค่าน้ำหนักยกกำลังติดลบ (2⁻¹ ถึง 2⁻¹⁶), การแปลงทศนิยมด้วยวิธีคูณ 2 ซ้ำ และปัญหาเศษส่วนซ้ำไม่สิ้นสุด (Repeating Fractions)
+                        </p>
+                    </div>
+                    <button onclick="switchTab('chap2')" class="mt-4 w-full py-2.5 rounded-lg bg-darkBg border border-panelBorder text-slate-200 hover:text-accentCyan hover:border-accentCyan/50 text-sm font-medium transition flex items-center justify-center gap-2">
+                        เข้าสู่บทเรียน
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Chapter 3 Card -->
+                <div class="bg-panelBg border border-panelBorder hover:border-accentCyan/40 rounded-2xl p-6 transition flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 font-bold flex items-center justify-center text-lg">03</span>
+                            <span class="text-xs text-slate-400 border border-slate-700 px-2 py-1 rounded">IEEE 754 Float32</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-accentCyan transition">บทที่ 3: IEEE 754 Single Precision (32-bit)</h3>
+                        <p class="text-slate-400 text-sm mb-4">
+                            โครงสร้าง 32 บิต: Sign (1-bit), Exponent (8-bit with Bias 127), Fraction (23-bit) และระบบ Normalization (Hidden Bit 1)
+                        </p>
+                    </div>
+                    <button onclick="switchTab('chap3')" class="mt-4 w-full py-2.5 rounded-lg bg-darkBg border border-panelBorder text-slate-200 hover:text-accentCyan hover:border-accentCyan/50 text-sm font-medium transition flex items-center justify-center gap-2">
+                        เข้าสู่บทเรียน
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Chapter 4 Card -->
+                <div class="bg-panelBg border border-panelBorder hover:border-accentCyan/40 rounded-2xl p-6 transition flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-400 font-bold flex items-center justify-center text-lg">04</span>
+                            <span class="text-xs text-slate-400 border border-slate-700 px-2 py-1 rounded">Float Arithmetic</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-accentCyan transition">บทที่ 4: การบวกและการลบ Floating-Point</h3>
+                        <p class="text-slate-400 text-sm mb-4">
+                            กระบวนการ 7 ขั้นตอนของ CPU: แปลง Operands เป็น Float32, Align Exponents, บวก/ลบ Significand, Normalize และ Rounding
+                        </p>
+                    </div>
+                    <button onclick="switchTab('chap4')" class="mt-4 w-full py-2.5 rounded-lg bg-darkBg border border-panelBorder text-slate-200 hover:text-accentCyan hover:border-accentCyan/50 text-sm font-medium transition flex items-center justify-center gap-2">
+                        เข้าสู่บทเรียน
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAPTER 1 PAGE -->
+        <section id="page-chap1" class="tab-page hidden space-y-8">
+            <div class="border-b border-panelBorder pb-4">
+                <span class="text-accentCyan text-sm font-semibold tracking-wide">CHAPTER 01</span>
+                <h2 class="text-3xl font-bold text-white mt-1">ระบบเลขฐานและจำนวนเต็มฐานสอง (Binary Integers)</h2>
+            </div>
+
+            <!-- Learning Objectives -->
+            <div class="bg-panelBg/60 border border-panelBorder rounded-xl p-5">
+                <h4 class="text-sm font-bold text-accentCyan uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    วัตถุประสงค์การเรียนรู้
+                </h4>
+                <ul class="list-disc list-inside text-slate-300 space-y-1 text-sm">
+                    <li>เข้าใจแนวคิดของระบบเลขฐานสิบ (Base-10) และเลขฐานสอง (Base-2)</li>
+                    <li>คำนวณค่าน้ำหนักประจำหลัก (Positional Weights: 2⁰, 2¹, 2², ...)</li>
+                    <li>แปลงจำนวนเต็มฐานสองแบบไม่มีเครื่องหมาย (Unsigned 8-bit Integer) เป็นเลขฐานสิบได้ถูกต้อง</li>
+                </ul>
+            </div>
+
+            <!-- Theory Content -->
+            <div class="space-y-4 text-slate-300 leading-relaxed">
+                <h3 class="text-xl font-bold text-white">1. ค่าประจำหลักของเลขฐานสิบ vs ฐานสอง</h3>
+                <p>
+                    มนุษย์คุ้นเคยกับ **ระบบเลขฐานสิบ (Base-10)** ซึ่งมีตัวเลข 0–9 และค่าประจำหลักจะเพิ่มขึ้นเป็นเท่าของ 10 ได้แก่ $10^0 = 1$, $10^1 = 10$, $10^2 = 100$ เป็นต้น 
+                    แต่คอมพิวเตอร์สร้างขึ้นจากวงจรอิเล็กทรอนิกส์ที่มีสถานะสวิตช์เพียง 2 สถานะ คือ **ปิด (0)** และ **เปิด (1)** จึงต้องใช้ **ระบบเลขฐานสอง (Base-2)**
+                </p>
+                <div class="bg-darkBg border border-panelBorder rounded-xl p-4 code-font text-sm overflow-x-auto">
+                    <div class="text-slate-400 mb-2">// เปรียบเทียบค่าประจำหลัก 8 บิต (Unsigned 8-bit Integer)</div>
+                    <div class="grid grid-cols-8 gap-1 text-center font-bold">
+                        <div class="bg-panelBg p-2 rounded">b7 (2⁷) = 128</div>
+                        <div class="bg-panelBg p-2 rounded">b6 (2⁶) = 64</div>
+                        <div class="bg-panelBg p-2 rounded">b5 (2⁵) = 32</div>
+                        <div class="bg-panelBg p-2 rounded">b4 (2⁴) = 16</div>
+                        <div class="bg-panelBg p-2 rounded">b3 (2³) = 8</div>
+                        <div class="bg-panelBg p-2 rounded">b2 (2²) = 4</div>
+                        <div class="bg-panelBg p-2 rounded">b1 (2¹) = 2</div>
+                        <div class="bg-panelBg p-2 rounded">b0 (2⁰) = 1</div>
+                    </div>
+                </div>
+                <p>
+                    สูตรการหาค่าเลขฐานสิบจากบิตฐานสอง:
+                    $$\text{Decimal Value} = \sum_{i=0}^{7} (b_i \times 2^i)$$
+                    ช่วงค่าของ Unsigned 8-bit Integer จะเริ่มจาก <code class="bg-slate-800 px-1.5 py-0.5 rounded text-accentCyan">00000000₂ (0)</code> ถึง <code class="bg-slate-800 px-1.5 py-0.5 rounded text-accentCyan">11111111₂ (255)</code>
+                </p>
+            </div>
+
+            <!-- Interactive Tool Chapter 1 -->
+            <div class="bg-panelBg border border-panelBorder rounded-2xl p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-panelBorder pb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-accentCyan"></span>
+                            Interactive: 8-bit Binary Integer Explorer
+                        </h3>
+                        <p class="text-xs text-slate-400">คลิกที่แต่ละบิตเพื่อเปิด (1) หรือปิด (0) แล้วสังเกตการรวมค่าน้ำหนัก</p>
+                    </div>
+                    <!-- Presets -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400">ตัวอย่าง:</span>
+                        <button onclick="setByte1(0)" class="px-2.5 py-1 text-xs rounded bg-darkBg hover:bg-slate-800 text-slate-300">0</button>
+                        <button onclick="setByte1(10)" class="px-2.5 py-1 text-xs rounded bg-darkBg hover:bg-slate-800 text-slate-300">10</button>
+                        <button onclick="setByte1(128)" class="px-2.5 py-1 text-xs rounded bg-darkBg hover:bg-slate-800 text-slate-300">128</button>
+                        <button onclick="setByte1(255)" class="px-2.5 py-1 text-xs rounded bg-darkBg hover:bg-slate-800 text-slate-300">255</button>
+                    </div>
+                </div>
+
+                <!-- 8-Bit Toggle Grid -->
+                <div class="grid grid-cols-8 gap-2 md:gap-3 text-center">
+                    <!-- Javascript will fill/update this -->
+                    <div id="bit-grid-1" class="contents"></div>
+                </div>
+
+                <!-- Calculation Live Display -->
+                <div class="bg-darkBg rounded-xl p-4 space-y-3 border border-panelBorder">
+                    <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">การคำนวณทีละขั้นตอน (Step-by-Step Breakdown)</div>
+                    <div id="chap1-breakdown" class="code-font text-xs sm:text-sm text-slate-300 overflow-x-auto whitespace-nowrap py-1"></div>
+                    <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-panelBorder/50">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-slate-400">Binary String:</span>
+                            <span id="chap1-bin-str" class="code-font text-lg font-bold text-accentCyan">00000000</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-slate-400">Decimal Value:</span>
+                            <span id="chap1-dec-val" class="code-font text-2xl font-extrabold text-white">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Box -->
+            <div class="bg-gradient-to-r from-panelBg to-[#182344] border-l-4 border-accentCyan rounded-r-xl p-5">
+                <h4 class="font-bold text-white mb-1">📌 สรุปท้ายบทที่ 1</h4>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    เลขฐานสองใช้ฐานเป็น 2 แต่ละหลักคือ $2^i$ บิตที่เป็น 1 จะนำค่าน้ำหนักนั้นมารวมกัน ส่วนบิตที่เป็น 0 จะไม่นำมารวม ในขนาด 8 บิต แบบไม่มีเครื่องหมาย จะแทนค่าได้สูงสุด $2^8 - 1 = 255$
+                </p>
+            </div>
+        </section>
+
+        <!-- CHAPTER 2 PAGE -->
+        <section id="page-chap2" class="tab-page hidden space-y-8">
+            <div class="border-b border-panelBorder pb-4">
+                <span class="text-accentPurple text-sm font-semibold tracking-wide">CHAPTER 02</span>
+                <h2 class="text-3xl font-bold text-white mt-1">เศษส่วนฐานสิบและเศษส่วนฐานสอง (Binary Fractions)</h2>
+            </div>
+
+            <!-- Learning Objectives -->
+            <div class="bg-panelBg/60 border border-panelBorder rounded-xl p-5">
+                <h4 class="text-sm font-bold text-accentPurple uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    วัตถุประสงค์การเรียนรู้
+                </h4>
+                <ul class="list-disc list-inside text-slate-300 space-y-1 text-sm">
+                    <li>เข้าใจค่าน้ำหนักยกกำลังติดลบ ($2^{-1}, 2^{-2}, 2^{-3}, \dots$) ของเศษส่วนฐานสอง</li>
+                    <li>แปลงเศษส่วนฐานสิบเป็นฐานสองด้วยอัลกอริทึม "คูณเศษส่วนด้วย 2 ซ้ำๆ"</li>
+                    <li>เข้าใจว่าทำไมเลขทศนิยมบางค่า เช่น $0.1_{10}$ ไม่สามารถเก็บได้ตรงเป๊ะในคอมพิวเตอร์ (Repeating Fraction)</li>
+                </ul>
+            </div>
+
+            <!-- Theory Content -->
+            <div class="space-y-4 text-slate-300 leading-relaxed">
+                <h3 class="text-xl font-bold text-white">1. น้ำหนักหลักเศษส่วนฐานสอง (Fractional Weights)</h3>
+                <p>
+                    เช่นเดียวกับเลขฐานสิบหลังจุดทศนิยมที่มีค่าประจำหลักเป็น $10^{-1} = 0.1$, $10^{-2} = 0.01$ หลังจุดทศนิยมฐานสองจะมีค่าน้ำหนักเป็น:
+                </p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 code-font text-xs text-center">
+                    <div class="bg-darkBg border border-panelBorder p-2 rounded"><span class="text-accentPurple font-bold">b₁ (2⁻¹)</span> = 0.5</div>
+                    <div class="bg-darkBg border border-panelBorder p-2 rounded"><span class="text-accentPurple font-bold">b₂ (2⁻²)</span> = 0.25</div>
+                    <div class="bg-darkBg border border-panelBorder p-2 rounded"><span class="text-accentPurple font-bold">b₃ (2⁻³)</span> = 0.125</div>
+                    <div class="bg-darkBg border border-panelBorder p-2 rounded"><span class="text-accentPurple font-bold">b₄ (2⁻⁴)</span> = 0.0625</div>
+                </div>
+
+                <h3 class="text-xl font-bold text-white mt-6">2. การแปลงเศษส่วนฐานสิบเป็นฐานสอง (Multiply by 2 Method)</h3>
+                <p>
+                    วิธีการแปลงคือ: นำเศษส่วนไป **คูณด้วย 2** ดึงส่วนจำนวนเต็ม (0 หรือ 1) ออกมาเป็นบิตคำตอบ แล้วนำเศษส่วนที่เหลือไปคูณ 2 ต่อ ทำเช่นนี้จนกว่าเศษส่วนจะเป็น 0 หรือครบจำนวนบิตที่ต้องการ
+                </p>
+            </div>
+
+            <!-- Interactive Tool 2A: 16-bit Binary Fraction Explorer -->
+            <div class="bg-panelBg border border-panelBorder rounded-2xl p-6 space-y-6">
+                <div class="border-b border-panelBorder pb-3">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-accentPurple"></span>
+                        Interactive A: 16-bit Binary Fraction Explorer (0.b₁b₂...b₁₆)
+                    </h3>
+                    <p class="text-xs text-slate-400">คลิกที่แต่ละบิตเศษส่วนเพื่อดูการคำนวณค่าทศนิยมฐานสิบ</p>
+                </div>
+
+                <!-- Bit grid 16-bit -->
+                <div id="bit-grid-frac-16" class="grid grid-cols-4 sm:grid-cols-8 gap-2 text-center"></div>
+
+                <!-- Result area -->
+                <div class="bg-darkBg rounded-xl p-4 border border-panelBorder space-y-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <span class="text-xs text-slate-400">Binary Fraction Representation:</span>
+                        <span id="chap2-frac-bin" class="code-font text-sm font-bold text-accentPurple">0.0000000000000000₂</span>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-t border-panelBorder/40 pt-2">
+                        <span class="text-sm text-slate-400">Decimal Value:</span>
+                        <span id="chap2-frac-dec" class="code-font text-xl font-extrabold text-white">0.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Tool 2B: Decimal Fraction Converter -->
+            <div class="bg-panelBg border border-panelBorder rounded-2xl p-6 space-y-6">
+                <div class="border-b border-panelBorder pb-3">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-cyan-400"></span>
+                        Interactive B: Decimal Fraction Converter (สาธิตการคูณ 2 ซ้ำ)
+                    </h3>
+                    <p class="text-xs text-slate-400">ป้อนเศษส่วนฐานสิบ (เช่น 0.375 หรือ 0.1) เพื่อดูขั้นตอนการแปลงทีละบรรทัด</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-medium text-slate-300 mb-1">เศษส่วนฐานสิบ (Decimal Fraction 0 ถึง 1)</label>
+                        <input type="number" step="any" id="frac-input-dec" value="0.1" class="w-full bg-darkBg border border-panelBorder rounded-lg px-3 py-2 text-white code-font focus:outline-none focus:border-accentCyan">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">จำนวนบิตสูงสุด</label>
+                        <select id="frac-input-bits" class="w-full bg-darkBg border border-panelBorder rounded-lg px-3 py-2 text-white code-font focus:outline-none focus:border-accentCyan">
+                            <option value="8">8 bits</option>
+                            <option value="16">16 bits</option>
+                            <option value="23" selected>23 bits (Mantissa size)</option>
+                            <option value="32">32 bits</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="frac-convert-error" class="hidden p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs"></div>
+
+                <!-- Step Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs code-font border-collapse">
+                        <thead>
+                            <tr class="bg-darkBg border-b border-panelBorder text-slate-400">
+                                <th class="p-2">Step</th>
+                                <th class="p-2">Fraction</th>
+                                <th class="p-2">× 2</th>
+                                <th class="p-2 text-accentCyan">Bit (Integer Part)</th>
+                                <th class="p-2">Remaining Fraction</th>
+                            </tr>
+                        </thead>
+                        <tbody id="frac-steps-table" class="divide-y divide-panelBorder/40 text-slate-300">
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Converter Summary Result -->
+                <div id="frac-convert-summary" class="bg-darkBg p-4 rounded-xl border border-panelBorder space-y-2">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+
+            <!-- Summary Box -->
+            <div class="bg-gradient-to-r from-panelBg to-[#182344] border-l-4 border-accentPurple rounded-r-xl p-5">
+                <h4 class="font-bold text-white mb-1">📌 สรุปท้ายบทที่ 2</h4>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    เศษส่วนฐานสิบจำนวนมาก เช่น $0.1_{10}$ หรือ $0.2_{10}$ ไม่สามารถแปลงเป็นเศษส่วนฐานสองที่มีจำนวนบิตจำกัดได้ลงตัว (กลายเป็น **เศษส่วนซ้ำแบบไม่สิ้นสุด**) การเก็บข้อมูลในคอมพิวเตอร์จึงต้องตัดจบ (Truncate/Round) ทำให้เกิด **ค่าความคลาดเคลื่อน (Absolute Error)** เสมอ
+                </p>
+            </div>
+        </section>
+
+        <!-- CHAPTER 3 PAGE -->
+        <section id="page-chap3" class="tab-page hidden space-y-8">
+            <div class="border-b border-panelBorder pb-4">
+                <span class="text-blue-400 text-sm font-semibold tracking-wide">CHAPTER 03</span>
+                <h2 class="text-3xl font-bold text-white mt-1">การแทนค่า Floating-Point ตามมาตรฐาน IEEE 754</h2>
+            </div>
+
+            <!-- Learning Objectives -->
+            <div class="bg-panelBg/60 border border-panelBorder rounded-xl p-5">
+                <h4 class="text-sm font-bold text-blue-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    วัตถุประสงค์การเรียนรู้
+                </h4>
+                <ul class="list-disc list-inside text-slate-300 space-y-1 text-sm">
+                    <li>เข้าใจโครงสร้าง IEEE 754 Single Precision 32 บิต (Sign 1 บิต, Exponent 8 บิต, Fraction 23 บิต)</li>
+                    <li>เข้าใจหน้าที่ของ **Exponent Bias = 127** และ **Hidden Leading Bit (1.xxxx)**</li>
+                    <li>สามารถทำการ Encode จากทศนิยมฐานสิบเป็นบิต Float32 และ Decode กลับเป็นค่าตัวเลขได้</li>
+                </ul>
+            </div>
+
+            <!-- Theory Breakdown -->
+            <div class="space-y-4 text-slate-300 leading-relaxed">
+                <h3 class="text-xl font-bold text-white">1. โครงสร้าง IEEE 754 Single Precision (32-bit Layout)</h3>
+                <p>
+                    มาตรฐาน IEEE 754 แบ่งบิต 32 บิตออกเป็น 3 ส่วนหลัก ดังนี้:
+                </p>
+                <div class="bg-darkBg border border-panelBorder rounded-xl p-4 overflow-x-auto space-y-3">
+                    <div class="grid grid-cols-32 text-center text-xs code-font font-bold gap-0.5 min-w-[600px]">
+                        <div class="col-span-1 bg-signColor/20 text-signColor border border-signColor/40 py-2 rounded-l">S</div>
+                        <div class="col-span-8 bg-expColor/20 text-expColor border border-expColor/40 py-2">Exponent (8 bits)</div>
+                        <div class="col-span-23 bg-fracColor/20 text-fracColor border border-fracColor/40 py-2 rounded-r">Fraction / Mantissa (23 bits)</div>
+                    </div>
+                    <div class="grid grid-cols-3 text-xs gap-4 pt-2">
+                        <div class="space-y-1">
+                            <span class="font-bold text-signColor">1. Sign Bit (1 บิต):</span>
+                            <p class="text-slate-400">0 = ค่าบวก, 1 = ค่าลบ</p>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="font-bold text-expColor">2. Exponent (8 บิต):</span>
+                            <p class="text-slate-400">ใช้ Exponent Bias = 127<br>$$\text{Stored Exp} = e + 127$$</p>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="font-bold text-fracColor">3. Fraction (23 บิต):</span>
+                            <p class="text-slate-400">เก็บส่วนหลังจุดของเลข Normalized <br>$$\text{Significand} = 1.F$$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-panelBg/80 p-4 rounded-xl border border-panelBorder space-y-2 text-sm">
+                    <h4 class="font-bold text-white">สูตรการคำนวณ Decoding ค่า IEEE 754 (Normalized Value):</h4>
+                    <div class="code-font text-accentCyan text-center p-3 bg-darkBg rounded-lg border border-panelBorder">
+                        $$\text{Value} = (-1)^{\text{Sign}} \times (1 + \text{Fraction}) \times 2^{(\text{Exponent} - 127)}$$
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Mode Switcher & Tools -->
+            <div class="bg-panelBg border border-panelBorder rounded-2xl p-6 space-y-6">
+                <!-- Tabs for Encoder vs Decoder -->
+                <div class="flex items-center gap-2 border-b border-panelBorder pb-3">
+                    <button id="btn-mode-encoder" onclick="switchIEEE3Mode('encoder')" class="px-4 py-2 rounded-lg text-sm font-bold bg-accentCyan text-darkBg shadow-md">
+                        Decimal → IEEE 754 Encoder
+                    </button>
+                    <button id="btn-mode-decoder" onclick="switchIEEE3Mode('decoder')" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-400 hover:text-white hover:bg-darkBg">
+                        IEEE 754 → Decimal Decoder
+                    </button>
+                </div>
+
+                <!-- ENCODER PANEL -->
+                <div id="ieee3-encoder-panel" class="space-y-6">
+                    <div class="flex flex-col sm:flex-row items-end gap-3">
+                        <div class="flex-grow">
+                            <label class="block text-xs font-medium text-slate-300 mb-1">ป้อนตัวเลขฐานสิบ (Decimal Input)</label>
+                            <input type="number" step="any" id="ieee3-dec-input" value="5.75" class="w-full bg-darkBg border border-panelBorder rounded-lg px-3 py-2 text-white code-font text-lg focus:outline-none focus:border-accentCyan">
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="setIEEE3Input(5.75)" class="px-3 py-2 rounded bg-darkBg text-xs text-slate-300 hover:bg-slate-800">5.75</button>
+                            <button onclick="setIEEE3Input(-13.25)" class="px-3 py-2 rounded bg-darkBg text-xs text-slate-300 hover:bg-slate-800">-13.25</button>
+                            <button onclick="setIEEE3Input(0.1)" class="px-3 py-2 rounded bg-darkBg text-xs text-slate-300 hover:bg-slate-800">0.1</button>
+                        </div>
+                    </div>
+
+                    <!-- Bit Visualizer -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-xs text-slate-400">
+                            <span>Bit String Representation (32 bits):</span>
+                            <span id="ieee3-hex-display" class="code-font font-bold text-slate-200">Hex: 0x40B80000</span>
+                        </div>
+                        <div class="flex flex-wrap gap-1 code-font text-sm font-bold p-3 bg-darkBg rounded-xl border border-panelBorder justify-center" id="ieee3-bits-container">
+                            <!-- JS injects 32 color-coded bits -->
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Step breakdown -->
+                    <div class="bg-darkBg rounded-xl p-4 border border-panelBorder space-y-3 text-xs sm:text-sm">
+                        <h4 class="font-bold text-accentCyan flex items-center justify-between">
+                            <span>ขั้นตอนการ Encode ทีละ Step:</span>
+                            <button onclick="copyToClipboard(document.getElementById('ieee3-bit-string-raw').innerText)" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 012-2v-8a2 2 0 01-2-2h-8a2 2 0 01-2 2v8a2 2 0 012 2z"></path></svg>
+                                Copy Bits
+                            </button>
+                        </h4>
+                        <div id="ieee3-encoder-steps" class="space-y-2 text-slate-300 leading-relaxed"></div>
+                        <span id="ieee3-bit-string-raw" class="hidden"></span>
+                    </div>
+
+                    <!-- Stored Float32 vs Actual Difference -->
+                    <div id="ieee3-precision-alert" class="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 text-xs hidden">
+                        <!-- Filled by JS if loss of precision occurs -->
+                    </div>
+                </div>
+
+                <!-- DECODER PANEL -->
+                <div id="ieee3-decoder-panel" class="space-y-6 hidden">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1">ป้อน Bit String 32 บิต (เว้นวรรคระหว่างกลุ่มได้)</label>
+                        <input type="text" id="ieee3-bit-input" value="01000000 10111000 00000000 00000000" class="w-full bg-darkBg border border-panelBorder rounded-lg px-3 py-2 text-accentCyan code-font text-base focus:outline-none focus:border-accentCyan">
+                    </div>
+
+                    <div id="ieee3-decoder-error" class="hidden p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs"></div>
+
+                    <!-- Decoder Output Breakdown -->
+                    <div id="ieee3-decoder-output" class="space-y-4">
+                        <!-- JS injects decoded fields -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Precision Bounds Disclaimer -->
+            <div class="bg-darkBg/60 border border-panelBorder p-4 rounded-xl text-xs text-slate-400 space-y-1">
+                <span class="font-bold text-slate-300">⚠️ ขอบเขตของเครื่องมือ:</span>
+                <p>เวอร์ชันนี้ออกแบบมาสำหรับการแทนค่าเลขปกติ (Normalized Numbers) เป็นหลัก ค่าพิเศษเช่น Subnormal, Infinity (±∞), NaN และ Signed Zero มีการจัดการตามมาตรฐาน Float32 เบื้องต้น</p>
+            </div>
+
+            <!-- Summary Box -->
+            <div class="bg-gradient-to-r from-panelBg to-[#182344] border-l-4 border-blue-500 rounded-r-xl p-5">
+                <h4 class="font-bold text-white mb-1">📌 สรุปท้ายบทที่ 3</h4>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    IEEE 754 Single Precision ใช้ 32 บิตแทนจำนวนจริง โดยแยกเป็น Sign (1), Exponent (8, Bias 127), และ Fraction (23) โดยใช้หลักการ **Hidden Bit 1** สำหรับเลข Normalized ทำให้ประหยัดพื้นที่จัดเก็บได้ 1 บิต
+                </p>
+            </div>
+        </section>
+
+        <!-- CHAPTER 4 PAGE -->
+        <section id="page-chap4" class="tab-page hidden space-y-8">
+            <div class="border-b border-panelBorder pb-4">
+                <span class="text-emerald-400 text-sm font-semibold tracking-wide">CHAPTER 04</span>
+                <h2 class="text-3xl font-bold text-white mt-1">การบวกและการลบ Floating-Point (Float32 Arithmetic)</h2>
+            </div>
+
+            <!-- Learning Objectives -->
+            <div class="bg-panelBg/60 border border-panelBorder rounded-xl p-5">
+                <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    วัตถุประสงค์การเรียนรู้
+                </h4>
+                <ul class="list-disc list-inside text-slate-300 space-y-1 text-sm">
+                    <li>เข้าใจกระบวนการ 7 ขั้นตอนของการบวกลบ Float32 ใน ALU/FPU ของคอมพิวเตอร์</li>
+                    <li>เข้าใจขั้นตอนการปรับ Exponent ให้เท่ากัน (Exponent Alignment) และการเลื่อน Significand</li>
+                    <li>อธิบายได้ว่าทำไม $0.1 + 0.2 \neq 0.3$ ในการคำนวณแบบ Float32</li>
+                </ul>
+            </div>
+
+            <!-- Theory Step Overview -->
+            <div class="space-y-4 text-slate-300 leading-relaxed">
+                <h3 class="text-xl font-bold text-white">ขั้นตอนหลัก 7 ขั้นตอนของ FPU (Floating-Point Arithmetic)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <div class="bg-darkBg p-3 rounded-lg border border-panelBorder flex gap-2">
+                        <span class="font-bold text-accentCyan">1.</span>
+                        <div><strong>Convert Operands:</strong> แปลงค่า A และ B เป็น Float32 ก่อนคำนวณ</div>
+                    </div>
+                    <div class="bg-darkBg p-3 rounded-lg border border-panelBorder flex gap-2">
+                        <span class="font-bold text-accentCyan">2.</span>
+                        <div><strong>Unpack Fields:</strong> แยก Sign, Exponent, Significand (1.F)</div>
+                    </div>
+                    <div class="bg-darkBg p-3 rounded-lg border border-panelBorder flex gap-2">
+                        <span class="font-bold text-accentCyan">3.</span>
+                        <div><strong>Align Exponents:</strong> เลื่อน Significand ของตัวที่มี Exponent น้อยกว่าไปทางขวา</div>
+                    </div>
+                    <div class="bg-darkBg p-3 rounded-lg border border-panelBorder flex gap-2">
+                        <span class="font-bold text-accentCyan">4.</span>
+                        <div><strong>Add/Subtract:</strong> บวกหรือลบ Significand ตามเครื่องหมาย</div>
+                    </div>
+                    <div class="bg-darkBg p-3 rounded-lg border border-panelBorder flex gap-2">
+                        <span class="font-bold text-accentCyan">5.</span>
+                        <div><strong>Normalize Result:</strong> เลื่อน Significand ผลลัพธ์ให้อยู่ในรูป 1.xxxxx</div>
+                    </div>
+                    <div class="bg-darkBg p-3 rounded-lg border border-panelBorder flex gap-2">
+                        <span class="font-bold text-accentCyan">6.</span>
+                        <div><strong>Rounding:</strong> ปัดเศษให้พอดีความแม่นยำ 23 บิต</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Arithmetic Simulator -->
+            <div class="bg-panelBg border border-panelBorder rounded-2xl p-6 space-y-6">
+                <div class="border-b border-panelBorder pb-3">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                        Float32 Arithmetic Simulator
+                    </h3>
+                    <p class="text-xs text-slate-400">ป้อนค่า Operand A และ B เพื่อดูการบวก/ลบในระดับบิตสถาปัตยกรรมคอมพิวเตอร์</p>
+                </div>
+
+                <!-- Input Panel -->
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-3 items-center">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Operand A</label>
+                        <input type="number" step="any" id="arith-op-a" value="0.1" class="w-full bg-darkBg border border-panelBorder rounded-lg px-3 py-2 text-white code-font focus:outline-none focus:border-accentCyan">
+                    </div>
+                    <div class="sm:col-span-1 flex justify-center pt-4">
+                        <div class="inline-flex rounded-lg bg-darkBg p-1 border border-panelBorder">
+                            <button id="btn-op-add" onclick="setArithOperator('+')" class="px-3 py-1 rounded-md text-sm font-bold bg-accentCyan text-darkBg">+</button>
+                            <button id="btn-op-sub" onclick="setArithOperator('-')" class="px-3 py-1 rounded-md text-sm font-bold text-slate-400 hover:text-white">-</button>
+                        </div>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-medium text-slate-300 mb-1">Operand B</label>
+                        <input type="number" step="any" id="arith-op-b" value="0.2" class="w-full bg-darkBg border border-panelBorder rounded-lg px-3 py-2 text-white code-font focus:outline-none focus:border-accentCyan">
+                    </div>
+                </div>
+
+                <!-- Presets -->
+                <div class="flex items-center gap-2 text-xs text-slate-400">
+                    <span>ตัวอย่างทดสอบ:</span>
+                    <button onclick="setArithPresets(0.1, '+', 0.2)" class="px-2.5 py-1 rounded bg-darkBg hover:bg-slate-800 text-accentCyan border border-accentCyan/30">0.1 + 0.2</button>
+                    <button onclick="setArithPresets(5.75, '+', 2.25)" class="px-2.5 py-1 rounded bg-darkBg hover:bg-slate-800 text-slate-300">5.75 + 2.25</button>
+                    <button onclick="setArithPresets(1.0, '-', 0.9)" class="px-2.5 py-1 rounded bg-darkBg hover:bg-slate-800 text-slate-300">1.0 - 0.9</button>
+                </div>
+
+                <!-- Operands Bit Info Card -->
+                <div id="arith-operands-bit-info" class="space-y-3 bg-darkBg p-4 rounded-xl border border-panelBorder">
+                    <!-- Filled by JS -->
+                </div>
+
+                <!-- Detailed Execution Steps -->
+                <div id="arith-steps-container" class="space-y-4">
+                    <!-- Step Cards injected by JS -->
+                </div>
+
+                <!-- Final Calculation Result Comparison -->
+                <div id="arith-final-summary" class="bg-darkBg p-5 rounded-xl border border-emerald-500/40 space-y-3">
+                    <!-- Injected by JS -->
+                </div>
+            </div>
+
+            <!-- Summary Box -->
+            <div class="bg-gradient-to-r from-panelBg to-[#182344] border-l-4 border-emerald-500 rounded-r-xl p-5">
+                <h4 class="font-bold text-white mb-1">📌 สรุปท้ายบทที่ 4</h4>
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    การบวกลบ Float32 ต้องปรับ Exponent ให้เท่ากันเสมอ ซึ่งอาจทำให้เกิด **Significand Shift (Right Shift)** ส่งผลให้บิตนัยสำคัญระดับล่างหลุดและสูญหายไป นอกจากนี้ เมื่อ operands ถูกแปลงเป็น Float32 ก่อนคำนวณ ผลลัพธ์ที่ได้จึงเป็นไปตามกฎความแม่นยำของ FPU เช่น $0.1 + 0.2 = 0.30000001192092896$
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#080C18] border-t border-panelBorder px-4 py-6 mt-12 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div>
+                <strong class="text-slate-300">Binary Lab</strong> — สื่อการสอน Computer Architecture เรื่อง Floating-Point
+            </div>
+            <div>
+                พัฒนาด้วย Pure Vanilla JavaScript + Web DataView APIs
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC ENGINE -->
+    <script>
+        /* ==========================================================================
+           GLOBAL STATE & UTILS
+           ========================================================================== */
+        let activeTab = 'dashboard';
+        let chap1Bits = [0, 0, 0, 0, 0, 0, 0, 0];
+        let chap2Bits = new Array(16).fill(0);
+        let arithOperator = '+';
+
+        // IEEE 754 Helper using DataView
+        function float32ToBits(num) {
+            const buffer = new ArrayBuffer(4);
+            const view = new DataView(buffer);
+            view.setFloat32(0, num, false); // Big endian
+            const uint32 = view.getUint32(0, false);
+            return uint32.toString(2).padStart(32, '0');
+        }
+
+        function bitsToFloat32(bitStr) {
+            const cleanBits = bitStr.replace(/\s+/g, '');
+            if (cleanBits.length !== 32 || /[^01]/.test(cleanBits)) return NaN;
+            const uint32 = parseInt(cleanBits, 2);
+            const buffer = new ArrayBuffer(4);
+            const view = new DataView(buffer);
+            view.setUint32(0, uint32, false);
+            return view.getFloat32(0, false);
+        }
+
+        function float32ToHex(num) {
+            const buffer = new ArrayBuffer(4);
+            const view = new DataView(buffer);
+            view.setFloat32(0, num, false);
+            const uint32 = view.getUint32(0, false);
+            return '0x' + uint32.toString(16).toUpperCase().padStart(8, '0');
+        }
+
+        // Navigation Switcher
+        function switchTab(tabId) {
+            activeTab = tabId;
+            document.querySelectorAll('.tab-page').forEach(page => page.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'text-accentCyan'));
+
+            const selectedPage = document.getElementById(`page-${tabId}`);
+            if (selectedPage) selectedPage.classList.remove('hidden');
+
+            const selectedBtn = document.getElementById(`tab-btn-${tabId}`);
+            if (selectedBtn) selectedBtn.classList.add('active', 'text-accentCyan');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function copyToClipboard(text) {
+            const tempInput = document.createElement("textarea");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("คัดลอก Bit String เรียบร้อยแล้ว!");
+        }
+
+        /* ==========================================================================
+           CHAPTER 1 LOGIC (8-bit Binary Integer)
+           ========================================================================== */
+        function initChap1() {
+            renderChap1Bits();
+        }
+
+        function renderChap1Bits() {
+            const container = document.getElementById('bit-grid-1');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const weights = [128, 64, 32, 16, 8, 4, 2, 1];
+            let sum = 0;
+            let steps = [];
+
+            for (let i = 0; i < 8; i++) {
+                const bitVal = chap1Bits[i];
+                const weight = weights[i];
+                const bitIndex = 7 - i;
+                const contrib = bitVal * weight;
+                sum += contrib;
+
+                if (bitVal === 1) {
+                    steps.push(`${weight}`);
+                }
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `bit-btn p-3 rounded-xl flex flex-col items-center justify-center border transition ${
+                    bitVal === 1 ? 'active-1' : 'active-0'
+                }`;
+                btn.onclick = () => toggleChap1Bit(i);
+
+                btn.innerHTML = `
+                    <span class="text-xs text-slate-400 code-font mb-1">b${bitIndex} (${weight})</span>
+                    <span class="text-2xl font-black">${bitVal}</span>
+                    <span class="text-[10px] mt-1 ${bitVal === 1 ? 'text-darkBg font-bold' : 'text-slate-500'}">+${contrib}</span>
+                `;
+                container.appendChild(btn);
+            }
+
+            // Update Breakdown text
+            const breakdownEl = document.getElementById('chap1-breakdown');
+            if (steps.length === 0) {
+                breakdownEl.innerHTML = '<span class="text-slate-500">ไม่มีบิตเปิด (ผลรวมเป็น 0)</span>';
+            } else {
+                breakdownEl.innerHTML = steps.join(' + ') + ` = <strong class="text-accentCyan">${sum}</strong>`;
+            }
+
+            document.getElementById('chap1-bin-str').innerText = chap1Bits.join('');
+            document.getElementById('chap1-dec-val').innerText = sum;
+        }
+
+        function toggleChap1Bit(index) {
+            chap1Bits[index] = chap1Bits[index] === 1 ? 0 : 1;
+            renderChap1Bits();
+        }
+
+        function setByte1(val) {
+            val = Math.max(0, Math.min(255, parseInt(val) || 0));
+            const binStr = val.toString(2).padStart(8, '0');
+            chap1Bits = binStr.split('').map(Number);
+            renderChap1Bits();
+        }
+
+        /* ==========================================================================
+           CHAPTER 2 LOGIC (Fraction Explorer & Converter)
+           ========================================================================== */
+        function initChap2() {
+            renderChap2Bits();
+            runDecimalFractionConverter();
+
+            document.getElementById('frac-input-dec').addEventListener('input', runDecimalFractionConverter);
+            document.getElementById('frac-input-bits').addEventListener('change', runDecimalFractionConverter);
+        }
+
+        function renderChap2Bits() {
+            const container = document.getElementById('bit-grid-frac-16');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let sum = 0;
+            let binStr = '0.';
+
+            for (let i = 0; i < 16; i++) {
+                const bitVal = chap2Bits[i];
+                const weight = Math.pow(2, -(i + 1));
+                const contrib = bitVal * weight;
+                sum += contrib;
+                binStr += bitVal;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `bit-btn p-2 rounded-lg flex flex-col items-center border text-xs transition ${
+                    bitVal === 1 ? 'bg-accentPurple text-darkBg border-accentPurple font-bold' : 'bg-darkBg text-slate-400 border-panelBorder'
+                }`;
+                btn.onclick = () => {
+                    chap2Bits[i] = chap2Bits[i] === 1 ? 0 : 1;
+                    renderChap2Bits();
+                };
+
+                btn.innerHTML = `
+                    <span class="text-[10px] opacity-75">2⁻${i+1}</span>
+                    <span class="text-lg font-bold my-0.5">${bitVal}</span>
+                    <span class="text-[9px] opacity-90">${weight.toFixed(4)}</span>
+                `;
+                container.appendChild(btn);
+            }
+
+            document.getElementById('chap2-frac-bin').innerText = binStr + '₂';
+            document.getElementById('chap2-frac-dec').innerText = sum.toFixed(10);
+        }
+
+        function runDecimalFractionConverter() {
+            const inputVal = parseFloat(document.getElementById('frac-input-dec').value);
+            const maxBits = parseInt(document.getElementById('frac-input-bits').value);
+            const errorEl = document.getElementById('frac-convert-error');
+            const tbody = document.getElementById('frac-steps-table');
+            const summaryEl = document.getElementById('frac-convert-summary');
+
+            errorEl.classList.add('hidden');
+            tbody.innerHTML = '';
+
+            if (isNaN(inputVal) || inputVal < 0 || inputVal >= 1) {
+                errorEl.innerText = 'กรุณาป้อนตัวเลขเศษส่วนที่มากกว่าหรือเท่ากับ 0 และน้อยกว่า 1 (เช่น 0.375)';
+                errorEl.classList.remove('hidden');
+                summaryEl.innerHTML = '';
+                return;
+            }
+
+            let frac = inputVal;
+            let bitResult = '0.';
+            let stepData = [];
+            let isTerminated = false;
+            let approxVal = 0;
+
+            for (let step = 1; step <= maxBits; step++) {
+                const multiplied = frac * 2;
+                const intBit = Math.floor(multiplied);
+                const remFrac = multiplied - intBit;
+
+                stepData.push({
+                    step,
+                    originalFrac: frac.toFixed(6),
+                    multiplied: multiplied.toFixed(6),
+                    intBit,
+                    remFrac: remFrac.toFixed(6)
+                });
+
+                bitResult += intBit;
+                approxVal += intBit * Math.pow(2, -step);
+                frac = parseFloat(remFrac.toFixed(10));
+
+                if (frac === 0) {
+                    isTerminated = true;
+                    break;
+                }
+            }
+
+            // Render Steps Table
+            stepData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2 text-slate-400">${row.step}</td>
+                    <td class="p-2">${row.originalFrac}</td>
+                    <td class="p-2">${row.multiplied}</td>
+                    <td class="p-2 font-bold text-accentCyan">${row.intBit}</td>
+                    <td class="p-2 text-slate-400">${row.remFrac}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const absError = Math.abs(inputVal - approxVal);
+
+            summaryEl.innerHTML = `
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 text-xs">
+                    <div>
+                        <span class="text-slate-400">ผลลัพธ์ Binary Fraction:</span>
+                        <strong class="code-font text-sm text-accentCyan ml-2">${bitResult}₂</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400">สถานะการสิ้นสุด:</span>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-bold ${isTerminated ? 'bg-emerald-500/20 text-emerald-400' : 'bg-yellow-500/20 text-yellow-400'}">
+                            ${isTerminated ? 'สิ้นสุดสมบูรณ์ (Exact)' : 'ไม่สิ้นสุด (Repeating/Truncated)'}
+                        </span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-xs border-t border-panelBorder/50 pt-2 mt-2">
+                    <div><span class="text-slate-400">ค่าประมาณ Decimal:</span> <span class="code-font text-white font-bold">${approxVal.toFixed(10)}</span></div>
+                    <div><span class="text-slate-400">Absolute Error:</span> <span class="code-font text-red-400 font-bold">${absError.toExponential(4)}</span></div>
+                </div>
+            `;
+        }
+
+        /* ==========================================================================
+           CHAPTER 3 LOGIC (IEEE 754 Encoder & Decoder)
+           ========================================================================== */
+        function initChap3() {
+            document.getElementById('ieee3-dec-input').addEventListener('input', updateIEEE3Encoder);
+            document.getElementById('ieee3-bit-input').addEventListener('input', updateIEEE3Decoder);
+            updateIEEE3Encoder();
+            updateIEEE3Decoder();
+        }
+
+        function switchIEEE3Mode(mode) {
+            const encPanel = document.getElementById('ieee3-encoder-panel');
+            const decPanel = document.getElementById('ieee3-decoder-panel');
+            const btnEnc = document.getElementById('btn-mode-encoder');
+            const btnDec = document.getElementById('btn-mode-decoder');
+
+            if (mode === 'encoder') {
+                encPanel.classList.remove('hidden');
+                decPanel.classList.add('hidden');
+                btnEnc.className = 'px-4 py-2 rounded-lg text-sm font-bold bg-accentCyan text-darkBg shadow-md';
+                btnDec.className = 'px-4 py-2 rounded-lg text-sm font-bold text-slate-400 hover:text-white hover:bg-darkBg';
+            } else {
+                encPanel.classList.add('hidden');
+                decPanel.classList.remove('hidden');
+                btnDec.className = 'px-4 py-2 rounded-lg text-sm font-bold bg-accentCyan text-darkBg shadow-md';
+                btnEnc.className = 'px-4 py-2 rounded-lg text-sm font-bold text-slate-400 hover:text-white hover:bg-darkBg';
+            }
+        }
+
+        function setIEEE3Input(val) {
+            document.getElementById('ieee3-dec-input').value = val;
+            updateIEEE3Encoder();
+        }
+
+        function updateIEEE3Encoder() {
+            const rawVal = parseFloat(document.getElementById('ieee3-dec-input').value);
+            const container = document.getElementById('ieee3-bits-container');
+            const hexDisplay = document.getElementById('ieee3-hex-display');
+            const stepsEl = document.getElementById('ieee3-encoder-steps');
+            const alertEl = document.getElementById('ieee3-precision-alert');
+
+            if (isNaN(rawVal)) {
+                container.innerHTML = '<span class="text-red-400 text-xs">กรุณาป้อนตัวเลขที่ถูกต้อง</span>';
+                stepsEl.innerHTML = '';
+                hexDisplay.innerText = '';
+                return;
+            }
+
+            // Get exact float32 bit representation
+            const f32Val = Math.fround(rawVal);
+            const bitStr = float32ToBits(f32Val);
+            document.getElementById('ieee3-bit-string-raw').innerText = bitStr;
+
+            const signBit = bitStr[0];
+            const expBits = bitStr.substring(1, 9);
+            const fracBits = bitStr.substring(9);
+
+            hexDisplay.innerText = `Hex: ${float32ToHex(f32Val)}`;
+
+            // Render Colored Bits
+            let bitsHtml = `<span class="px-1.5 py-1 rounded bg-signColor/20 text-signColor border border-signColor/50" title="Sign">${signBit}</span>`;
+            bitsHtml += `<span class="px-1.5 py-1 rounded bg-expColor/20 text-expColor border border-expColor/50 tracking-widest ml-1" title="Exponent">${expBits}</span>`;
+            bitsHtml += `<span class="px-1.5 py-1 rounded bg-fracColor/20 text-fracColor border border-fracColor/50 tracking-widest ml-1" title="Fraction">${fracBits}</span>`;
+            container.innerHTML = bitsHtml;
+
+            // Step Breakdown logic
+            const signNum = signBit === '1' ? -1 : 1;
+            const biasedExp = parseInt(expBits, 2);
+            const unbiasedExp = biasedExp - 127;
+            
+            let significandVal = 1.0;
+            for (let i = 0; i < 23; i++) {
+                if (fracBits[i] === '1') significandVal += Math.pow(2, -(i + 1));
+            }
+
+            stepsEl.innerHTML = `
+                <div class="step-card pl-3 space-y-1">
+                    <div><strong>Step 1 (Sign):</strong> ค่าตัวเลขเป็น ${rawVal >= 0 ? 'บวก' : 'ลบ'} → Sign Bit (S) = <span class="text-signColor font-bold">${signBit}</span></div>
+                    <div><strong>Step 2 (Normalization & Exponent):</strong> Biased Exp = ${biasedExp} → Unbiased Exp (e) = ${biasedExp} - 127 = <span class="text-expColor font-bold">${unbiasedExp}</span></div>
+                    <div><strong>Step 3 (Significand/Fraction):</strong> รูป Normalized คือ 1.${fracBits}₂ (Hidden Bit 1) → Mantissa Value = <span class="text-fracColor font-bold">${significandVal.toFixed(7)}</span></div>
+                    <div><strong>Step 4 (Stored Float32):</strong> (-1)<sup>${signBit}</sup> × ${significandVal.toFixed(7)} × 2<sup>${unbiasedExp}</sup> = <strong class="text-accentCyan">${f32Val}</strong></div>
+                </div>
+            `;
+
+            // Check Precision Alert
+            if (rawVal !== f32Val) {
+                const diff = Math.abs(rawVal - f32Val);
+                alertEl.innerHTML = `
+                    ⚠️ <strong>หมายเหตุเรื่องความแม่นยำ (Rounding Warning):</strong><br>
+                    ค่าที่คุณป้อน (<code class="font-bold">${rawVal}</code>) ไม่สามารถเก็บในระบบ Float32 32-bit ได้ตรงเป๊ะ<br>
+                    คอมพิวเตอร์จึงปัดเศษและจัดเก็บค่าจริงเป็น: <code class="font-bold text-white">${f32Val}</code> (ผลต่าง = ${diff.toExponential(4)})
+                `;
+                alertEl.classList.remove('hidden');
+            } else {
+                alertEl.classList.add('hidden');
+            }
+        }
+
+        function updateIEEE3Decoder() {
+            const rawBits = document.getElementById('ieee3-bit-input').value.replace(/\s+/g, '');
+            const errorEl = document.getElementById('ieee3-decoder-error');
+            const outputEl = document.getElementById('ieee3-decoder-output');
+
+            if (rawBits.length !== 32 || /[^01]/.test(rawBits)) {
+                errorEl.innerText = `บิตต้องมีจำนวนครบ 32 บิตพอดี (ปัจจุบันมี ${rawBits.length} บิต และต้องมีเฉพาะตัวเลข 0 และ 1)`;
+                errorEl.classList.remove('hidden');
+                outputEl.innerHTML = '';
+                return;
+            }
+
+            errorEl.classList.add('hidden');
+
+            const signBit = rawBits[0];
+            const expBits = rawBits.substring(1, 9);
+            const fracBits = rawBits.substring(9);
+
+            const decodedFloat = bitsToFloat32(rawBits);
+            const biasedExp = parseInt(expBits, 2);
+            const unbiasedExp = biasedExp - 127;
+
+            let fracSum = 0;
+            for (let i = 0; i < 23; i++) {
+                if (fracBits[i] === '1') fracSum += Math.pow(2, -(i + 1));
+            }
+            const significand = 1.0 + fracSum;
+
+            outputEl.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 code-font text-xs">
+                    <div class="bg-darkBg p-3 rounded-xl border border-signColor/40">
+                        <span class="text-signColor font-bold block mb-1">Sign (1-bit)</span>
+                        <div class="text-lg font-bold text-white">${signBit} (${signBit === '0' ? '+ บวก' : '- ลบ'})</div>
+                    </div>
+                    <div class="bg-darkBg p-3 rounded-xl border border-expColor/40">
+                        <span class="text-expColor font-bold block mb-1">Exponent (8-bit)</span>
+                        <div class="text-sm font-bold text-white">${expBits}₂ = ${biasedExp}</div>
+                        <div class="text-slate-400 mt-1">Unbiased e = ${biasedExp} - 127 = <strong>${unbiasedExp}</strong></div>
+                    </div>
+                    <div class="bg-darkBg p-3 rounded-xl border border-fracColor/40">
+                        <span class="text-fracColor font-bold block mb-1">Fraction (23-bit)</span>
+                        <div class="text-xs font-bold text-white overflow-x-auto">${fracBits}</div>
+                        <div class="text-slate-400 mt-1">1 + Fraction = <strong>${significand.toFixed(7)}</strong></div>
+                    </div>
+                </div>
+
+                <div class="bg-darkBg p-4 rounded-xl border border-panelBorder space-y-2">
+                    <div class="text-xs text-slate-400">การถอดรหัสเป็นตัวเลข (Decoded Result):</div>
+                    <div class="code-font text-2xl font-black text-accentCyan">${decodedFloat}</div>
+                    <div class="text-xs text-slate-400">Hex Representation: <span class="text-white code-font font-bold">${float32ToHex(decodedFloat)}</span></div>
+                </div>
+            `;
+        }
+
+        /* ==========================================================================
+           CHAPTER 4 LOGIC (Float32 Arithmetic Simulator)
+           ========================================================================== */
+        function initChap4() {
+            document.getElementById('arith-op-a').addEventListener('input', runArithSimulator);
+            document.getElementById('arith-op-b').addEventListener('input', runArithSimulator);
+            runArithSimulator();
+        }
+
+        function setArithOperator(op) {
+            arithOperator = op;
+            const btnAdd = document.getElementById('btn-op-add');
+            const btnSub = document.getElementById('btn-op-sub');
+            if (op === '+') {
+                btnAdd.className = 'px-3 py-1 rounded-md text-sm font-bold bg-accentCyan text-darkBg';
+                btnSub.className = 'px-3 py-1 rounded-md text-sm font-bold text-slate-400 hover:text-white';
+            } else {
+                btnSub.className = 'px-3 py-1 rounded-md text-sm font-bold bg-accentCyan text-darkBg';
+                btnAdd.className = 'px-3 py-1 rounded-md text-sm font-bold text-slate-400 hover:text-white';
+            }
+            runArithSimulator();
+        }
+
+        function setArithPresets(a, op, b) {
+            document.getElementById('arith-op-a').value = a;
+            document.getElementById('arith-op-b').value = b;
+            setArithOperator(op);
+        }
+
+        function runArithSimulator() {
+            const rawA = parseFloat(document.getElementById('arith-op-a').value);
+            const rawB = parseFloat(document.getElementById('arith-op-b').value);
+
+            const bitCard = document.getElementById('arith-operands-bit-info');
+            const stepsContainer = document.getElementById('arith-steps-container');
+            const summaryEl = document.getElementById('arith-final-summary');
+
+            if (isNaN(rawA) || isNaN(rawB)) {
+                bitCard.innerHTML = '<span class="text-red-400 text-xs">กรุณาป้อนตัวเลขที่ถูกต้องทั้งสองช่อง</span>';
+                stepsContainer.innerHTML = '';
+                summaryEl.innerHTML = '';
+                return;
+            }
+
+            // CRITICAL REQUIREMENT: Convert inputs to Float32 FIRST
+            const f32A = Math.fround(rawA);
+            const f32B = Math.fround(rawB);
+
+            const bitsA = float32ToBits(f32A);
+            const bitsB = float32ToBits(f32B);
+
+            // Render Bit Representations of Operands
+            bitCard.innerHTML = `
+                <div class="text-xs font-bold text-slate-400 mb-2">1. สแนปชอต IEEE 754 บิตของ Operands A และ B (หลังแปลงเป็น Float32):</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 code-font text-xs">
+                    <div class="p-2.5 rounded-lg bg-panelBg border border-panelBorder space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Operand A (ป้อน: ${rawA}):</span>
+                            <strong class="text-accentCyan">${f32A}</strong>
+                        </div>
+                        <div class="text-[11px]"><span class="text-signColor">${bitsA[0]}</span> <span class="text-expColor">${bitsA.substring(1,9)}</span> <span class="text-fracColor">${bitsA.substring(9)}</span></div>
+                    </div>
+                    <div class="p-2.5 rounded-lg bg-panelBg border border-panelBorder space-y-1">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Operand B (ป้อน: ${rawB}):</span>
+                            <strong class="text-accentPurple">${f32B}</strong>
+                        </div>
+                        <div class="text-[11px]"><span class="text-signColor">${bitsB[0]}</span> <span class="text-expColor">${bitsB.substring(1,9)}</span> <span class="text-fracColor">${bitsB.substring(9)}</span></div>
+                    </div>
+                </div>
+            `;
+
+            // FPU Step-by-Step Logic
+            const expA = parseInt(bitsA.substring(1,9), 2);
+            const expB = parseInt(bitsB.substring(1,9), 2);
+
+            const fracA = bitsA.substring(9);
+            const fracB = bitsB.substring(9);
+
+            const sigA = 1.0 + (parseInt(fracA, 2) / Math.pow(2, 23));
+            const sigB = 1.0 + (parseInt(fracB, 2) / Math.pow(2, 23));
+
+            const expDiff = expA - expB;
+            let alignedSigA = sigA;
+            let alignedSigB = sigB;
+            let commonExp = Math.max(expA, expB);
+            let shiftMsg = '';
+
+            if (expDiff > 0) {
+                alignedSigB = sigB / Math.pow(2, expDiff);
+                shiftMsg = `Exponent A > Exponent B (${expA} > ${expB}) → เลื่อน Significand B ไปทางขวา ${expDiff} บิต`;
+            } else if (expDiff < 0) {
+                alignedSigA = sigA / Math.pow(2, Math.abs(expDiff));
+                shiftMsg = `Exponent B > Exponent A (${expB} > ${expA}) → เลื่อน Significand A ไปทางขวา ${Math.abs(expDiff)} บิต`;
+            } else {
+                shiftMsg = `Exponent ของทั้งสองเท่ากันพอดี (${expA}) → ไม่ต้องเลื่อน Significand`;
+            }
+
+            // Actual Operation
+            let resSig = 0;
+            const valB_signed = (arithOperator === '-') ? -f32B : f32B;
+            const float32Result = Math.fround(f32A + valB_signed);
+
+            if (arithOperator === '+') {
+                resSig = alignedSigA + alignedSigB;
+            } else {
+                resSig = alignedSigA - alignedSigB;
+            }
+
+            const resBits = float32ToBits(float32Result);
+
+            // Render Steps
+            stepsContainer.innerHTML = `
+                <div class="bg-darkBg p-4 rounded-xl border border-panelBorder space-y-3 text-xs sm:text-sm">
+                    <h4 class="font-bold text-accentCyan">2. ขั้นตอน Exponent Alignment & Calculation:</h4>
+                    <div class="space-y-2 text-slate-300">
+                        <div class="p-2 rounded bg-panelBg"><strong class="text-slate-200">เปรียบเทียบ Exponents:</strong> Exp A = ${expA} (e=${expA-127}), Exp B = ${expB} (e=${expB-127})</div>
+                        <div class="p-2 rounded bg-panelBg"><strong class="text-slate-200">การเลื่อนหลัก (Shift):</strong> ${shiftMsg}</div>
+                        <div class="p-2 rounded bg-panelBg">
+                            <strong class="text-slate-200">ผลบวก/ลบ Significands:</strong><br>
+                            <code class="code-font text-accentCyan">${alignedSigA.toFixed(8)} ${arithOperator} ${alignedSigB.toFixed(8)} = ${resSig.toFixed(8)}</code>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Summary Comparison (Mathematical Exact vs Float32)
+            const exactMathResult = arithOperator === '+' ? (rawA + rawB) : (rawA - rawB);
+
+            summaryEl.innerHTML = `
+                <div class="text-xs text-slate-400 font-bold uppercase tracking-wider">3. ผลลัพธ์สุดท้าย (Final Calculation Result)</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                    <div>
+                        <span class="text-xs text-slate-400">ผลลัพธ์ Float32 จริงจาก CPU/FPU:</span>
+                        <div class="code-font text-2xl font-black text-emerald-400">${float32Result}</div>
+                        <div class="text-xs text-slate-400 mt-1">Bit String: <span class="code-font text-white">${resBits}</span></div>
+                        <div class="text-xs text-slate-400">Hex: <span class="code-font text-accentCyan">${float32ToHex(float32Result)}</span></div>
+                    </div>
+                    <div class="border-t md:border-t-0 md:border-l border-panelBorder pt-2 md:pt-0 md:pl-4">
+                        <span class="text-xs text-slate-400">เปรียบเทียบกับ Exact Math (ฐานสิบแม่นยำสูง):</span>
+                        <div class="code-font text-xl font-bold text-slate-300">${exactMathResult}</div>
+                        <p class="text-[11px] text-slate-400 mt-2 leading-normal">
+                            ${float32Result !== exactMathResult 
+                                ? `💡 <strong>สังเกตเห็นความต่าง:</strong> ผลลัพธ์ Float32 ต่างจากค่าคณิตศาสตร์บริสุทธิ์ เนื่องจากการปัดเศษในระดับ 23 บิตของ Mantissa` 
+                                : `✅ ค่าที่ได้ตรงกันพอดีเนื่องจากไม่มีเศษส่วนเล็ดลอดเกินความแม่นยำ 23 บิต`}
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* ==========================================================================
+           APPLICATION INITIALIZATION
+           ========================================================================== */
+        window.onload = function() {
+            // Navbar click toggle for mobile
+            document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+                const nav = document.getElementById('navMenu');
+                nav.classList.toggle('hidden');
+            });
+
+            // Initialize all interactive modules
+            initChap1();
+            initChap2();
+            initChap3();
+            initChap4();
+
+            // Set default view to dashboard
+            switchTab('dashboard');
+        };
+    </script>
+</body>
+</html>
