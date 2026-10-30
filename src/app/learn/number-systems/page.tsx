@@ -10,7 +10,7 @@ import {
 import { ToolBoundary } from '@/components/tools/tool-boundary';
 import { Base, Pow } from '@/components/ui/num';
 import { chapterBySlug } from '@/content/chapters';
-import { uintMax, uintTerms, uintToBits } from '@/lib/fp';
+import { uintMax, uintTerms, uintToBits, uintValue } from '@/lib/fp';
 
 const ch = chapterBySlug('number-systems');
 export const metadata: Metadata = { title: `บทที่ 1 ${ch.title}`, description: ch.blurb };
@@ -105,6 +105,19 @@ export default function NumberSystemsPage() {
         <Formula>
           <Base>1011</Base> = 1×8 + 0×4 + 1×2 + 1×1 = 11
         </Formula>
+        <p>ตัวอย่างเพิ่มเติม (คิดแบบเดียวกัน: รวมน้ำหนักของบิตที่เป็น 1):</p>
+        <ul className="space-y-1" data-testid="more-int-examples">
+          {['101', '11010', '10000000', '01111111'].map((b) => (
+            <li key={b} className="num font-mono">
+              <Base>{b}</Base> ={' '}
+              {uintTerms(b)
+                .filter((t) => t.bit === 1)
+                .map((t) => t.weight)
+                .join(' + ')}{' '}
+              = <b>{uintValue(b)}</b>
+            </li>
+          ))}
+        </ul>
       </Section>
 
       <Section id="range" title="ช่วงค่าของจำนวนเต็ม 8 บิตแบบไม่มีเครื่องหมาย">

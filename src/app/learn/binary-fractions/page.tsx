@@ -10,7 +10,7 @@ import {
 import { ToolBoundary } from '@/components/tools/tool-boundary';
 import { Pow } from '@/components/ui/num';
 import { chapterBySlug } from '@/content/chapters';
-import { R, convertFraction, formatRational } from '@/lib/fp';
+import { R, convertFraction, formatRational, fractionValue } from '@/lib/fp';
 
 const ch = chapterBySlug('binary-fractions');
 export const metadata: Metadata = { title: `บทที่ 2 ${ch.title}`, description: ch.blurb };
@@ -98,6 +98,20 @@ export default function BinaryFractionsPage() {
         <ToolBoundary>
           <BinaryFractionDemo bits="101" />
         </ToolBoundary>
+        <p>ตัวอย่างเพิ่มเติม:</p>
+        <ul className="space-y-1" data-testid="more-frac-examples">
+          {['11', '0101', '0011', '1111'].map((b) => (
+            <li key={b} className="num font-mono">
+              0.{b}
+              <sub>2</sub> ={' '}
+              {[...b]
+                .map((c, i) => (c === '1' ? plain(R.pow2(-(i + 1))) : null))
+                .filter(Boolean)
+                .join(' + ')}{' '}
+              = <b>{plain(fractionValue(b))}</b>
+            </li>
+          ))}
+        </ul>
       </Section>
 
       <Section id="explorer" title="Fraction Explorer: เศษส่วนฐานสอง 16 บิต" wide>

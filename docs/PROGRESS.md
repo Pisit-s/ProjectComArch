@@ -57,12 +57,13 @@
 - [x] build + start production ผ่าน · ไม่มี secret · security headers ครบ (ไม่มี X-Frame-Options ตามแผน) · DEPLOY.md + README ตรงงานล่าสุด
 ## Phase 9 — Review 3 รอบ
 - [x] รอบ 1 ใช้งานจริง · [x] รอบ 2 ความสวย/interface · [x] รอบ 3 ความถูกต้อง (รายละเอียดใน docs/REVIEW.md)
-- [ ] ไล่อ่านเนื้อหาทุกบทเทียบ requirement แบบละเอียดอีกครั้ง
+- [x] ไล่อ่านเนื้อหาทุกบทเทียบ requirement แบบละเอียด · เพิ่มตัวอย่างแปลงฐานสองเป็นฐานสิบในบทที่ 1–2 (requirement ขอตัวอย่างหลายข้อ) · e2e 65 ผ่านอีกรอบ
 ## Phase 10 — รายงานสุดท้าย
-- [ ] docs/FINAL_REPORT.md: สรุปตาม phase, ตาราง acceptance criteria ครบ 4 ไฟล์, ผล test/coverage/Lighthouse, path screenshot, คำถามทั้งหมดเรียงตามความสำคัญ
-- หยุดพักตามที่ Pisit ขอ (30 ต.ค. 2569) — ทำต่อจากข้อนี้
+- [x] docs/FINAL_REPORT.md: สรุปตาม phase, ตาราง acceptance criteria, ผล test/coverage/Lighthouse, path screenshot, คำถามทั้งหมดเรียงตามความสำคัญ
+- งานตามแผนเสร็จครบ · ที่เหลือรอ Pisit ตอบคำถาม (docs/QUESTIONS.md) และ deploy
 
 ## บันทึกการตัดสินใจ / ต่างจากแผน
 - Tailwind ใช้ `@tailwindcss/turbopack` แทน `@tailwindcss/postcss` (ค่าเริ่มต้นของ create-next-app 16.4.3)
 - คูณ/หาร: ขั้น range อยู่ก่อน round ตาม flowchart ใน PLAN.md 8.2 (requirement เขียน round ก่อน range) — เหตุผลใน docs/ENGINE.md
+- ชื่อผู้จัดทำคนที่ 4: Pisit แก้เองใน `src/lib/site.ts` เป็น "นายณัฐิวุฒิ แสงสารพันธ์" (commit `5ed58bd`) ต่างจาก PLAN.md 7.1 → ยึดตาม site.ts และแก้ README ให้ตรง
 - `parseDecimal` คืน `magnitude` + `negative` แยกกัน (แผนเขียน `value`) เพื่อเก็บ −0 ได้
