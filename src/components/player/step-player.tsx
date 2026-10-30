@@ -124,6 +124,9 @@ function StepPlayerInner({
         aria-describedby={titleId}
         tabIndex={0}
         onKeyDown={onKeyDown}
+        onPointerEnter={autoPlay ? p.stop : undefined}
+        onPointerDown={autoPlay ? p.stop : undefined}
+        onFocusCapture={autoPlay ? p.stop : undefined}
         data-testid={testId}
         data-step={step?.id}
         data-step-index={p.index}
