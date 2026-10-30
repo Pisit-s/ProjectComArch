@@ -1,0 +1,373 @@
+{
+ "_note": "n = 4 bits. Rows follow the step codes in docs/plans/wp2-multiply.md. Verified: all 4-bit and 8-bit pairs exhaustively + 20,000 random 32-bit pairs against exact integer arithmetic.",
+ "v1": {
+  "2x3": [
+   {
+    "iteration": 0,
+    "step": "init",
+    "multiplier": "0011",
+    "multiplicand": "00000010",
+    "product": "00000000"
+   },
+   {
+    "iteration": 1,
+    "step": "1a",
+    "multiplier": "0011",
+    "multiplicand": "00000010",
+    "product": "00000010"
+   },
+   {
+    "iteration": 1,
+    "step": "2",
+    "multiplier": "0011",
+    "multiplicand": "00000100",
+    "product": "00000010"
+   },
+   {
+    "iteration": 1,
+    "step": "3",
+    "multiplier": "0001",
+    "multiplicand": "00000100",
+    "product": "00000010"
+   },
+   {
+    "iteration": 2,
+    "step": "1a",
+    "multiplier": "0001",
+    "multiplicand": "00000100",
+    "product": "00000110"
+   },
+   {
+    "iteration": 2,
+    "step": "2",
+    "multiplier": "0001",
+    "multiplicand": "00001000",
+    "product": "00000110"
+   },
+   {
+    "iteration": 2,
+    "step": "3",
+    "multiplier": "0000",
+    "multiplicand": "00001000",
+    "product": "00000110"
+   },
+   {
+    "iteration": 3,
+    "step": "1",
+    "multiplier": "0000",
+    "multiplicand": "00001000",
+    "product": "00000110"
+   },
+   {
+    "iteration": 3,
+    "step": "2",
+    "multiplier": "0000",
+    "multiplicand": "00010000",
+    "product": "00000110"
+   },
+   {
+    "iteration": 3,
+    "step": "3",
+    "multiplier": "0000",
+    "multiplicand": "00010000",
+    "product": "00000110"
+   },
+   {
+    "iteration": 4,
+    "step": "1",
+    "multiplier": "0000",
+    "multiplicand": "00010000",
+    "product": "00000110"
+   },
+   {
+    "iteration": 4,
+    "step": "2",
+    "multiplier": "0000",
+    "multiplicand": "00100000",
+    "product": "00000110"
+   },
+   {
+    "iteration": 4,
+    "step": "3",
+    "multiplier": "0000",
+    "multiplicand": "00100000",
+    "product": "00000110"
+   }
+  ],
+  "13x11": [
+   {
+    "iteration": 0,
+    "step": "init",
+    "multiplier": "1011",
+    "multiplicand": "00001101",
+    "product": "00000000"
+   },
+   {
+    "iteration": 1,
+    "step": "1a",
+    "multiplier": "1011",
+    "multiplicand": "00001101",
+    "product": "00001101"
+   },
+   {
+    "iteration": 1,
+    "step": "2",
+    "multiplier": "1011",
+    "multiplicand": "00011010",
+    "product": "00001101"
+   },
+   {
+    "iteration": 1,
+    "step": "3",
+    "multiplier": "0101",
+    "multiplicand": "00011010",
+    "product": "00001101"
+   },
+   {
+    "iteration": 2,
+    "step": "1a",
+    "multiplier": "0101",
+    "multiplicand": "00011010",
+    "product": "00100111"
+   },
+   {
+    "iteration": 2,
+    "step": "2",
+    "multiplier": "0101",
+    "multiplicand": "00110100",
+    "product": "00100111"
+   },
+   {
+    "iteration": 2,
+    "step": "3",
+    "multiplier": "0010",
+    "multiplicand": "00110100",
+    "product": "00100111"
+   },
+   {
+    "iteration": 3,
+    "step": "1",
+    "multiplier": "0010",
+    "multiplicand": "00110100",
+    "product": "00100111"
+   },
+   {
+    "iteration": 3,
+    "step": "2",
+    "multiplier": "0010",
+    "multiplicand": "01101000",
+    "product": "00100111"
+   },
+   {
+    "iteration": 3,
+    "step": "3",
+    "multiplier": "0001",
+    "multiplicand": "01101000",
+    "product": "00100111"
+   },
+   {
+    "iteration": 4,
+    "step": "1a",
+    "multiplier": "0001",
+    "multiplicand": "01101000",
+    "product": "10001111"
+   },
+   {
+    "iteration": 4,
+    "step": "2",
+    "multiplier": "0001",
+    "multiplicand": "11010000",
+    "product": "10001111"
+   },
+   {
+    "iteration": 4,
+    "step": "3",
+    "multiplier": "0000",
+    "multiplicand": "11010000",
+    "product": "10001111"
+   }
+  ]
+ },
+ "v2": {
+  "2x3": [
+   {
+    "iteration": 0,
+    "step": "init",
+    "multiplicand": "0010",
+    "carry": 0,
+    "product": "00000011"
+   },
+   {
+    "iteration": 1,
+    "step": "1a",
+    "multiplicand": "0010",
+    "carry": 0,
+    "product": "00100011"
+   },
+   {
+    "iteration": 1,
+    "step": "2",
+    "multiplicand": "0010",
+    "carry": 0,
+    "product": "00010001"
+   },
+   {
+    "iteration": 2,
+    "step": "1a",
+    "multiplicand": "0010",
+    "carry": 0,
+    "product": "00110001"
+   },
+   {
+    "iteration": 2,
+    "step": "2",
+    "multiplicand": "0010",
+    "carry": 0,
+    "product": "00011000"
+   },
+   {
+    "iteration": 3,
+    "step": "1",
+    "multiplicand": "0010",
+    "carry": 0,
+    "product": "00011000"
+   },
+   {
+    "iteration": 3,
+    "step": "2",
+    "multiplicand": "0010",
+    "carry": 0,
+    "product": "00001100"
+   },
+   {
+    "iteration": 4,
+    "step": "1",
+    "multiplicand": "0010",
+    "carry": 0,
+    "product": "00001100"
+   },
+   {
+    "iteration": 4,
+    "step": "2",
+    "multiplicand": "0010",
+    "carry": 0,
+    "product": "00000110"
+   }
+  ],
+  "13x11": [
+   {
+    "iteration": 0,
+    "step": "init",
+    "multiplicand": "1101",
+    "carry": 0,
+    "product": "00001011"
+   },
+   {
+    "iteration": 1,
+    "step": "1a",
+    "multiplicand": "1101",
+    "carry": 0,
+    "product": "11011011"
+   },
+   {
+    "iteration": 1,
+    "step": "2",
+    "multiplicand": "1101",
+    "carry": 0,
+    "product": "01101101"
+   },
+   {
+    "iteration": 2,
+    "step": "1a",
+    "multiplicand": "1101",
+    "carry": 1,
+    "product": "00111101"
+   },
+   {
+    "iteration": 2,
+    "step": "2",
+    "multiplicand": "1101",
+    "carry": 0,
+    "product": "10011110"
+   },
+   {
+    "iteration": 3,
+    "step": "1",
+    "multiplicand": "1101",
+    "carry": 0,
+    "product": "10011110"
+   },
+   {
+    "iteration": 3,
+    "step": "2",
+    "multiplicand": "1101",
+    "carry": 0,
+    "product": "01001111"
+   },
+   {
+    "iteration": 4,
+    "step": "1a",
+    "multiplicand": "1101",
+    "carry": 1,
+    "product": "00011111"
+   },
+   {
+    "iteration": 4,
+    "step": "2",
+    "multiplicand": "1101",
+    "carry": 0,
+    "product": "10001111"
+   }
+  ]
+ },
+ "signed": [
+  {
+   "a": -2,
+   "b": 3,
+   "n": 4,
+   "product": -6,
+   "productBits": "11111010",
+   "magnitudes": [
+    2,
+    3
+   ],
+   "negate": true
+  },
+  {
+   "a": 7,
+   "b": -8,
+   "n": 4,
+   "product": -56,
+   "productBits": "11001000",
+   "magnitudes": [
+    7,
+    8
+   ],
+   "negate": true
+  },
+  {
+   "a": -8,
+   "b": -8,
+   "n": 4,
+   "product": 64,
+   "productBits": "01000000",
+   "magnitudes": [
+    8,
+    8
+   ],
+   "negate": false
+  },
+  {
+   "a": -1,
+   "b": -1,
+   "n": 4,
+   "product": 1,
+   "productBits": "00000001",
+   "magnitudes": [
+    1,
+    1
+   ],
+   "negate": false
+  }
+ ]
+}

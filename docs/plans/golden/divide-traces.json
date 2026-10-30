@@ -1,0 +1,491 @@
+{
+ "_note": "n = 4 bits. Rows follow the step codes in docs/plans/wp3-divide.md. remainder/remLeft hold the register bit pattern; negative = sign of the exact ALU result (needs one extra bit in hardware). Verified exhaustively for 4-bit and 8-bit, 20,000 random 32-bit pairs.",
+ "v1": {
+  "7/2": [
+   {
+    "iteration": 0,
+    "step": "init",
+    "quotient": "0000",
+    "divisor": "00100000",
+    "remainder": "00000111"
+   },
+   {
+    "iteration": 1,
+    "step": "1",
+    "quotient": "0000",
+    "divisor": "00100000",
+    "remainder": "11100111",
+    "negative": true
+   },
+   {
+    "iteration": 1,
+    "step": "2b",
+    "quotient": "0000",
+    "divisor": "00100000",
+    "remainder": "00000111"
+   },
+   {
+    "iteration": 1,
+    "step": "3",
+    "quotient": "0000",
+    "divisor": "00010000",
+    "remainder": "00000111"
+   },
+   {
+    "iteration": 2,
+    "step": "1",
+    "quotient": "0000",
+    "divisor": "00010000",
+    "remainder": "11110111",
+    "negative": true
+   },
+   {
+    "iteration": 2,
+    "step": "2b",
+    "quotient": "0000",
+    "divisor": "00010000",
+    "remainder": "00000111"
+   },
+   {
+    "iteration": 2,
+    "step": "3",
+    "quotient": "0000",
+    "divisor": "00001000",
+    "remainder": "00000111"
+   },
+   {
+    "iteration": 3,
+    "step": "1",
+    "quotient": "0000",
+    "divisor": "00001000",
+    "remainder": "11111111",
+    "negative": true
+   },
+   {
+    "iteration": 3,
+    "step": "2b",
+    "quotient": "0000",
+    "divisor": "00001000",
+    "remainder": "00000111"
+   },
+   {
+    "iteration": 3,
+    "step": "3",
+    "quotient": "0000",
+    "divisor": "00000100",
+    "remainder": "00000111"
+   },
+   {
+    "iteration": 4,
+    "step": "1",
+    "quotient": "0000",
+    "divisor": "00000100",
+    "remainder": "00000011",
+    "negative": false
+   },
+   {
+    "iteration": 4,
+    "step": "2a",
+    "quotient": "0001",
+    "divisor": "00000100",
+    "remainder": "00000011"
+   },
+   {
+    "iteration": 4,
+    "step": "3",
+    "quotient": "0001",
+    "divisor": "00000010",
+    "remainder": "00000011"
+   },
+   {
+    "iteration": 5,
+    "step": "1",
+    "quotient": "0001",
+    "divisor": "00000010",
+    "remainder": "00000001",
+    "negative": false
+   },
+   {
+    "iteration": 5,
+    "step": "2a",
+    "quotient": "0011",
+    "divisor": "00000010",
+    "remainder": "00000001"
+   },
+   {
+    "iteration": 5,
+    "step": "3",
+    "quotient": "0011",
+    "divisor": "00000001",
+    "remainder": "00000001"
+   }
+  ],
+  "13/3": [
+   {
+    "iteration": 0,
+    "step": "init",
+    "quotient": "0000",
+    "divisor": "00110000",
+    "remainder": "00001101"
+   },
+   {
+    "iteration": 1,
+    "step": "1",
+    "quotient": "0000",
+    "divisor": "00110000",
+    "remainder": "11011101",
+    "negative": true
+   },
+   {
+    "iteration": 1,
+    "step": "2b",
+    "quotient": "0000",
+    "divisor": "00110000",
+    "remainder": "00001101"
+   },
+   {
+    "iteration": 1,
+    "step": "3",
+    "quotient": "0000",
+    "divisor": "00011000",
+    "remainder": "00001101"
+   },
+   {
+    "iteration": 2,
+    "step": "1",
+    "quotient": "0000",
+    "divisor": "00011000",
+    "remainder": "11110101",
+    "negative": true
+   },
+   {
+    "iteration": 2,
+    "step": "2b",
+    "quotient": "0000",
+    "divisor": "00011000",
+    "remainder": "00001101"
+   },
+   {
+    "iteration": 2,
+    "step": "3",
+    "quotient": "0000",
+    "divisor": "00001100",
+    "remainder": "00001101"
+   },
+   {
+    "iteration": 3,
+    "step": "1",
+    "quotient": "0000",
+    "divisor": "00001100",
+    "remainder": "00000001",
+    "negative": false
+   },
+   {
+    "iteration": 3,
+    "step": "2a",
+    "quotient": "0001",
+    "divisor": "00001100",
+    "remainder": "00000001"
+   },
+   {
+    "iteration": 3,
+    "step": "3",
+    "quotient": "0001",
+    "divisor": "00000110",
+    "remainder": "00000001"
+   },
+   {
+    "iteration": 4,
+    "step": "1",
+    "quotient": "0001",
+    "divisor": "00000110",
+    "remainder": "11111011",
+    "negative": true
+   },
+   {
+    "iteration": 4,
+    "step": "2b",
+    "quotient": "0010",
+    "divisor": "00000110",
+    "remainder": "00000001"
+   },
+   {
+    "iteration": 4,
+    "step": "3",
+    "quotient": "0010",
+    "divisor": "00000011",
+    "remainder": "00000001"
+   },
+   {
+    "iteration": 5,
+    "step": "1",
+    "quotient": "0010",
+    "divisor": "00000011",
+    "remainder": "11111110",
+    "negative": true
+   },
+   {
+    "iteration": 5,
+    "step": "2b",
+    "quotient": "0100",
+    "divisor": "00000011",
+    "remainder": "00000001"
+   },
+   {
+    "iteration": 5,
+    "step": "3",
+    "quotient": "0100",
+    "divisor": "00000001",
+    "remainder": "00000001"
+   }
+  ]
+ },
+ "v2": {
+  "7/2": [
+   {
+    "iteration": 0,
+    "step": "init",
+    "divisor": "0010",
+    "remLeft": "0000",
+    "remRight": "0111"
+   },
+   {
+    "iteration": 1,
+    "step": "1",
+    "divisor": "0010",
+    "remLeft": "0000",
+    "remRight": "1110"
+   },
+   {
+    "iteration": 1,
+    "step": "2",
+    "divisor": "0010",
+    "remLeft": "1110",
+    "remRight": "1110",
+    "negative": true
+   },
+   {
+    "iteration": 1,
+    "step": "3b",
+    "divisor": "0010",
+    "remLeft": "0000",
+    "remRight": "1110"
+   },
+   {
+    "iteration": 2,
+    "step": "1",
+    "divisor": "0010",
+    "remLeft": "0001",
+    "remRight": "1100"
+   },
+   {
+    "iteration": 2,
+    "step": "2",
+    "divisor": "0010",
+    "remLeft": "1111",
+    "remRight": "1100",
+    "negative": true
+   },
+   {
+    "iteration": 2,
+    "step": "3b",
+    "divisor": "0010",
+    "remLeft": "0001",
+    "remRight": "1100"
+   },
+   {
+    "iteration": 3,
+    "step": "1",
+    "divisor": "0010",
+    "remLeft": "0011",
+    "remRight": "1000"
+   },
+   {
+    "iteration": 3,
+    "step": "2",
+    "divisor": "0010",
+    "remLeft": "0001",
+    "remRight": "1000",
+    "negative": false
+   },
+   {
+    "iteration": 3,
+    "step": "3a",
+    "divisor": "0010",
+    "remLeft": "0001",
+    "remRight": "1001"
+   },
+   {
+    "iteration": 4,
+    "step": "1",
+    "divisor": "0010",
+    "remLeft": "0011",
+    "remRight": "0010"
+   },
+   {
+    "iteration": 4,
+    "step": "2",
+    "divisor": "0010",
+    "remLeft": "0001",
+    "remRight": "0010",
+    "negative": false
+   },
+   {
+    "iteration": 4,
+    "step": "3a",
+    "divisor": "0010",
+    "remLeft": "0001",
+    "remRight": "0011"
+   }
+  ],
+  "13/3": [
+   {
+    "iteration": 0,
+    "step": "init",
+    "divisor": "0011",
+    "remLeft": "0000",
+    "remRight": "1101"
+   },
+   {
+    "iteration": 1,
+    "step": "1",
+    "divisor": "0011",
+    "remLeft": "0001",
+    "remRight": "1010"
+   },
+   {
+    "iteration": 1,
+    "step": "2",
+    "divisor": "0011",
+    "remLeft": "1110",
+    "remRight": "1010",
+    "negative": true
+   },
+   {
+    "iteration": 1,
+    "step": "3b",
+    "divisor": "0011",
+    "remLeft": "0001",
+    "remRight": "1010"
+   },
+   {
+    "iteration": 2,
+    "step": "1",
+    "divisor": "0011",
+    "remLeft": "0011",
+    "remRight": "0100"
+   },
+   {
+    "iteration": 2,
+    "step": "2",
+    "divisor": "0011",
+    "remLeft": "0000",
+    "remRight": "0100",
+    "negative": false
+   },
+   {
+    "iteration": 2,
+    "step": "3a",
+    "divisor": "0011",
+    "remLeft": "0000",
+    "remRight": "0101"
+   },
+   {
+    "iteration": 3,
+    "step": "1",
+    "divisor": "0011",
+    "remLeft": "0000",
+    "remRight": "1010"
+   },
+   {
+    "iteration": 3,
+    "step": "2",
+    "divisor": "0011",
+    "remLeft": "1101",
+    "remRight": "1010",
+    "negative": true
+   },
+   {
+    "iteration": 3,
+    "step": "3b",
+    "divisor": "0011",
+    "remLeft": "0000",
+    "remRight": "1010"
+   },
+   {
+    "iteration": 4,
+    "step": "1",
+    "divisor": "0011",
+    "remLeft": "0001",
+    "remRight": "0100"
+   },
+   {
+    "iteration": 4,
+    "step": "2",
+    "divisor": "0011",
+    "remLeft": "1110",
+    "remRight": "0100",
+    "negative": true
+   },
+   {
+    "iteration": 4,
+    "step": "3b",
+    "divisor": "0011",
+    "remLeft": "0001",
+    "remRight": "0100"
+   }
+  ]
+ },
+ "signed": [
+  {
+   "a": 7,
+   "b": 2,
+   "n": 4,
+   "quotient": 3,
+   "remainder": 1,
+   "quotientBits": "0011",
+   "remainderBits": "0001",
+   "overflow": false
+  },
+  {
+   "a": -7,
+   "b": 2,
+   "n": 4,
+   "quotient": -3,
+   "remainder": -1,
+   "quotientBits": "1101",
+   "remainderBits": "1111",
+   "overflow": false
+  },
+  {
+   "a": 7,
+   "b": -2,
+   "n": 4,
+   "quotient": -3,
+   "remainder": 1,
+   "quotientBits": "1101",
+   "remainderBits": "0001",
+   "overflow": false
+  },
+  {
+   "a": -7,
+   "b": -2,
+   "n": 4,
+   "quotient": 3,
+   "remainder": -1,
+   "quotientBits": "0011",
+   "remainderBits": "1111",
+   "overflow": false
+  },
+  {
+   "a": -8,
+   "b": -1,
+   "n": 4,
+   "quotient": 8,
+   "remainder": 0,
+   "quotientBits": "1000",
+   "remainderBits": "0000",
+   "overflow": true
+  }
+ ]
+}
