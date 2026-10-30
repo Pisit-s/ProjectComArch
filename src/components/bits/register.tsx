@@ -92,7 +92,12 @@ export function Register({
   };
 
   const group = (field: 'sign' | 'exp' | 'frac', from: number, to: number) => (
-    <div className={cn('flex min-w-0 flex-col gap-1', !edit && field === 'frac' && 'w-full lg:w-auto lg:flex-1')}>
+    <div
+      className={cn(
+        'flex min-w-0 flex-col gap-1',
+        !edit && field === 'frac' && 'w-full lg:w-auto lg:flex-1',
+      )}
+    >
       <span className={cn('text-xs font-semibold', FIELD_STYLE[field].text)}>
         {field === 'sign' ? 'S' : FIELD_STYLE[field].label}
         <span className="ml-1 font-normal text-muted">{to - from} บิต</span>

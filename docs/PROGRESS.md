@@ -27,10 +27,12 @@
 - [x] screenshot 390 + 1280 · REVIEW.md · e2e player 4 ข้อผ่าน (pixel7)
 
 ## Phase 3 — บทที่ 1–2
-- [ ] บทที่ 1: เนื้อหา + PlaceValue + ตัวอย่าง 1011 + IntegerExplorer + สรุป
-- [ ] บทที่ 2: เนื้อหา + FractionExplorer + NumberLine + FractionConverter + สรุป
-- [ ] e2e ข้อ 2–3 · screenshot 390
+- [x] บทที่ 1: เนื้อหา + PlaceValue + ตัวอย่าง 1011 + IntegerExplorer + สรุป
+- [x] บทที่ 2: เนื้อหา + FractionExplorer + NumberLine + FractionConverter + สรุป
+- [x] e2e ข้อ 2–3 ผ่าน (pixel7) · screenshot 390 ดูแล้ว
 ## Phase 4 — บทที่ 3
+- [ ] เนื้อหา + WorkedExample (render จาก engine) + IEEE 754 Converter (encode/decode tabs) + สรุป
+- [ ] e2e ข้อ 4 (Chromium + WebKit)
 ## Phase 5 — บทที่ 4
 ## Phase 6 — บทที่ 5
 ## Milestone "พร้อมใช้สอน"
