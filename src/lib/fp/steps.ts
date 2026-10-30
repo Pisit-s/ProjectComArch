@@ -143,6 +143,8 @@ type StepBody =
       /** After shifting right by d with bits that fall off ORed into the lowest bit. */
       after: bigint;
       sticky: Bit;
+      /** State after each single shift 0..min(d, fracBits + 4); the last entry always equals `after`. */
+      stages: { shift: number; value: bigint; sticky: Bit }[];
       /** Larger significand with 3 extra low bits. */
       larger: bigint;
       /** Bits after the binary point in before/after/larger. */

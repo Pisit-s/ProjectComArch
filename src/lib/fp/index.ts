@@ -15,3 +15,4 @@ export * from './simulate';
 export * from './format-number';
 export * from './fraction';
 export * from './integer';
+export * from './bit-info';

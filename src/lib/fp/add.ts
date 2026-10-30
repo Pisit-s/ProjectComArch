@@ -78,6 +78,13 @@ export function addSub(fmt: FloatFormat, a: bigint, b: bigint, op: '+' | '-'): F
     sticky = (before & ((1n << BigInt(d)) - 1n)) !== 0n ? 1 : 0;
     after = (before >> BigInt(d)) | BigInt(sticky);
   }
+  const stages: { shift: number; value: bigint; sticky: Bit }[] = [];
+  const shown = Math.min(d, F + GRS + 1);
+  for (let k = 0; k <= shown; k++) {
+    const lost: Bit = (before & ((1n << BigInt(k)) - 1n)) !== 0n ? 1 : 0;
+    stages.push({ shift: k, value: (before >> BigInt(k)) | BigInt(lost), sticky: lost });
+  }
+  if (shown < d) stages.push({ shift: d, value: after, sticky });
   steps.push({
     id: 'align',
     flow: 'align',
@@ -86,6 +93,7 @@ export function addSub(fmt: FloatFormat, a: bigint, b: bigint, op: '+' | '-'): F
     before,
     after,
     sticky,
+    stages,
     larger,
     fracBits: F + GRS,
     exponent: x.e + b0,

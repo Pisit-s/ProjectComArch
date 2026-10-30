@@ -117,3 +117,42 @@ describe('simulate', () => {
     expect(ok.ok && ok.result.bits).toBe(0x418f0000n);
   });
 });
+
+describe('align stages', () => {
+  it('end at the aligned value and grow sticky monotonically', () => {
+    fc.assert(
+      fc.property(anyPair, ([a, b]) => {
+        const r = operate(F32, '+', a, b);
+        const al = r.steps.find((s) => s.kind === 'align');
+        if (!al || al.kind !== 'align') return true;
+        const last = al.stages.at(-1)!;
+        expect(last.value).toBe(al.after);
+        expect(last.shift).toBe(al.shift);
+        for (let i = 1; i < al.stages.length; i++) {
+          expect(al.stages[i].sticky >= al.stages[i - 1].sticky).toBe(true);
+        }
+        return true;
+      }),
+      { numRuns: 2_000 },
+    );
+  });
+});
+
+describe('simulate comparison values', () => {
+  it('0.1 + 0.2: typed 0.3, stored differs', () => {
+    const s = simulate(F32, '+', '0.1', '0.2');
+    if (!s.ok) throw new Error();
+    expect(s.typed).toEqual({ num: 3n, den: 10n });
+    expect(s.error && s.error.num > 0n).toBe(true);
+  });
+  it('special values have no typed result', () => {
+    const s = simulate(F32, '/', '1', '0');
+    if (!s.ok) throw new Error();
+    expect(s.typed).toBeNull();
+    expect(s.stored).toBeNull();
+    const m = simulate(F32, '-', '5', '3');
+    expect(m.ok && m.error).toEqual({ num: 0n, den: 1n });
+    const p = simulate(F32, '*', '-0', '3');
+    expect(p.ok && p.typed).toEqual({ num: 0n, den: 1n });
+  });
+});
