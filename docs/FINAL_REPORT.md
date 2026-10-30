@@ -78,7 +78,7 @@ screenshot สำคัญ (อยู่ในเครื่อง, `test-resul
 **ไม่ด่วน**
 | # | คำถาม | ค่าที่ใช้อยู่ |
 |---|---|---|
-| Q4 | ใช้ `*.vercel.app` หรือ domain เอง | `https://binary-lab.vercel.app` ใน `site.ts` — ถ้าชื่อโปรเจกต์บน Vercel ต่างไป ให้แก้ `siteUrl` |
+| Q4 | ใช้ `*.vercel.app` หรือ domain เอง | ตอบแล้ว: https://comkrub.mypisit.com (แก้ `siteUrl` แล้ว) |
 | Q7 | อยากได้ binary16/binary64 ใน Lab ไหม | ยังไม่ทำ |
 | Q8 | อยากได้โหมดนำเสนอไหม | ยังไม่ทำ (ใช้คีย์บอร์ดใน player + ซูม browser ได้ จอ ≥1536px ขยายตัวอักษรให้อัตโนมัติ) |
 | Q9 | ใส่ Vercel Web Analytics ไหม | ไม่ใส่ |

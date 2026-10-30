@@ -9,8 +9,8 @@ export const site = {
     'สื่อการสอนแบบ interactive เรื่องเลขฐานสองและ Floating-Point (IEEE 754 Single Precision) วิชา Computer Architecture: เลขฐานสอง เศษส่วนฐานสอง encode/decode บวก ลบ คูณ หาร ดูได้ทีละขั้น',
   ogSubtitle: 'สื่อการสอน Floating-Point · IEEE 754',
   course: 'Computer Architecture',
-  /** Q4: assumed *.vercel.app until a custom domain is chosen. */
-  siteUrl: 'https://binary-lab.vercel.app',
+  /** Q4 answered: deployed on Pisit's own domain. */
+  siteUrl: 'https://comkrub.mypisit.com',
   githubUrl: 'https://github.com/Pisit-s/ProjectComArch',
   references: [
     'IEEE Std 754-2019, IEEE Standard for Floating-Point Arithmetic',
