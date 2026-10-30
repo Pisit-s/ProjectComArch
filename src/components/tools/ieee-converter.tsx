@@ -172,6 +172,15 @@ function EncodePanel({
                 <span>ค่านี้เล็กเกินกว่าค่าที่เล็กที่สุดที่เก็บได้ จึงกลายเป็น 0</span>
               </div>
             )}
+            {r.input.kind === 'finite' && r.input.magnitude.num === 0n && (
+              <div className="alert alert-info">
+                <Info className="h-5 w-5" aria-hidden />
+                <span>
+                  ศูนย์เก็บแบบพิเศษ: Exponent และ Fraction เป็น 0 ทั้งหมด ส่วน Sign บอกว่าเป็น +0
+                  หรือ −0
+                </span>
+              </div>
+            )}
             {r.input.kind !== 'finite' && (
               <div className="alert alert-info">
                 <Info className="h-5 w-5" aria-hidden />

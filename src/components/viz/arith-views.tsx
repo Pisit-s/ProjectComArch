@@ -278,7 +278,9 @@ export function LongDivisionView({ step }: { step: StepOf<'sig-div'> }) {
                   <td>
                     <BitLine int={rem.int} frac={rem.frac} intWidth={2} />
                   </td>
-                  <td className="font-sans">{r.subtracted ? 'ใช่ → ลบ' : 'ไม่ → ไม่ลบ'}</td>
+                  <td className="font-sans whitespace-nowrap">
+                    {r.subtracted ? 'ใช่ ลบ' : 'ไม่ลบ'}
+                  </td>
                   <td className={cn('font-bold', r.qBit ? 'text-primary' : 'text-muted')}>
                     {r.qBit}
                   </td>

@@ -181,6 +181,17 @@ export function FpSimulator({
                     label={`${k.toUpperCase()} = ${state[k]}`}
                     name={`${testId}-reg-${k}`}
                   />
+                  {e.input.kind === 'finite' && !e.stored && (
+                    <p
+                      className="flex gap-1.5 text-sm text-warning"
+                      data-testid={`${testId}-${k}-overflow`}
+                    >
+                      <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                      <span>
+                        ค่านี้ใหญ่เกินกว่าที่ Single Precision เก็บได้ จึงเก็บเป็น ∞ ก่อนคำนวณ
+                      </span>
+                    </p>
+                  )}
                   {!e.equal && e.stored && (
                     <p
                       className="flex gap-1.5 text-sm text-warning"

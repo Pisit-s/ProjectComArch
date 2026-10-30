@@ -337,9 +337,21 @@ function Flowchart({
   onJump: (id: string) => void;
   testId: string;
 }) {
+  const listRef = useRef<HTMLOListElement>(null);
+  // phones show the flowchart as a horizontal strip: keep the active box in view
+  useEffect(() => {
+    const list = listRef.current;
+    const i = nodes.findIndex((n) => n.id === active);
+    const li = list?.children[i] as HTMLElement | undefined;
+    if (!list || !li || list.scrollWidth <= list.clientWidth) return;
+    list.scrollTo({ left: li.offsetLeft - list.clientWidth / 2 + li.clientWidth / 2 });
+  }, [active, nodes]);
   return (
     <nav aria-label="Flowchart ของขั้นตอน" className="mb-3 lg:mb-0" data-testid={testId}>
-      <ol className="scroll-x flex gap-1.5 pb-1 lg:flex-col lg:gap-0 lg:overflow-visible">
+      <ol
+        ref={listRef}
+        className="scroll-x flex gap-1.5 pb-1 lg:flex-col lg:gap-0 lg:overflow-visible"
+      >
         {nodes.map((n, i) => {
           const isActive = n.id === active;
           const enabled = present.has(n.id);
