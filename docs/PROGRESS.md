@@ -12,11 +12,11 @@
 - [x] DoD: lint/typecheck/test (172) / build ผ่าน · git status สะอาด · Slide/ ไม่ถูก track
 
 ## Phase 1 — โมเดลและ frame adapters
-- [ ] int/adder.ts + test
-- [ ] sci/decimal.ts + test
-- [ ] fp/format-c.ts + test
-- [ ] lesson/* adapters + test (D.1, D.5)
-- [ ] DoD: coverage ≥ 95% ไฟล์ใหม่ · engine algorithm ไม่เปลี่ยน
+- [x] int/adder.ts + test (exhaustive 4/8 บิต + D.2)
+- [x] sci/decimal.ts + test (D.3 + property)
+- [x] fp/format-c.ts + test (D.4)
+- [x] lesson adapters: keys, fp-frames, bit-window, round-line, window, circuit-map, int-frames, encode-frames (encode/decode/layout), sci-frames (point, C code, dec4), fun-fact + test (D.1, D.5, D.6, invariants)
+- [x] DoD: test 239 ผ่าน · coverage src/lib/{fp,int,sci,lesson} 99.2% statements / 97.7% branches · engine algorithm ไม่เปลี่ยน · build ผ่าน
 
 ## Phase 2 — โครงหน้าเดียว ชื่อ comkrub ลบของเก่า
 - [ ] เปลี่ยนชื่อ comkrub
@@ -35,3 +35,5 @@
 ## Phase 8 — ขัดเกลา review 4 รอบ และ PR
 
 ## บันทึกการตัดสินใจ / ต่างจากแผน
+- adapter เพิ่มจากแผน: `sci-frames.ts` (ฉาก 2.1, 2.2, 5.1) และ `fun-fact.ts` (ฉาก 5.5) · `keys.ts` เป็นรายการ caption key ที่ adapter ส่งออก (test ตรวจว่ามีข้อความครบใน Phase 2)
+- `decimalAdd` ไม่มีกรณีปัดแล้วทด (หลัง normalize ผลต่ำกว่า 2.000 เสมอ) จึงไม่มี field `carry`

@@ -13,9 +13,14 @@ export default defineConfig({
     testTimeout: 120_000,
     coverage: {
       provider: 'v8',
-      include: ['src/lib/fp/**/*.ts'],
+      include: [
+        'src/lib/fp/**/*.ts',
+        'src/lib/int/**/*.ts',
+        'src/lib/sci/**/*.ts',
+        'src/lib/lesson/**/*.ts',
+      ],
       thresholds: {
-        'src/lib/fp/**/*.ts': { statements: 95, lines: 95, functions: 95, branches: 90 },
+        'src/lib/**/*.ts': { statements: 95, lines: 95, functions: 95, branches: 90 },
       },
     },
   },
