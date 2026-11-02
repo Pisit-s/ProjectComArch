@@ -23,7 +23,7 @@
 ## แก้ไฟล์ร่วม
 - `src/components/lesson/hero.tsx`: `SceneShell id="hero-teaser"` minHeight `16rem` → `22rem` (เปลี่ยนค่าเดียว) · teaser จริงสูง 352px บนจอ 390 (แถบควบคุมขึ้น 2 แถว) ถ้าจองไว้ 16rem หน้าจะกระโดดตอน scene โหลด (CLS) · desktop สูง 320px จึงเหลือที่ว่าง 32px ใต้ teaser
 - `src/content/lesson/copy.ts`: เพิ่ม `HERO.steps` (แถวของ hero ตาม PARALLEL.md)
-- `src/components/player/step-player.tsx`: ปุ่ม "ทำไม?" สีตัวอักษร `text-primary` → `text-bit-frac-ink` (#1d4ed8) เปลี่ยน class เดียว · axe จับ color-contrast บนมือถือ (#2563eb บนพื้น primary/10 ทับพื้นหลังไล่สี ต่ำกว่า 4.5:1) · ฉาก 2.1 มี "ทำไม?" ตั้งแต่ขั้นแรกจึงเห็นตอน a11y สแกน แต่ปุ่มเดียวกันในบทที่ 5 ก็โดนเหมือนกัน
+- `src/components/player/step-player.tsx`: เคยแก้สีปุ่ม "ทำไม?" (contrast บนมือถือ) แต่ base แก้เรื่องเดียวกันแล้ว (`text-secondary`) ตอน merge ใช้ของ base ทั้งหมด · ตอนนี้ branch นี้ไม่ได้แก้ไฟล์นี้
 
 ## คำถาม + ค่าที่สมมติ
 - ไม่มี Context7 ใน session นี้ · ใช้ motion ตามแบบที่ใช้อยู่แล้วใน repo (`layoutId`, `initial/animate`, spring เดิม) ไม่ใช้ API ใหม่
@@ -36,7 +36,7 @@
 - **ฝาก Pisit**: `a11y.spec.ts` บน desktop เคย fail แบบสุ่ม 1 ใน ~5 รอบ ที่ลิงก์ "7 ลองเอง" ของ `layout/progress-nav.tsx` · สาเหตุน่าจะเป็น scrollspy ทำให้ลิงก์ active ตอน test เลื่อนผ่านบทที่ 7 แล้ว `transition-colors` ยังเปลี่ยนสีไม่เสร็จตอน axe สแกน (สแกน contrast แยก 6 รอบผ่านหมด, `--repeat-each=4` ผ่าน 12/12) · ไม่ได้แก้เพราะเป็นไฟล์ร่วม · ทางแก้ที่เสนอ: test รอให้ scrollspy นิ่งก่อนสแกน หรือเอา `transition-colors` ออกจากลิงก์ nav
 
 ## ผล test (2 พ.ย. 2569, production build)
-- `npm run lint`, `npm run typecheck`, `npm test` (197 tests) ผ่าน · `npm run build` ผ่าน ทุก route static
+- `npm run lint`, `npm run typecheck`, `npm test` (200 tests หลัง merge base ล่าสุด) ผ่าน · `npm run build` ผ่าน ทุก route static
 - e2e chapter1 + chapter2 + hero + a11y + lesson บน pixel7, iphone13, desktop: 57 ผ่าน, 2 skipped (ตามที่ spec กำหนด), 1 fail คือ a11y desktop แบบสุ่มด้านบน · รัน a11y ซ้ำ 4 รอบต่อเครื่อง ผ่าน 12/12
 - งบข้อความ: บทที่ 1 = 487/600, บทที่ 2 = 482/600
 
