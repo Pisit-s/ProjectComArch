@@ -12,25 +12,25 @@ import { site } from '@/lib/site';
 
 const SHORTCUTS = [
   {
-    href: '/learn/ieee-754#converter',
+    href: '/floating-point/ieee-754#converter',
     title: 'แปลงเลขเป็น IEEE 754',
     body: 'พิมพ์ทศนิยมแล้วดู 32 บิตทีละขั้น',
     icon: Cpu,
   },
   {
-    href: '/learn/add-sub#simulator',
+    href: '/floating-point/add-sub#simulator',
     title: 'Simulator บวก/ลบ',
     body: 'เลื่อนให้ Exponent เท่ากัน แล้วปัดด้วย G/R/S',
     icon: Calculator,
   },
   {
-    href: '/learn/mul-div#simulator',
+    href: '/floating-point/mul-div#simulator',
     title: 'Simulator คูณ/หาร',
     body: 'partial product, หารยาว และกรณีพิเศษ',
     icon: X,
   },
   {
-    href: '/lab',
+    href: '/floating-point/lab',
     title: 'Lab',
     body: 'ครบ + − × ÷ และส่งลิงก์ตัวอย่างได้',
     icon: FlaskConical,
@@ -62,7 +62,7 @@ export default function HomePage() {
               เริ่มบทที่ 1 <ArrowRight className="h-5 w-5" aria-hidden />
             </Link>
             <Link
-              href="/lab"
+              href="/floating-point/lab"
               className="btn h-12 min-h-12 bg-white/80 btn-ghost px-6 text-base ring-1 ring-line"
             >
               เปิด Lab

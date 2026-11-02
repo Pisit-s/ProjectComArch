@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test.describe('StepPlayer', () => {
   test('buttons, indicator, keyboard and flowchart', async ({ page }) => {
-    await page.goto('/lab');
+    await page.goto('/floating-point/lab');
     const player = page.getByTestId('sim-player');
     const counter = page.getByTestId('sim-player-counter');
     await expect(counter).toHaveText('ขั้นที่ 1/9');
@@ -27,7 +27,7 @@ test.describe('StepPlayer', () => {
   });
 
   test('auto play advances and stops when the user steps', async ({ page }) => {
-    await page.goto('/lab');
+    await page.goto('/floating-point/lab');
     const counter = page.getByTestId('sim-player-counter');
     await page.getByTestId('sim-player').getByLabel('ความเร็วในการเล่น').selectOption('2');
     await page.getByTestId('sim-player-play').click();
@@ -41,7 +41,7 @@ test.describe('StepPlayer', () => {
   test('works with reduced motion', async ({ browser }) => {
     const ctx = await browser.newContext({ reducedMotion: 'reduce' });
     const page = await ctx.newPage();
-    await page.goto('/lab');
+    await page.goto('/floating-point/lab');
     const counter = page.getByTestId('sim-player-counter');
     for (let i = 2; i <= 9; i++) {
       await page.getByTestId('sim-player-next').click();
@@ -52,7 +52,7 @@ test.describe('StepPlayer', () => {
   });
 
   test('tapping a bit explains it', async ({ page }) => {
-    await page.goto('/lab');
+    await page.goto('/floating-point/lab');
     await page.getByTestId('sim-reg-a-bit-1').click();
     await expect(page.getByTestId('bit-info').first()).toContainText('Exponent');
   });

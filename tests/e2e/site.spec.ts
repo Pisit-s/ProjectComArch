@@ -3,18 +3,18 @@ import { expect, test } from '@playwright/test';
 
 const PAGES = [
   '/',
-  '/learn/number-systems',
-  '/learn/binary-fractions',
-  '/learn/ieee-754',
-  '/learn/add-sub',
-  '/learn/mul-div',
-  '/lab',
+  '/floating-point/number-systems',
+  '/floating-point/binary-fractions',
+  '/floating-point/ieee-754',
+  '/floating-point/add-sub',
+  '/floating-point/mul-div',
+  '/floating-point/lab',
 ];
 const CHAPTERS = PAGES.slice(1, 6);
 
 test('navigate to every chapter and the Lab from the menu', async ({ page, isMobile }) => {
   await page.goto('/');
-  for (const href of [...CHAPTERS, '/lab']) {
+  for (const href of [...CHAPTERS, '/floating-point/lab']) {
     if (isMobile) {
       await page.getByRole('button', { name: 'เมนูบทเรียน' }).click();
       await page

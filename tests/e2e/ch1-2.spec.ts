@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('chapter 1: toggle bits to 00001010 = 10, preset 255', async ({ page }) => {
-  await page.goto('/learn/number-systems');
+  await page.goto('/floating-point/number-systems');
   await page.getByTestId('int-preset-0').click();
   await expect(page.getByTestId('int-binary')).toContainText('00000000');
   await page.getByTestId('int-bit-4').click();
@@ -20,7 +20,7 @@ test('chapter 1: toggle bits to 00001010 = 10, preset 255', async ({ page }) => 
 });
 
 test('chapter 2: 0.1 at 16 bits and 0.375', async ({ page }) => {
-  await page.goto('/learn/binary-fractions');
+  await page.goto('/floating-point/binary-fractions');
   const fc = page.getByTestId('frac-converter');
   await fc.getByTestId('fc-input').fill('0.1');
   await fc.getByTestId('fc-bits-16').click();

@@ -10,7 +10,15 @@ const nextConfig: NextConfig = {
       },
     },
   },
-  // No X-Frame-Options on purpose: instructors may embed pages in an LMS iframe (PLAN.md 3.2).
+  // Stage 1 links (shared in LINE, Lab share links) keep working; the query string is carried over.
+  redirects() {
+    return [
+      { source: '/learn', destination: '/floating-point', permanent: true },
+      { source: '/learn/:slug', destination: '/floating-point/:slug', permanent: true },
+      { source: '/lab', destination: '/floating-point/lab', permanent: true },
+    ];
+  },
+  // No X-Frame-Options on purpose: instructors may embed pages in an LMS iframe (docs/plans/stage1-floating-point.md 3.2).
   headers() {
     return [
       {

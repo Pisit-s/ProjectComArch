@@ -5,7 +5,7 @@
 - [x] 1. เตรียม: branch `wp0-hub` · แผน (`PLAN.md`, `docs/plans/`) ถูก commit ไว้บน `main` แล้วใน 6d87a64 จึงไม่ต้อง commit ซ้ำ · `CLAUDE.md` = ภาคผนวก B · ไฟล์ progress 4 ไฟล์ · บรรทัดประวัติระยะที่ 1 · comment อ้าง `PLAN.md` → `docs/plans/stage1-floating-point.md`
 - [x] 2. เปลี่ยนชื่อเป็น comkrub: site.ts ตามภาคผนวก C, githubUrl null + footer ซ่อนลิงก์, package name, ธีม daisyUI `comkrub`, โลโก้ชิปใหม่ (`LogoMark`) + `FpMark` (3 แถบเดิม), icon, OG, README
 - [x] 3. Topic registry: `src/content/topics.ts` (+ `TOPICS_IN_ORDER`, `firstReadyLesson`, `topicOfPath`), `TopicIcon`, `StatusBadge`, `tests/unit/topics/topics.test.ts`
-- [ ] 4. ย้าย route ของ Floating-Point + redirect
+- [x] 4. ย้าย route: `src/app/floating-point/{5 บท,lab}` (git mv), `/floating-point` = หน้าแรกเดิม, `layout.tsx` + `FpSubnav` (breadcrumb + แถบบท), redirect 308 ใน `next.config.ts` (ตรวจด้วย curl: query ติดไป), e2e ใช้ path ใหม่ (FP 15 tests ผ่านบน pixel7)
 - [ ] 5. หน้าแรกใหม่
 - [ ] 6. หน้า "กำลังพัฒนา"
 - [ ] 7. การนำทาง
