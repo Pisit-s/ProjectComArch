@@ -1,3 +1,6 @@
+'use client';
+
+import { useStageDuration } from '@/components/player/player-speed';
 import { AnimatedNumber } from '@/components/ui/animated-number';
 import { cn } from '@/lib/utils';
 
@@ -13,6 +16,7 @@ export function ExponentTag({
   className?: string;
   testId?: string;
 }) {
+  const duration = useStageDuration(0.4);
   return (
     <span
       className={cn('num inline-flex items-start font-mono whitespace-nowrap', className)}
@@ -22,6 +26,7 @@ export function ExponentTag({
       {base}
       <AnimatedNumber
         value={exp}
+        duration={duration}
         className={cn('-mt-1 ml-px text-[0.7em] font-semibold', 'text-bit-exp-ink')}
       />
     </span>

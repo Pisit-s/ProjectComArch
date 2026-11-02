@@ -1,5 +1,6 @@
 'use client';
 
+import { useStageSpring } from '@/components/player/player-speed';
 import { motion } from 'motion/react';
 import type { Bit } from '@/lib/fp';
 import { cn } from '@/lib/utils';
@@ -14,6 +15,7 @@ export function StickyBucket({
   className?: string;
   testId?: string;
 }) {
+  const spring = useStageSpring(0.3);
   return (
     <span
       className={cn('relative inline-flex h-7 w-full items-end justify-center', className)}
@@ -34,7 +36,7 @@ export function StickyBucket({
         key={sticky}
         initial={{ y: -8, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+        transition={spring}
         className="num relative mb-0.5 font-mono text-xs font-bold text-bit-grs-ink"
       >
         {sticky}

@@ -1,5 +1,6 @@
 'use client';
 
+import { useStageDuration } from '@/components/player/player-speed';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
@@ -13,6 +14,7 @@ export function CarryArc({
   className?: string;
   testId?: string;
 }) {
+  const d = useStageDuration(0.45);
   return (
     <svg
       viewBox="0 0 40 16"
@@ -28,7 +30,7 @@ export function CarryArc({
         strokeLinecap="round"
         initial={false}
         animate={{ pathLength: active ? 1 : 0, opacity: active ? 1 : 0 }}
-        transition={{ duration: 0.45, ease: 'easeOut' }}
+        transition={{ duration: d, ease: 'easeOut' }}
       />
       <motion.path
         d="M3 10 L6 14 L10 11"
@@ -39,7 +41,7 @@ export function CarryArc({
         strokeLinejoin="round"
         initial={false}
         animate={{ opacity: active ? 1 : 0 }}
-        transition={{ delay: active ? 0.35 : 0, duration: 0.15 }}
+        transition={{ delay: active ? d * 0.8 : 0, duration: d / 3 }}
       />
     </svg>
   );

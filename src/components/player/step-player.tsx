@@ -208,7 +208,8 @@ function StepPlayerInner({
 
       <div
         className="glass-solid relative overflow-hidden rounded-2xl p-3 ring-1 ring-foreground/10 sm:p-5"
-        style={{ minHeight }}
+        // presentation shows one scene at a time: no reserved height (it grows with the root font)
+        style={{ minHeight: presenting ? undefined : minHeight }}
         data-testid={`${testId}-stage`}
       >
         {render(p.index)}
