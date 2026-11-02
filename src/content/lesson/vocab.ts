@@ -31,7 +31,10 @@ export const VOCAB = {
     meaning: 'หน้าจุดมีเลขที่ไม่ใช่ 0 แค่ 1 หลัก เช่น 2.34 × 10⁵⁶',
   },
   floatingPoint: { term: 'Floating point', meaning: 'จุดทศนิยมเลื่อนได้ โดยเปลี่ยนเลขชี้กำลังแทน' },
-  fpu: { term: 'FPU', meaning: 'วงจรคำนวณเลข floating-point ในซีพียู (บทที่ 6 จะเปิดดูข้างใน)' },
+  fpu: {
+    term: 'FPU',
+    meaning: 'วงจรคำนวณเลข floating-point ในซีพียู ทำ 4 ขั้นของบทที่ 5 ด้วยฮาร์ดแวร์',
+  },
 
   ieee754: {
     term: 'IEEE 754',

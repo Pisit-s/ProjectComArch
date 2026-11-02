@@ -49,7 +49,7 @@ export const SECTIONS: SectionDef[] = [
     title: 'เลขทศนิยมในโปรแกรม',
     short: 'ทศนิยมใน C',
     hook: 'ภาษา C มี float กับ double สำหรับเลขทศนิยม ข้างในเก็บแบบ scientific notation ฐานสอง',
-    vocab: ['float', 'double', 'scientific', 'normalized', 'floatingPoint', 'fpu'],
+    vocab: ['float', 'double', 'scientific', 'normalized', 'floatingPoint'],
     scenes: [
       { id: 'c-code', title: '2.1 โค้ด C' },
       { id: 'point', title: '2.2 จุดที่เลื่อนได้' },
@@ -62,7 +62,7 @@ export const SECTIONS: SectionDef[] = [
     title: 'มาตรฐาน IEEE 754',
     short: 'IEEE 754',
     hook: 'ทุกเครื่องเก็บ float แบบเดียวกัน: 32 บิต แบ่งเป็น 3 ส่วน',
-    vocab: ['ieee754', 'sign', 'exponent', 'bias', 'significand', 'hiddenBit'],
+    vocab: ['sign', 'exponent', 'bias', 'significand', 'hiddenBit', 'hex'],
     scenes: [
       { id: 'layout', title: '3.1 แบ่ง 32 บิต' },
       { id: 'bit-play', title: '3.2 กดบิตเล่น' },
@@ -76,7 +76,7 @@ export const SECTIONS: SectionDef[] = [
     title: 'แปลงเลขทศนิยมเป็น IEEE 754',
     short: 'แปลงเลข',
     hook: 'แปลงเป็นฐานสอง เลื่อนจุดให้เป็น 1.xxx แล้วใส่ลงช่องทั้ง 3 ส่วน',
-    vocab: ['binaryPoint', 'timesTwo', 'normalize', 'biasedExponent', 'hex'],
+    vocab: ['binaryPoint', 'timesTwo', 'normalize', 'biasedExponent'],
     scenes: [
       { id: 'encode', title: '4.1 แปลงทีละขั้น' },
       { id: 'decode', title: '4.2 ถอดกลับ' },
@@ -104,8 +104,8 @@ export const SECTIONS: SectionDef[] = [
     number: 6,
     title: 'วงจรบวก/ลบ Floating-Point',
     short: 'วงจร',
-    hook: '4 ขั้นเดิมกลายเป็นกล่องวงจรที่ต่อจาก ALU, MUX และ shifter ที่รู้จักแล้ว',
-    vocab: ['smallAlu', 'mux', 'shifter', 'bigAlu', 'control', 'roundingHw'],
+    hook: 'เปิดดูข้างใน FPU: 4 ขั้นเดิมคือกล่องวงจรที่ต่อจาก ALU, MUX และ shifter',
+    vocab: ['fpu', 'smallAlu', 'mux', 'shifter', 'bigAlu', 'control'],
     scenes: [{ id: 'circuit-flow', title: '6.1 ข้อมูลไหลผ่านวงจร' }],
     source: 'P&H 3.5 · สไลด์ w03c หน้า 30–33, 36–37 · w04a หน้า 7, 12',
   },
