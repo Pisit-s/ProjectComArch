@@ -6,7 +6,7 @@
 - [x] 2. เปลี่ยนชื่อเป็น comkrub: site.ts ตามภาคผนวก C, githubUrl null + footer ซ่อนลิงก์, package name, ธีม daisyUI `comkrub`, โลโก้ชิปใหม่ (`LogoMark`) + `FpMark` (3 แถบเดิม), icon, OG, README
 - [x] 3. Topic registry: `src/content/topics.ts` (+ `TOPICS_IN_ORDER`, `firstReadyLesson`, `topicOfPath`), `TopicIcon`, `StatusBadge`, `tests/unit/topics/topics.test.ts`
 - [x] 4. ย้าย route: `src/app/floating-point/{5 บท,lab}` (git mv), `/floating-point` = หน้าแรกเดิม, `layout.tsx` + `FpSubnav` (breadcrumb + แถบบท), redirect 308 ใน `next.config.ts` (ตรวจด้วย curl: query ติดไป), e2e ใช้ path ใหม่ (FP 15 tests ผ่านบน pixel7)
-- [ ] 5. หน้าแรกใหม่
+- [x] 5. หน้าแรกใหม่: `src/app/page.tsx` + `TopicCard` (ปกติ/กว้าง + BeamRing) · มือถือ 390×844 เห็นการ์ดแรกโดยไม่ต้องเลื่อน (`test-results/shots/hub-390-fold.png`)
 - [x] 6. หน้า "กำลังพัฒนา": `ComingSoon` + `comingSoonMetadata` (noindex) + `src/app/{multiply,divide,mips}/page.tsx` (ทำก่อนขั้นที่ 5 ดูบันทึก)
 - [ ] 7. การนำทาง
 - [ ] 8. โครงร่วมสำหรับทีม
