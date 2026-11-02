@@ -16,3 +16,4 @@ export * from './format-number';
 export * from './fraction';
 export * from './integer';
 export * from './bit-info';
+export * from './format-c';
