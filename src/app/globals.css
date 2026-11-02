@@ -76,6 +76,8 @@
   --color-bit-frac-ink: #1d4ed8;
   --color-bit-grs: #cc79a7;
   --color-bit-grs-ink: #963f73;
+  --color-carry: #e69f00;
+  --color-carry-ink: #8a5a00;
 
   --animate-shiny-text: shiny-text 8s infinite;
   @keyframes shiny-text {

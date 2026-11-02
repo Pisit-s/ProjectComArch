@@ -133,6 +133,15 @@ describe('frame invariants (random pairs)', () => {
               for (let i = 0; i <= sc.fracBits + 1; i++)
                 if ((r.value >> BigInt(i)) & 1n) expect(shown.has(i)).toBe(true);
         }
+        // the result row remembers how far its bits slid (normalize, then the rounding carry)
+        const norm = sc.frames.find((f) => f.stage === 'normalize');
+        if (norm?.normalize) {
+          const { direction, amount } = norm.normalize;
+          const moved = direction === 'right' ? amount : direction === 'left' ? -amount : 0;
+          expect(norm.rows[0].shifted).toBe(moved);
+          const carry = sc.frames.some((f) => f.stage === 'roundCarry') ? 1 : 0;
+          expect(last.rows[0].shifted).toBe(moved + carry);
+        }
         return true;
       }),
       { numRuns: 3_000 },

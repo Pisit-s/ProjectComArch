@@ -9,7 +9,12 @@ export function VocabStrip({ ids, sectionId }: { ids: VocabId[]; sectionId: stri
   return (
     <div data-testid={`vocab-${sectionId}`}>
       <h3 className="sr-only">{UI.vocab}</h3>
-      <ul className="scroll-x -mx-4 flex snap-x snap-mandatory gap-2.5 px-4 pb-2 md:mx-0 md:grid md:grid-cols-3 md:px-0">
+      {/* focusable so the strip can be scrolled from the keyboard on phones */}
+      <ul
+        tabIndex={0}
+        aria-label={UI.vocab}
+        className="scroll-x -mx-4 flex snap-x snap-mandatory gap-2.5 rounded-xl px-4 pb-2 outline-none focus-visible:ring-2 focus-visible:ring-primary md:mx-0 md:grid md:grid-cols-3 md:px-0"
+      >
         {ids.map((id) => {
           const v = VOCAB[id];
           return (

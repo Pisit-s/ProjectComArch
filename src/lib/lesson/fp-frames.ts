@@ -47,7 +47,10 @@ export interface TrackRow {
   value: bigint;
   /** Unbiased exponent shown in the "x 2^e" tag. */
   exp: number;
-  /** Places this row has moved right while aligning. */
+  /**
+   * Places the bits of this row have moved right since it appeared (align, normalize, the carry
+   * of rounding; negative = left). Lets the UI keep one identity per bit while it slides.
+   */
   shifted: number;
   /** Sticky bucket under the S column (1 once a 1 bit fell past it). */
   sticky: Bit;
@@ -303,7 +306,9 @@ export function buildFpFrames(
   }
 
   const norm = find<StepOf<'normalize'>>('normalize')!;
-  const normRow: TrackRow = { ...sum, value: norm.after, exp: norm.expAfter - b0 };
+  const moved =
+    norm.direction === 'right' ? norm.amount : norm.direction === 'left' ? -norm.amount : 0;
+  const normRow: TrackRow = { ...sum, value: norm.after, exp: norm.expAfter - b0, shifted: moved };
   push({
     id: 'normalize',
     stage: 'normalize',
@@ -339,10 +344,15 @@ export function buildFpFrames(
 
   const rd = find<StepOf<'round'>>('round')!;
   const lsb = (rd.kept & 1n) === 1n ? 1 : 0;
+  const rounded: TrackRow = {
+    ...normRow,
+    value: rd.result << BigInt(GRS),
+    shifted: moved + (rd.carryOut ? 1 : 0),
+  };
   push({
     id: 'round',
     stage: 'round',
-    rows: [normRow, { ...normRow, value: rd.result << BigInt(GRS) }],
+    rows: [normRow, rounded],
     captionKey: ROUND_KEY[rd.decision],
     params: { g: String(rd.guard), r: String(rd.round), s: String(rd.sticky) },
     detailKey: 'why.grs',
@@ -353,20 +363,13 @@ export function buildFpFrames(
     push({
       id: 'round-carry',
       stage: 'roundCarry',
-      rows: [{ ...normRow, value: rd.result << BigInt(GRS), exp: normRow.exp + 1 }],
+      rows: [{ ...rounded, exp: normRow.exp + 1 }],
       captionKey: 'fp.roundCarry',
       params: {},
     });
   }
 
-  const final: TrackRow = {
-    key: 'R',
-    sign: sigAdd.sign,
-    value: rd.result << BigInt(GRS),
-    exp: rd.carryOut ? normRow.exp + 1 : normRow.exp,
-    shifted: 0,
-    sticky: 0,
-  };
+  const final: TrackRow = { ...rounded, exp: rd.carryOut ? normRow.exp + 1 : normRow.exp };
   packFrame([final]);
   return { fmt, fracBits: FRAC, op, frames, shift: d, result: resultInfo };
 }
