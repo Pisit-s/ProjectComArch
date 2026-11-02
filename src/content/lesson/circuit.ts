@@ -69,7 +69,7 @@ export const BLOCKS: CircuitBlock[] = [
     vocab: 'shifter',
   },
   { id: 'bigAlu', kind: 'alu', label: 'Big ALU', x: 150, y: 380, w: 160, h: 52, vocab: 'bigAlu' },
-  { id: 'negate', kind: 'box', label: 'Negate if bigNeg', x: 165, y: 448, w: 130, h: 24 },
+  { id: 'negate', kind: 'box', label: 'Negate if < 0', x: 165, y: 448, w: 130, h: 24 },
   {
     id: 'normalize',
     kind: 'box',
