@@ -3,15 +3,21 @@
 import { motion } from 'motion/react';
 import { type CSSProperties, useId, useMemo, useState } from 'react';
 import { type Width, mask } from '@/lib/int/adder';
-import { type IntAddScene as AddModel, buildIntAddFrames } from '@/lib/lesson/int-frames';
+import {
+  type IntAddScene as AddModel,
+  type IntSubScene as SubModel,
+  buildIntAddFrames,
+  buildIntSubFrames,
+} from '@/lib/lesson/int-frames';
 import { caption } from '@/content/lesson/captions';
 import { UI } from '@/content/lesson/copy';
-import { INT_ADD_EXAMPLES, type IntExample } from '@/content/lesson/examples';
+import { INT_ADD_EXAMPLES, INT_SUB_EXAMPLES, type IntExample } from '@/content/lesson/examples';
 import { sectionById } from '@/content/lesson/sections';
 import { UI_CH12 } from '@/content/lesson/ui-ch12';
 import { ScenePlaceholder } from '@/components/lesson/scene-shell';
 import { StepPlayer } from '@/components/player/step-player';
 import { CarryArc } from '@/components/stage/carry-arc';
+import { MiniAlu } from '@/components/stage/mini-alu';
 import { cn } from '@/lib/utils';
 
 // Owner: addsub-ch12 (docs/PARALLEL.md).
@@ -394,8 +400,168 @@ export function IntAddScene() {
   );
 }
 
+/* ------------------------------------------------------------------------------------------ */
+/* 1.2 subtract on the same ALU                                                               */
+/* ------------------------------------------------------------------------------------------ */
+
+function BitRow({
+  bits,
+  label,
+  flip = false,
+  testId,
+  className,
+}: {
+  bits: string;
+  label: string;
+  /** Bits turn over (rotateX) when they change. */
+  flip?: boolean;
+  testId?: string;
+  className?: string;
+}) {
+  return (
+    <div className={cn('flex items-center gap-2', className)}>
+      <span className="w-6 text-right font-sans text-xs font-semibold text-muted">{label}</span>
+      <span className="flex gap-1" data-testid={testId} aria-label={bits}>
+        {[...bits].map((c, k) => (
+          <motion.span
+            key={flip ? `${k}${c}` : k}
+            initial={flip ? { rotateX: 90, opacity: 0 } : false}
+            animate={{ rotateX: 0, opacity: 1 }}
+            transition={{ duration: 0.35, delay: flip ? k * 0.08 : 0 }}
+            className="grid h-[var(--c)] w-[var(--c)] place-items-center rounded-md bg-white ring-1 ring-line"
+            aria-hidden
+          >
+            {c}
+          </motion.span>
+        ))}
+      </span>
+    </div>
+  );
+}
+
+function SubStage({ m, index }: { m: SubModel; index: number }) {
+  const f = m.frames[index];
+  const { a, b } = m.frames[0].params;
+  const last = index === m.frames.length - 1;
+  return (
+    <div
+      className="num mx-auto flex w-max max-w-full flex-col items-center gap-2 font-mono text-[clamp(1.05rem,4.6vw,1.5rem)]"
+      style={{ ['--c' as string]: 'clamp(1.7rem, 7.5vw, 2.4rem)' }}
+      data-testid="int-sub-stage"
+      data-frame={f.id}
+    >
+      <p className="text-[0.85em]" data-testid="int-sub-equation">
+        <span>{a}</span> <span className="text-muted">−</span> <span>{b}</span>{' '}
+        <span className="text-muted">=</span> <span>{a}</span>{' '}
+        <span className="text-muted">+</span>{' '}
+        <span className="font-semibold text-primary">(−{b})</span>
+      </p>
+      <div className="flex flex-col gap-1.5">
+        <BitRow bits={m.aBits} label="A" />
+        <div className="flex items-center gap-2">
+          <BitRow
+            bits={f.bShown}
+            label="B"
+            flip
+            testId="int-sub-b"
+            className={cn(f.binvert && 'text-primary')}
+          />
+          {f.carryIn === 1 && (
+            <motion.span
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="rounded-full bg-carry/15 px-2 py-0.5 text-[0.7em] font-bold text-carry-ink ring-1 ring-carry/50"
+              data-testid="int-sub-plus1"
+            >
+              +1
+            </motion.span>
+          )}
+        </div>
+      </div>
+      <MiniAlu
+        binvert={f.binvert}
+        carryIn={f.carryIn}
+        active={f.binvert === 1}
+        className="w-40 sm:w-48"
+      />
+      <div className="flex items-center gap-2">
+        <span className="w-6 text-right font-sans text-xs font-semibold text-primary">
+          {UI_CH12.sum}
+        </span>
+        <span className="w-[1ch] text-[0.8em]">
+          {f.carryOut !== null && (
+            <motion.span
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: last ? 0.3 : 1, x: 0 }}
+              className={cn('block font-bold text-carry-ink', last && 'line-through')}
+              title={UI_CH12.carryOut}
+              data-testid="int-sub-carry-out"
+            >
+              {f.carryOut}
+            </motion.span>
+          )}
+        </span>
+        <span className="flex gap-1" data-testid="int-sub-result">
+          {[...(f.result ?? ' '.repeat(m.width))].map((c, k) => (
+            <motion.span
+              key={`${k}${c}`}
+              initial={c === ' ' ? false : { opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ ...SPRING, delay: c === ' ' ? 0 : (m.width - 1 - k) * 0.06 }}
+              className="grid h-[var(--c)] w-[var(--c)] place-items-center rounded-md bg-ice-100 font-semibold ring-1 ring-sky-200"
+            >
+              {c.trim()}
+            </motion.span>
+          ))}
+        </span>
+        {last && (
+          <span className="text-[0.75em] text-muted" data-testid="int-sub-dec">
+            = {f.params.dec}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Scene 1.2: a − b on the same adder, Binvert = 1 and CarryIn = 1 (slide w03c pages 11, 30-33). */
 export function IntSubScene() {
-  return <ScenePlaceholder minHeight="24rem" />;
+  const [ex, setEx] = useState<IntExample>(INT_SUB_EXAMPLES[0]);
+  const [touched, setTouched] = useState(false);
+  const m = useMemo(() => buildIntSubFrames(ex.width, ex.a, ex.b), [ex]);
+  const steps = m.frames.map((f) => ({
+    id: f.id,
+    title: f.id,
+    caption: caption(f.captionKey, f.params),
+  }));
+  return (
+    <div className="space-y-3" data-testid="int-sub">
+      <Chips>
+        {INT_SUB_EXAMPLES.map((e) => (
+          <Chip
+            key={`${e.a}-${e.b}`}
+            on={e === ex}
+            onClick={() => (setTouched(true), setEx(e))}
+            testId="int-sub-chip"
+          >
+            {e.a} − {e.b}
+            <span className="font-sans text-xs opacity-75">
+              {e.width === 4 ? UI_CH12.bits4 : UI_CH12.bits8}
+            </span>
+          </Chip>
+        ))}
+      </Chips>
+      <StepPlayer
+        key={`${ex.width}|${ex.a}|${ex.b}`}
+        steps={steps}
+        label={sceneTitle('int-sub')}
+        poster={!touched}
+        testId="int-sub-player"
+        minHeight="20rem"
+        render={(i) => <SubStage m={m} index={i} />}
+      />
+    </div>
+  );
 }
 
 export function OverflowScene() {
