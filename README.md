@@ -1,4 +1,4 @@
-# Binary Lab
+# comkrub
 
 เว็บสื่อการสอนแบบ interactive เรื่องเลขฐานสองและ Floating-Point (IEEE 754 Single Precision) วิชา Computer Architecture
 

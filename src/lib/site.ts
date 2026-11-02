@@ -3,18 +3,20 @@
  * Assumed values are marked with the question number in docs/QUESTIONS.md.
  */
 export const site = {
-  name: 'Binary Lab',
-  tagline: 'เข้าใจ Floating-Point ทีละบิต',
+  name: 'comkrub',
+  tagline: 'บวก ลบ เลขทศนิยมในคอมพิวเตอร์ แบบเห็นทุกบิต',
   description:
-    'สื่อการสอนแบบ interactive เรื่องเลขฐานสองและ Floating-Point (IEEE 754 Single Precision) วิชา Computer Architecture: เลขฐานสอง เศษส่วนฐานสอง encode/decode บวก ลบ คูณ หาร ดูได้ทีละขั้น',
-  ogSubtitle: 'สื่อการสอน Floating-Point · IEEE 754',
+    'สื่อการสอนวิชา Computer Architecture เรื่องการบวกและลบเลข Floating-Point (IEEE 754) เริ่มจากบวกเลขฐานสองไปจนถึงวงจรบวกเลขทศนิยม ดูเป็นภาพเคลื่อนไหวทีละขั้นและลองใส่ตัวเลขเองได้',
+  ogSubtitle: 'บวก ลบ Floating-Point · IEEE 754',
   course: 'Computer Architecture',
   /** Q4 answered: deployed on Pisit's own domain. */
   siteUrl: 'https://comkrub.mypisit.com',
-  githubUrl: 'https://github.com/Pisit-s/ProjectComArch',
+  /** Q8: the repo is still private, so no public link. */
+  githubUrl: null as string | null,
   references: [
+    'สไลด์ Computer Architecture: Arithmetic for Computers (w03c, w03c_mult), Tatpong Katanyukul, CoE KKU',
+    'D. A. Patterson and J. L. Hennessy, Computer Organization and Design, 5th ed., หัวข้อ 3.2 และ 3.5',
     'IEEE Std 754-2019, IEEE Standard for Floating-Point Arithmetic',
-    'D. A. Patterson and J. L. Hennessy, Computer Organization and Design',
   ],
   /** Q2 answered: members sorted by student ID; printed exactly as given. */
   authors: [
