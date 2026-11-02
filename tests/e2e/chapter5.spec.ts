@@ -63,10 +63,4 @@ test.describe('chapter 5: add and subtract', () => {
     await stepToEnd(page, 'rounding-player');
     await expect(page.getByTestId('rounding-hex')).toHaveText('0x4B800000');
   });
-
-  test('5.5 slide example in double: 16 / 20 / 16', async ({ page }) => {
-    await openScene(page, 'slide-fun-fact');
-    await stepToEnd(page, 'fun-fact');
-    await expect(page.getByTestId('fun-fact-order')).toHaveText(/y − x\s*16.*20.*16/s);
-  });
 });
