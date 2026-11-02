@@ -16,7 +16,8 @@
 - `tests/unit/lesson/ch34.test.ts`
 
 ## แก้ไฟล์ร่วม
-- (ไม่มี) · เพิ่มแถวของบท 3–4 ใน `examples.ts` (`LAYOUT_EXAMPLES`, `SPECIAL_EXAMPLES`) แบบต่อท้าย ไม่แตะของเดิม
+- `src/components/lesson/lesson-section.tsx`: แก้เฉพาะ 5 แถวของบท 3–4 ใน `SCENE_HEIGHT` (layout 26→36, bit-play 24→36, special 22→34, encode 28→37, decode 22→34 rem) · เหตุผล: ฉากจริงสูงกว่าที่จอง 8–17rem (วัดที่ iPhone 13 และ desktop) หน้าเลื่อนตอนโหลด (PLAN 4.9) · ค่าใหม่ใกล้ความสูงจริงบน desktop บนมือถือยังสูงกว่า 2–4rem
+- เพิ่มแถวของบท 3–4 ใน `examples.ts` (`LAYOUT_EXAMPLES`, `SPECIAL_EXAMPLES`) แบบต่อท้าย ไม่แตะของเดิม
 
 ## คำถาม + ค่าที่สมมติ
 - session นี้ไม่มี Context7 ให้ query → ใช้ motion/react แบบเดียวกับ `dec4-scene.tsx` และ `fp-op-scene.tsx` (motion.span, layoutId, AnimatePresence) ไม่ใช้ API ใหม่
@@ -25,5 +26,11 @@
 - ฉาก 3.1 รับ hex เฉพาะที่ขึ้นต้นด้วย `0x` (เพราะ `10000000` เป็นได้ทั้งทศนิยมและ hex) · ค่าที่ไม่ใช่ตัวเลขปกติ (0, ∞, NaN, subnormal) ขึ้นข้อความ "ฉากนี้ใช้ได้กับเลขปกติ" แล้วคงภาพเดิมไว้
 - chip ของฉาก 3.1 (PLAN ไม่ได้กำหนด): 6.5, 3.75, −0.75, 0xC0A00000
 
+## ผล test (2 พ.ย. 2569, production build)
+- `npm run lint`, `npm run typecheck`, `npm test` (200 tests) ผ่าน · `npm run build` ผ่าน ทุก route static
+- e2e `chapter3.spec.ts` + `chapter4.spec.ts` + `a11y.spec.ts` + `lesson.spec.ts` บน pixel7, iphone13, desktop: 55 passed, 2 skipped
+- หมายเหตุ: `lesson.spec.ts` "quick check answers right and wrong" (quiz บท 5) fail บางรอบเมื่อรันกับ `next dev` บน iphone13 · ลองกับ placeholder ของ base ก็ fail เหมือนกัน (3/4 รอบ) จึงไม่ใช่จากงานนี้ · กับ production build ผ่าน
+- screenshot 390px และ 1440px เปิดดูแล้วทุกฉาก
+
 ## สถานะ
-- ยังไม่พร้อมรวม
+- พร้อมรวม
