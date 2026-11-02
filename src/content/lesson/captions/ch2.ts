@@ -2,7 +2,7 @@ import type { CaptionTable } from './types';
 
 export const CH2: CaptionTable = {
   'c.int': () => 'int ใช้ ALU บวกจำนวนเต็มแบบบทที่ 1',
-  'c.float': () => 'float ต้องใช้วงจรบวกอีกแบบ (FPU)',
+  'c.float': () => 'float ต้องใช้วงจรบวกอีกแบบ (เปิดดูข้างในในบทที่ 6)',
   'c.print': () => 'พิมพ์ผลออกมา',
   'c.teaser': () => 'พิมพ์ 9 หลักแล้วไม่ใช่ 0.3 พอดี ดูเหตุผลในบทที่ 5',
   'point.not': () => 'ยังไม่ normalized: หน้าจุดต้องมีเลขที่ไม่ใช่ 0 แค่หลักเดียว',

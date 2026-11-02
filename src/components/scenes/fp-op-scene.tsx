@@ -191,7 +191,15 @@ export function FpFrameView({
     <div className="space-y-3">
       <div className="flex min-h-8 flex-wrap items-center justify-between gap-2">
         <FrameChips frame={f} scene={scene} />
-        {f.stage === 'sub' && <MiniAlu binvert={1} carryIn={1} active className="w-36 sm:w-44" />}
+        {f.stage === 'sub' && (
+          <MiniAlu
+            binvert={1}
+            carryIn={1}
+            active
+            testId={`${testId}-alu`}
+            className="w-36 sm:w-44"
+          />
+        )}
       </div>
       <div className={cn(full && 'scroll-x -mx-1 px-1 pb-2')}>
         <BitTrack

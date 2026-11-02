@@ -67,7 +67,7 @@ function Chips({ children }: { children: React.ReactNode }) {
 /* 2.1 C code                                                                                 */
 /* ------------------------------------------------------------------------------------------ */
 
-/** The small trapezoid used for the ALU in Chapter 1; the FPU is still a question mark here. */
+/** The small trapezoid used for the ALU in Chapter 1; the float adder is still a question mark here (Chapter 6). */
 function Unit({ kind }: { kind: 'alu' | 'fpu' }) {
   const fpu = kind === 'fpu';
   return (
@@ -87,7 +87,7 @@ function Unit({ kind }: { kind: 'alu' | 'fpu' }) {
           fpu ? 'text-bit-grs-ink' : 'text-primary',
         )}
       >
-        {fpu ? 'FPU ?' : 'ALU'}
+        {fpu ? '?' : 'ALU'}
       </span>
     </span>
   );

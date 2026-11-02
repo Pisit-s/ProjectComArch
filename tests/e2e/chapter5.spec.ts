@@ -31,8 +31,8 @@ test.describe('chapter 5: add and subtract', () => {
   test('5.3 0.5 − 0.4375 = 0x3D800000, normalize left 3; 3.75 − 6.5 swaps', async ({ page }) => {
     await openScene(page, 'fp-sub');
     await stepTo(page, 'fp-sub-player', 'add');
-    await expect(page.getByTestId('mini-alu-binvert')).toHaveText('1');
-    await expect(page.getByTestId('mini-alu-carryin')).toHaveText('1');
+    await expect(page.getByTestId('fp-sub-alu-binvert')).toHaveText('1');
+    await expect(page.getByTestId('fp-sub-alu-carryin')).toHaveText('1');
     await stepTo(page, 'fp-sub-player', 'normalize');
     await expect(page.getByTestId('fp-sub-player-stage')).toContainText('←3');
     await stepToEnd(page, 'fp-sub-player');
