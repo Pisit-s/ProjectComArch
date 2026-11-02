@@ -1,9 +1,11 @@
 'use client';
 
+import { X } from 'lucide-react';
 import { useState } from 'react';
-import { type BlockId, circuitState } from '@/lib/lesson/circuit-map';
+import { type BlockId, type WireId, circuitState } from '@/lib/lesson/circuit-map';
 import type { FpFrame } from '@/lib/lesson/fp-frames';
-import { BLOCKS, CIRCUIT_VIEWBOX, WIRES } from '@/content/lesson/circuit';
+import { BLOCKS, CIRCUIT_VIEWBOX, type CircuitBlock, WIRES } from '@/content/lesson/circuit';
+import { BLOCK_DETAILS, CIRCUIT_SCOPE, type SignalRow } from '@/content/lesson/circuit-details';
 import { UI } from '@/content/lesson/copy';
 import { VOCAB } from '@/content/lesson/vocab';
 import { cn } from '@/lib/utils';
@@ -83,33 +85,120 @@ export function FpAdderDiagram({
           );
         })}
       </svg>
-      {sel && (sel.vocab || inputs || outputs) && (
-        <div
-          className="space-y-1 rounded-lg bg-ice-100 p-2.5 text-sm leading-relaxed"
-          role="status"
-          data-testid={`${testId}-info`}
-        >
-          {sel.vocab && (
-            <p>
-              <b className="font-semibold">{VOCAB[sel.vocab].term}</b> {VOCAB[sel.vocab].meaning}
-            </p>
-          )}
-          {(inputs || outputs) && (
-            <p className="num font-mono" data-testid={`${testId}-io`}>
-              {inputs && (
-                <span className="mr-3">
-                  <span className="font-sans text-muted">{UI.wireIn}</span> {inputs}
-                </span>
-              )}
-              {outputs && (
-                <span>
-                  <span className="font-sans text-muted">{UI.wireOut}</span> {outputs}
-                </span>
-              )}
-            </p>
-          )}
-        </div>
+      {sel && (
+        <BlockPanel
+          block={sel}
+          values={st.labels}
+          lit={lit}
+          inputs={inputs}
+          outputs={outputs}
+          onClose={() => setSelected(null)}
+          testId={testId}
+        />
       )}
     </div>
+  );
+}
+
+/**
+ * For readers who want to go further: what the tapped block is, its bit-level equations, and
+ * every signal in and out (with this step's value when the wire is lit). The animation above
+ * stays the main explanation.
+ */
+function BlockPanel({
+  block,
+  values,
+  lit,
+  inputs,
+  outputs,
+  onClose,
+  testId,
+}: {
+  block: CircuitBlock;
+  values: Partial<Record<WireId, string>>;
+  lit: Set<WireId>;
+  inputs: string;
+  outputs: string;
+  onClose: () => void;
+  testId: string;
+}) {
+  const d = BLOCK_DETAILS[block.id];
+  const rows = (title: string, list: SignalRow[]) =>
+    list.length > 0 && (
+      <div>
+        <p className="mb-1 text-xs font-semibold text-muted">{title}</p>
+        <table className="w-full text-left text-xs">
+          <tbody>
+            {list.map((r) => {
+              const v = r.wire && lit.has(r.wire) ? values[r.wire] : undefined;
+              return (
+                <tr key={r.name} className="border-t border-line/60 align-top">
+                  <td className="num py-1 pr-2 font-mono font-semibold whitespace-nowrap">
+                    {r.name}
+                  </td>
+                  <td className="num py-1 pr-2 whitespace-nowrap text-muted">
+                    {r.bits} {UI.bitsUnit}
+                  </td>
+                  <td className="py-1 pr-2">{r.peer}</td>
+                  <td className="num py-1 text-right font-mono font-bold text-primary">
+                    {v ?? ''}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+  return (
+    <section
+      className="space-y-3 rounded-xl bg-ice-100 p-3 text-sm leading-relaxed ring-1 ring-line"
+      aria-label={block.label}
+      data-testid={`${testId}-info`}
+    >
+      <header className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="font-display text-base font-semibold">{block.label}</p>
+          {block.vocab && <p className="text-ink/80">{VOCAB[block.vocab].meaning}</p>}
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="btn btn-circle h-9 min-h-9 w-9 btn-ghost btn-sm"
+          aria-label={UI.close}
+          data-testid={`${testId}-info-close`}
+        >
+          <X className="h-4 w-4" aria-hidden />
+        </button>
+      </header>
+      {(inputs || outputs) && (
+        <p className="num font-mono text-primary" data-testid={`${testId}-io`}>
+          {inputs && (
+            <span className="mr-3">
+              <span className="font-sans text-muted">{UI.wireIn}</span> {inputs}
+            </span>
+          )}
+          {outputs && (
+            <span>
+              <span className="font-sans text-muted">{UI.wireOut}</span> {outputs}
+            </span>
+          )}
+        </p>
+      )}
+      <div>
+        <p className="mb-1 text-xs font-semibold text-muted">{UI.detailWhat}</p>
+        <p>{d.what}</p>
+      </div>
+      <div>
+        <p className="mb-1 text-xs font-semibold text-muted">{UI.detailHow}</p>
+        <pre className="num overflow-x-auto rounded-lg bg-white/80 p-2 font-mono text-xs leading-relaxed whitespace-pre-wrap ring-1 ring-line/60">
+          {d.how.join('\n')}
+        </pre>
+      </div>
+      {rows(UI.detailIn, d.inputs)}
+      {rows(UI.detailOut, d.outputs)}
+      {d.note && <p className="text-xs text-ink/80">{d.note}</p>}
+      <p className="text-xs text-muted">{CIRCUIT_SCOPE}</p>
+    </section>
   );
 }

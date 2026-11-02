@@ -2,8 +2,9 @@ import type { BlockId, WireId } from '@/lib/lesson/circuit-map';
 import type { VocabId } from './vocab';
 
 /**
- * Layout of the floating-point adder (Chapter 6), drawn for a 360 × 600 viewBox so it reads on a
- * 390px phone. Arranged top to bottom in the order of P&H 3.5; our own drawing, not the figure.
+ * Layout of the floating-point adder (Chapter 5) following the team's bit-level drawing
+ * (วงจร/fp_adder_bitlevel_1.svg, signals in FP-Adder-bit-level-signals-per-block.pdf),
+ * rearranged for a 360 × 680 viewBox so it reads on a 390px phone.
  */
 export type BlockKind = 'register' | 'alu' | 'mux' | 'box';
 export type WireKind = 'exp' | 'sig' | 'sign' | 'ctl';
@@ -22,9 +23,11 @@ export interface CircuitBlock {
 
 export interface CircuitWire {
   id: WireId;
-  /** Block the wire leaves and the block it enters (values shown when a block is tapped). */
-  from: BlockId;
+  /** Block the wire leaves (none: an outside input such as `sub`) and the block it enters. */
+  from: BlockId | null;
   to: BlockId;
+  /** Signal name(s) on this wire, as in the bit-level drawing (e.g. "absD[4:0]"). */
+  signal: string;
   kind: WireKind;
   points: [number, number][];
   dashed?: boolean;
@@ -34,232 +37,308 @@ export interface CircuitWire {
   chipOffset?: [number, number];
 }
 
-export const CIRCUIT_VIEWBOX = { w: 360, h: 610 } as const;
+export const CIRCUIT_VIEWBOX = { w: 360, h: 680 } as const;
 
-/*
- * Data flows top to bottom. Every MUX has two data inputs (from A and from B) and a dashed select
- * line from Control; Control reads the exponent difference and both signs, then drives the three
- * MUX selects, the shift amount and add/subtract of the Big ALU.
- */
 export const BLOCKS: CircuitBlock[] = [
-  { id: 'regA', kind: 'register', label: 'A', x: 10, y: 10, w: 160, h: 30 },
-  { id: 'regB', kind: 'register', label: 'B', x: 190, y: 10, w: 160, h: 30 },
+  { id: 'regA', kind: 'register', label: 'A', x: 5, y: 10, w: 170, h: 30 },
+  { id: 'regB', kind: 'register', label: 'B', x: 185, y: 10, w: 170, h: 30 },
   {
     id: 'smallAlu',
     kind: 'alu',
     label: 'Small ALU',
-    x: 20,
+    x: 130,
     y: 76,
-    w: 80,
-    h: 40,
+    w: 90,
+    h: 36,
     vocab: 'smallAlu',
   },
-  { id: 'control', kind: 'box', label: 'Control', x: 150, y: 80, w: 90, h: 32, vocab: 'control' },
-  { id: 'muxExp', kind: 'mux', label: 'MUX', x: 20, y: 196, w: 80, h: 24, vocab: 'mux' },
-  { id: 'muxSmall', kind: 'mux', label: 'MUX', x: 150, y: 196, w: 80, h: 24, vocab: 'mux' },
-  { id: 'muxBig', kind: 'mux', label: 'MUX', x: 262, y: 196, w: 80, h: 24, vocab: 'mux' },
+  { id: 'control', kind: 'box', label: 'Control', x: 112, y: 140, w: 140, h: 42, vocab: 'control' },
+  { id: 'muxExp', kind: 'mux', label: 'MUX exp', x: 20, y: 262, w: 80, h: 30, vocab: 'mux' },
+  { id: 'muxSmall', kind: 'mux', label: 'MUX small', x: 120, y: 262, w: 80, h: 30, vocab: 'mux' },
+  { id: 'muxBig', kind: 'mux', label: 'MUX large', x: 240, y: 262, w: 80, h: 30, vocab: 'mux' },
   {
     id: 'shift',
     kind: 'box',
     label: 'Shift right',
-    x: 145,
-    y: 250,
+    x: 115,
+    y: 318,
     w: 90,
     h: 32,
     vocab: 'shifter',
   },
-  { id: 'bigAlu', kind: 'alu', label: 'Big ALU', x: 200, y: 310, w: 140, h: 60, vocab: 'bigAlu' },
-  { id: 'incdec', kind: 'box', label: 'Inc / Dec', x: 20, y: 410, w: 90, h: 32 },
+  { id: 'bigAlu', kind: 'alu', label: 'Big ALU', x: 150, y: 380, w: 160, h: 52, vocab: 'bigAlu' },
+  { id: 'negate', kind: 'box', label: 'Negate if bigNeg', x: 165, y: 448, w: 130, h: 24 },
   {
     id: 'normalize',
     kind: 'box',
     label: 'Normalize',
-    x: 200,
-    y: 410,
-    w: 140,
-    h: 32,
+    x: 165,
+    y: 495,
+    w: 130,
+    h: 30,
     vocab: 'normalize',
   },
-  { id: 'round', kind: 'box', label: 'Round', x: 200, y: 480, w: 140, h: 32, vocab: 'roundingHw' },
-  { id: 'regR', kind: 'register', label: 'ผลลัพธ์', x: 60, y: 570, w: 240, h: 30 },
+  { id: 'incdec', kind: 'box', label: 'Inc / Dec', x: 10, y: 555, w: 100, h: 35 },
+  { id: 'round', kind: 'box', label: 'Round', x: 165, y: 555, w: 130, h: 30, vocab: 'roundingHw' },
+  { id: 'regR', kind: 'register', label: 'ผลลัพธ์', x: 30, y: 640, w: 300, h: 30 },
 ];
 
 type P = [number, number];
 const w = (
   id: WireId,
   kind: WireKind,
-  from: BlockId,
+  from: BlockId | null,
   to: BlockId,
+  signal: string,
   points: P[],
   extra: Partial<CircuitWire> = {},
-): CircuitWire => ({ id, kind, from, to, points, ...extra });
+): CircuitWire => ({ id, kind, from, to, signal, points, ...extra });
 
 export const WIRES: CircuitWire[] = [
-  // exponents: each one goes to the Small ALU and to the exponent MUX
-  w('a-exp', 'exp', 'regA', 'smallAlu', [
+  // signs go to Control
+  w('a-sign', 'sign', 'regA', 'control', 'sA', [
+    [13, 40],
+    [13, 162],
+    [112, 162],
+  ]),
+  w('b-sign', 'sign', 'regB', 'control', 'sB', [
+    [193, 40],
+    [193, 140],
+  ]),
+  // each exponent goes to the Small ALU and (branch) to the exponent MUX
+  w('a-exp', 'exp', 'regA', 'smallAlu', 'eA[7:0]', [
     [40, 40],
-    [40, 76],
+    [40, 60],
+    [150, 60],
+    [150, 76],
   ]),
-  w('b-exp', 'exp', 'regB', 'smallAlu', [
-    [230, 40],
-    [230, 60],
-    [80, 60],
-    [80, 76],
+  w('b-exp', 'exp', 'regB', 'smallAlu', 'eB[7:0]', [
+    [225, 40],
+    [225, 60],
+    [200, 60],
+    [200, 76],
   ]),
-  w('a-exp-mux', 'exp', 'regA', 'muxExp', [
-    [60, 40],
-    [60, 50],
-    [8, 50],
-    [8, 180],
-    [36, 180],
-    [36, 196],
-  ]),
+  w(
+    'a-exp-mux',
+    'exp',
+    'regA',
+    'muxExp',
+    'eA[7:0]',
+    [
+      [40, 60],
+      [40, 262],
+    ],
+    { junction: true },
+  ),
   w(
     'b-exp-mux',
     'exp',
     'regB',
     'muxExp',
+    'eB[7:0]',
     [
-      [104, 60],
-      [104, 146],
-      [84, 146],
-      [84, 196],
+      [225, 60],
+      [262, 60],
+      [262, 200],
+      [80, 200],
+      [80, 262],
     ],
     { junction: true },
   ),
-  // signs and the exponent difference go to Control
-  w('a-sign', 'sign', 'regA', 'control', [
-    [18, 40],
-    [18, 70],
-    [170, 70],
-    [170, 80],
+  // each significand with its hidden 1 goes to both significand MUXes
+  w('a-sig', 'sig', 'regA', 'muxSmall', 'mA = {1, fA}', [
+    [85, 40],
+    [85, 215],
+    [180, 215],
+    [180, 262],
   ]),
-  w('b-sign', 'sign', 'regB', 'control', [
-    [198, 40],
-    [198, 80],
+  w(
+    'a-sig-big',
+    'sig',
+    'regA',
+    'muxBig',
+    'mA = {1, fA}',
+    [
+      [180, 215],
+      [260, 215],
+      [260, 262],
+    ],
+    { junction: true },
+  ),
+  w('b-sig', 'sig', 'regB', 'muxBig', 'mB = {1, fB}', [
+    [300, 40],
+    [300, 262],
   ]),
+  w(
+    'b-sig-small',
+    'sig',
+    'regB',
+    'muxSmall',
+    'mB = {1, fB}',
+    [
+      [300, 230],
+      [140, 230],
+      [140, 262],
+    ],
+    { junction: true },
+  ),
+  // Small ALU: who is larger goes to Control, how far to shift goes to the shifter
   w(
     'alu-ctl',
     'ctl',
     'smallAlu',
     'control',
+    'neg',
     [
-      [96, 96],
-      [150, 96],
+      [175, 112],
+      [175, 140],
     ],
-    { chipOffset: [0, 14] },
+    { chipOffset: [24, 0] },
   ),
-  // significands: each one goes to both significand MUXes
-  w('a-sig', 'sig', 'regA', 'muxSmall', [
-    [122, 40],
-    [122, 158],
-    [166, 158],
-    [166, 196],
+  w('alu-shift', 'exp', 'smallAlu', 'shift', 'absD[4:0]', [
+    [136, 94],
+    [96, 94],
+    [96, 330],
+    [115, 330],
   ]),
-  w('a-sig-big', 'sig', 'regA', 'muxBig', [
-    [134, 40],
-    [134, 172],
-    [278, 172],
-    [278, 196],
+  w('alu-far', 'ctl', 'smallAlu', 'shift', 'far', [
+    [140, 104],
+    [104, 104],
+    [104, 342],
+    [115, 342],
   ]),
-  w('b-sig', 'sig', 'regB', 'muxBig', [
-    [326, 40],
-    [326, 196],
+  // Control
+  w('sub-in', 'ctl', null, 'control', 'sub', [
+    [358, 150],
+    [252, 150],
   ]),
-  w('b-sig-small', 'sig', 'regB', 'muxSmall', [
-    [290, 40],
-    [290, 158],
-    [214, 158],
-    [214, 196],
+  w('ctl-mux-exp', 'ctl', 'control', 'muxExp', 'sel', [
+    [170, 182],
+    [170, 247],
+    [60, 247],
+    [60, 262],
   ]),
-  // Control drives the MUX selects, the shift amount and add / subtract
-  w('ctl-mux-exp', 'ctl', 'control', 'muxExp', [
-    [160, 112],
-    [160, 134],
-    [60, 134],
-    [60, 196],
+  w('ctl-mux-small', 'ctl', 'control', 'muxSmall', 'sel', [
+    [170, 182],
+    [170, 247],
+    [160, 247],
+    [160, 262],
   ]),
-  w('ctl-mux-small', 'ctl', 'control', 'muxSmall', [
-    [190, 112],
-    [190, 196],
-  ]),
-  w('ctl-mux-big', 'ctl', 'control', 'muxBig', [
-    [230, 112],
-    [230, 126],
-    [302, 126],
-    [302, 196],
-  ]),
-  w('ctl-shift', 'ctl', 'control', 'shift', [
-    [240, 96],
-    [252, 96],
-    [252, 266],
-    [235, 266],
+  w('ctl-mux-big', 'ctl', 'control', 'muxBig', 'sel', [
+    [170, 182],
+    [170, 247],
+    [280, 247],
+    [280, 262],
   ]),
   w(
     'ctl-alu',
     'ctl',
     'control',
     'bigAlu',
+    'Binv, CarryIn',
     [
-      [240, 106],
-      [352, 106],
-      [352, 340],
-      [330, 340],
+      [252, 178],
+      [335, 178],
+      [335, 405],
+      [302, 405],
     ],
-    { chipOffset: [-10, 0] },
+    { chipOffset: [-32, 0] },
   ),
+  w('big-neg', 'ctl', 'bigAlu', 'control', 'bigNeg', [
+    [305, 420],
+    [348, 420],
+    [348, 168],
+    [252, 168],
+  ]),
+  w('ctl-sign', 'sign', 'control', 'regR', 'signR', [
+    [112, 175],
+    [5, 175],
+    [5, 625],
+    [45, 625],
+    [45, 640],
+  ]),
   // data path
-  w('mux-shift', 'sig', 'muxSmall', 'shift', [
-    [190, 220],
-    [190, 250],
+  w('exp-incdec', 'exp', 'muxExp', 'incdec', 'E0[7:0]', [
+    [60, 292],
+    [60, 555],
   ]),
-  w('shift-alu', 'sig', 'shift', 'bigAlu', [
-    [190, 282],
-    [190, 296],
-    [235, 296],
-    [235, 310],
+  w('mux-shift', 'sig', 'muxSmall', 'shift', 'mSmall', [
+    [160, 292],
+    [160, 318],
   ]),
-  w('big-alu', 'sig', 'muxBig', 'bigAlu', [
-    [302, 220],
-    [302, 310],
+  w('shift-alu', 'sig', 'shift', 'bigAlu', 'Q = {Y, G, R, S}', [
+    [160, 350],
+    [160, 365],
+    [190, 365],
+    [190, 380],
   ]),
-  w('alu-norm', 'sig', 'bigAlu', 'normalize', [
-    [270, 370],
-    [270, 410],
-  ]),
-  w('exp-incdec', 'exp', 'muxExp', 'incdec', [
-    [60, 220],
-    [60, 410],
-  ]),
-  w('norm-round', 'sig', 'normalize', 'round', [
-    [270, 442],
-    [270, 480],
+  w('big-alu', 'sig', 'muxBig', 'bigAlu', 'P = {X, 000}', [
+    [280, 292],
+    [280, 365],
+    [270, 365],
+    [270, 380],
   ]),
   w(
-    'round-back',
+    'alu-negate',
     'sig',
-    'round',
-    'normalize',
+    'bigAlu',
+    'negate',
+    'T[27:0]',
     [
-      [340, 496],
-      [352, 496],
-      [352, 426],
-      [340, 426],
+      [230, 432],
+      [230, 448],
     ],
-    {
-      dashed: true,
-    },
+    { chipOffset: [40, 0] },
   ),
-  w('incdec-out', 'exp', 'incdec', 'regR', [
-    [65, 442],
-    [65, 550],
-    [120, 550],
-    [120, 570],
+  w(
+    'negate-norm',
+    'sig',
+    'negate',
+    'normalize',
+    'Z, G2 R2 S2',
+    [
+      [230, 472],
+      [230, 495],
+    ],
+    { chipOffset: [40, 0] },
+  ),
+  w('norm-incdec', 'exp', 'normalize', 'incdec', 'dir, cnt', [
+    [165, 510],
+    [85, 510],
+    [85, 555],
   ]),
-  w('round-out', 'sig', 'round', 'regR', [
-    [270, 512],
-    [270, 550],
-    [228, 550],
-    [228, 570],
+  w(
+    'norm-round',
+    'sig',
+    'normalize',
+    'round',
+    'M, G3 R3 S3',
+    [
+      [230, 525],
+      [230, 555],
+    ],
+    { chipOffset: [40, 0] },
+  ),
+  w(
+    'round-ovf',
+    'ctl',
+    'round',
+    'incdec',
+    'ovf',
+    [
+      [165, 575],
+      [110, 575],
+    ],
+    { chipOffset: [0, -12] },
+  ),
+  w('incdec-out', 'exp', 'incdec', 'regR', 'E[7:0]', [
+    [60, 590],
+    [60, 615],
+    [105, 615],
+    [105, 640],
+  ]),
+  w('round-out', 'sig', 'round', 'regR', 'F[22:0]', [
+    [230, 585],
+    [230, 640],
   ]),
 ];

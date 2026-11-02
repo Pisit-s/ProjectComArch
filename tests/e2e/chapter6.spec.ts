@@ -30,7 +30,12 @@ test.describe('chapter 6: the adder circuit', () => {
     await openScene(page, 'circuit-flow');
     await page.getByTestId('circuit-player-next').click(); // leaves the poster
     await page.locator('[data-block=shift]').click();
-    await expect(page.getByTestId('circuit-diagram-info')).toContainText('Shifter');
+    await expect(page.getByTestId('circuit-diagram-info')).toContainText('barrel shifter');
+    // the "go further" part: equations and the signals in and out
+    await expect(page.getByTestId('circuit-diagram-info')).toContainText('{Y, G, R, S}');
+    await expect(page.getByTestId('circuit-diagram-info')).toContainText('absD[4:0]');
+    await page.getByTestId('circuit-diagram-info-close').click();
+    await expect(page.getByTestId('circuit-diagram-info')).toHaveCount(0);
   });
 
   test('a tapped block shows the values going in and out in this step', async ({ page }) => {
@@ -49,7 +54,7 @@ test.describe('chapter 6: the adder circuit', () => {
     await page.getByTestId('circuit-player-next').click();
     await expect(page.getByTestId('circuit-diagram').locator('svg')).toHaveAttribute(
       'data-active',
-      'control regB',
+      'control',
     );
   });
 });

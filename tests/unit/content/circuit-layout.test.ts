@@ -23,3 +23,20 @@ describe('circuit layout (Chapter 6)', () => {
       }
   });
 });
+
+describe('block details (tap a block)', () => {
+  it('every block has details and every listed wire really touches that block', async () => {
+    const { BLOCK_DETAILS } = await import('@/content/lesson/circuit-details');
+    const byId = new Map(WIRES.map((w) => [w.id, w]));
+    const wrong: string[] = [];
+    for (const id of BLOCK_IDS) {
+      const d = BLOCK_DETAILS[id];
+      expect(d.what.length, id).toBeGreaterThan(0);
+      for (const r of d.inputs)
+        if (r.wire && byId.get(r.wire)?.to !== id) wrong.push(`${id} in ${r.name} (${r.wire})`);
+      for (const r of d.outputs)
+        if (r.wire && byId.get(r.wire)?.from !== id) wrong.push(`${id} out ${r.name} (${r.wire})`);
+    }
+    expect(wrong).toEqual([]);
+  });
+});

@@ -154,21 +154,37 @@ export function HwAlu(props: BoxProps) {
 /** Multiplexer as a capsule; the select line comes in from the side. */
 export function HwMux(props: BoxProps) {
   const { x, y, w, h, label, active, selected } = props;
+  // wide side up (two inputs: 0 on the left, 1 on the right), narrow side down (one output)
+  const d = `M${x} ${y} H${x + w} L${x + w * 0.85} ${y + h} H${x + w * 0.15} Z`;
+  const port = (dx: number, text: string) => (
+    <text
+      x={x + w * dx}
+      y={y + 8}
+      textAnchor="middle"
+      className="pointer-events-none fill-muted font-mono text-[8px]"
+    >
+      {text}
+    </text>
+  );
   return (
-    <Pressable {...props}>
-      <rect
-        x={x}
-        y={y}
-        width={w}
-        height={h}
-        rx={Math.min(w, h) / 2}
-        strokeWidth={2}
-        className={shapeClass(active, selected)}
-      />
-      <Label x={x + w / 2} y={y + h / 2}>
-        {label}
-      </Label>
-    </Pressable>
+    <>
+      <Pressable {...props}>
+        <path
+          d={d}
+          strokeWidth={2}
+          strokeLinejoin="round"
+          className={shapeClass(active, selected)}
+        />
+        <Label x={x + w / 2} y={y + h * 0.62}>
+          {label}
+        </Label>
+      </Pressable>
+      {/* the input numbers sit outside the button so its name stays just the label */}
+      <g aria-hidden>
+        {port(0.25, '0')}
+        {port(0.75, '1')}
+      </g>
+    </>
   );
 }
 
