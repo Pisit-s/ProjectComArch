@@ -3,7 +3,7 @@
 import { TriangleAlert } from 'lucide-react';
 import { Component, type ReactNode } from 'react';
 
-/** One broken tool never takes the whole page down (PLAN.md 7.1). */
+/** One broken tool never takes the whole page down (docs/plans/stage1-floating-point.md 7.1). */
 export class ToolBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
 

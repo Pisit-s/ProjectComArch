@@ -55,7 +55,7 @@ type Props = {
 };
 
 /**
- * Every multi-step process plays through this component (FR-07, PLAN.md 8.1): previous / next /
+ * Every multi-step process plays through this component (FR-07, docs/plans/stage1-floating-point.md 8.1): previous / next /
  * play / restart / speed, a clickable step indicator, keyboard (left/right, space, home) while focus
  * is inside, aria-live step names, an optional clickable flowchart, and reduced-motion support.
  * Each step renders its own complete state, so going back needs no replay.

@@ -1,16 +1,18 @@
-# Binary Lab — กติกาถาวรสำหรับ Claude Code
+# comkrub: กติกาถาวรสำหรับ Claude Code
 @AGENTS.md
 
-- เว็บสื่อการสอน Floating-Point (IEEE 754 binary32) วิชา Computer Architecture: 5 บท + Lab · แผนเต็ม: PLAN.md (เปิดอ่านหัวข้อที่เกี่ยวข้องก่อนเริ่มทุกงาน) · requirement: floating_website_requirement/ (4 ไฟล์) · ความคืบหน้า: docs/PROGRESS.md · คำถาม: docs/QUESTIONS.md · version: docs/STACK.md
-- ทำงานแบบ autonomous: ห้ามใช้ AskUserQuestion และห้ามหยุดถาม → จดคำถาม + ค่าที่สมมติใน QUESTIONS.md แล้วทำต่อ
-- ก่อนใช้ library ใดให้ query Context7 ก่อนเสมอ (daisyUI 5: /websites/daisyui · Next.js 16: /vercel/next.js + node_modules/next/dist/docs · Tailwind v4: /tailwindlabs/tailwindcss.com · motion: /websites/motion_dev) · ใช้ version ล่าสุดแบบ stable ยกเว้น typescript ~6.0.x, eslint ^9, @types/node ^24 (PLAN.md 5)
-- engine อยู่ที่ src/lib/fp: BigInt ล้วน ห้ามคำนวณผลด้วย Number · ผลต้องตรง IEEE 754 round to nearest ties to even ทุกบิต · algorithm ตาม PLAN.md 4.3 · test: golden vectors (ภาคผนวก C) + oracle Math.fround + exhaustive MINI8 ห้ามลด numRuns
-- ตัวเลขบิต/hex/ค่าที่เก็บจริงในเนื้อหาต้อง render จาก engine (WorkedExample) ห้ามพิมพ์เอง
-- ทุกกระบวนการหลายขั้นใช้ StepPlayer: ย้อน/ถัดไป/เล่น/ความเร็ว/กดกระโดดขั้น/คีย์บอร์ด/reduced motion (PLAN.md 8)
-- ธีม Liquid Glass ฟ้า-ขาวแบบ coekku.shop: port จาก docs/reference/coe-shop/ (PLAN.md 9) · daisyUI ตั้ง exclude: glass, rootcolor · สีบิต PLAN.md 9.4 · สว่างอย่างเดียว · mobile-first
-- ห้ามแก้/สร้าง/ลบไฟล์ใน /Users/pisit/Documents/Development/CoE-Shop (เว็บใช้งานจริง) · ห้ามแก้ requirement 2 ไฟล์เดิมของเพื่อน
-- ชื่อเว็บ Binary Lab · เครดิตผู้จัดทำ 4 คนและอาจารย์ผู้สอนอยู่ใน src/lib/site.ts ตาม PLAN.md 7.1 (พิมพ์ชื่อไทยตามนั้นทุกตัวอักษร)
-- ห้าม emoji ทุกที่ ใช้ lucide-react · ข้อความไทยต้องเป็นธรรมชาติ ใช้ศัพท์ตาม PLAN.md 7.9
-- ห้าม deploy เอง (push ได้) · ห้าม git push --force / reset --hard · ก่อน push ให้ git fetch แล้ว pull --rebase ถ้ามี commit ใหม่
-- ก่อน commit: lint + typecheck + test ผ่าน · งาน UI ต้องเปิดดู screenshot มือถือ 390px เองก่อนบอกว่าเสร็จ · จบ phase: build ผ่านและทุก route เป็น static
-- ประหยัด token: Vitest dot, Playwright line, log ดูแค่ tail/grep, PLAN.md อ่านเฉพาะหัวข้อที่ใช้ (PLAN.md 2.8)
+- เว็บสื่อการสอนวิชา Computer Architecture เรื่องเดียว: การบวกและการลบเลข Floating-Point (IEEE 754 single precision) เป็นหน้าเดียว `/` เลื่อนลงทีละบท (บทที่ 1-7 + สรุป) · ไม่มีเรื่องคูณ/หาร ไม่มี hub/MIPS Simulator (ยกเลิกแล้ว)
+- แผน: PLAN.md (อ่านเฉพาะหัวข้อที่เกี่ยวกับงานก่อนเริ่มทุกครั้ง) · ความคืบหน้า docs/PROGRESS.md · คำถาม docs/QUESTIONS.md · review docs/REVIEW.md · แผนรอบแรก (engine, StepPlayer, ธีม, testing): docs/plans/stage1-floating-point.md · version: docs/STACK.md
+- แหล่งเนื้อหา: สไลด์อาจารย์ใน Slide/ ก่อน (สรุปใน PLAN.md ภาคผนวก E) → Patterson & Hennessy 5e หัวข้อ 3.2, 3.5 → IEEE 754-2019 · ศัพท์ตามสไลด์ (PLAN.md 2.4) · ห้าม commit Slide/ และ EMIPS.pdf · ห้ามคัดลอกรูปหรือข้อความจากสไลด์/ตำรา วาดและเขียนเอง
+- ทำงานแบบ autonomous: ห้ามใช้ AskUserQuestion ห้ามหยุดถาม → จดคำถาม + ค่าที่สมมติใน docs/QUESTIONS.md แล้วทำต่อ
+- ก่อนใช้ library ให้ query Context7 ก่อนเสมอ (Next.js 16: /vercel/next.js + node_modules/next/dist/docs · daisyUI 5: /websites/daisyui · Tailwind v4: /tailwindlabs/tailwindcss.com · motion: /websites/motion_dev · Vitest/fast-check/Playwright: resolve ตอนใช้) · ห้ามเพิ่ม dependency ถ้าไม่จำเป็น (จดคำถามก่อน) · version: latest stable ยกเว้น typescript ~6.0.x, eslint ^9, @types/node ^24
+- "เห็นก่อนอ่าน" (PLAN.md 1): ทุกบทเริ่มด้วยคำศัพท์ แล้วเป็น animation ที่กดเล่นได้ · ข้อความที่ผู้ใช้เห็นอยู่ใน src/content/lesson/ เท่านั้นและต้องอยู่ในงบ (PLAN.md 1.3) · ทุกกระบวนการหลายขั้นใช้ StepPlayer (ย้อน/ถัดไป/เล่น/ความเร็ว/กดกระโดดขั้น/คีย์บอร์ด/reduced motion/โหมดนำเสนอ)
+- engine อยู่ที่ src/lib/fp: BigInt ล้วน ห้ามคำนวณผลด้วย Number · ผลตรง IEEE 754 round to nearest ties to even ทุกบิต · test: golden (PLAN.md ภาคผนวก D + stage1 ภาคผนวก C) + oracle Math.fround + exhaustive MINI8 · ห้ามลด numRuns
+- ตัวเลขผลลัพธ์ บิต hex ค่าที่เก็บจริง และผล printf ในเนื้อหาต้อง render จาก engine/โมเดล ห้ามพิมพ์เอง (input ของตัวอย่างเขียนได้) · UI ห้ามคำนวณเอง ใช้ frame adapters ใน src/lib/lesson/
+- ธีม Liquid Glass ฟ้า-ขาว (stage1 9) · daisyUI ตั้ง exclude: glass, rootcolor · สีตาม PLAN.md 1.2 · สว่างอย่างเดียว · mobile-first (390px ก่อน)
+- ห้ามแก้/สร้าง/ลบไฟล์ใน /Users/pisit/Documents/Development/CoE-Shop · ห้ามแก้ requirement 2 ไฟล์เดิมของเพื่อน
+- ชื่อเว็บ comkrub · ข้อมูลเว็บ เครดิตผู้จัดทำ 4 คนและอาจารย์อยู่ใน src/lib/site.ts (ห้ามแก้ชื่อ พิมพ์ตามนั้นทุกตัวอักษร)
+- ห้าม emoji ทุกที่ ใช้ lucide-react · ภาษาไทยเป็นธรรมชาติ สั้น ตรง ใช้ศัพท์ตาม src/content/lesson/vocab.ts · ห้ามสำนวนแบบ AI
+- git: ทำบน branch addsub-redesign · ห้าม commit/push เข้า main ห้าม merge ห้าม deploy เอง (push branch ได้ Vercel สร้าง preview เอง) · ห้าม push --force, reset --hard, rebase branch ที่ push แล้ว · ก่อน push: git fetch ถ้า main มี commit ใหม่ให้ git merge origin/main
+- ก่อน commit: lint + typecheck + test ผ่าน · งาน UI ต้องเปิดดู screenshot 390px และ 1440px เอง · จบ phase: build ผ่านและทุก route static · จบงาน: review 4 รอบ (PLAN.md 11.4)
+- ประหยัด token: Vitest dot, Playwright line, log ดูแค่ tail/grep, PLAN.md อ่านเฉพาะหัวข้อที่ใช้ (grep -n "^## \|^### " PLAN.md)

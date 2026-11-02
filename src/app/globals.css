@@ -46,6 +46,7 @@
 @source not '../../docs';
 @source not '../../floating_website_requirement';
 @source not '../../PLAN.md';
+@source not '../../Slide';
 
 @theme inline {
   --font-sans: var(--font-plex-sans-thai), 'IBM Plex Sans Thai', system-ui, sans-serif;
@@ -66,7 +67,7 @@
   --color-muted: #54648a;
   --color-card: #ffffffb8;
   --color-foreground: #0b1b4d;
-  /* bit-field colours (PLAN.md 9.4, Okabe-Ito based) */
+  /* bit-field colours (docs/plans/stage1-floating-point.md 9.4, Okabe-Ito based) */
   --color-bit-sign: #d55e00;
   --color-bit-sign-ink: #a64300;
   --color-bit-exp: #009e73;
