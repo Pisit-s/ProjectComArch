@@ -41,6 +41,6 @@ describe('section registry', () => {
     );
     expect(QUIZ.convert!.options[0]).toBe(toHex(encodeBits(BINARY32, '-0.75')!, 32));
     expect(QUIZ.convert!.options[0]).toBe('0xBF400000');
-    expect(QUIZ.ieee754!.options[0]).toBe('2^3');
+    expect(QUIZ.ieee754!.options[0]).toBe('2³');
   });
 });
