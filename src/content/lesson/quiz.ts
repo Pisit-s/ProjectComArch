@@ -1,6 +1,7 @@
 import { BINARY32, decode, encodeBits, splitFields, toHex } from '@/lib/fp';
 import { addBits, toBits, toSigned } from '@/lib/int/adder';
 import { sigText } from '@/lib/lesson/fp-frames';
+import { pow } from './captions/types';
 import type { SectionId } from './sections';
 
 /**
@@ -36,7 +37,7 @@ function ieeeQuiz(): Quiz {
   const e = E - 127;
   return {
     question: 'Exponent = 10000010₂ แปลว่าคูณด้วยเท่าไร',
-    options: [`2^${e}`, `2^${E}`, `2^${e - 1}`],
+    options: [pow(2, e), pow(2, E), pow(2, e - 1)],
     order: [2, 0, 1],
     reason: `${E} − 127 = ${e}`,
   };
