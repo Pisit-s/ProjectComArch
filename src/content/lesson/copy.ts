@@ -11,6 +11,12 @@ export const HERO = {
   skip: 'ข้ามไปลองเอง',
   teaser: 'ข้างในเกิดอะไรขึ้น เลื่อนลงไปดู',
   replay: 'เล่นซ้ำ',
+  /** Captions of the three teaser steps. */
+  steps: {
+    decimal: 'ในโปรแกรมเราเขียนเลขทศนิยมแบบนี้',
+    operands: 'ในเครื่อง float แต่ละตัวเก็บเป็น 32 บิต',
+    sum: 'ผลบวกก็ออกมาเป็น 32 บิตเหมือนกัน',
+  },
 } as const;
 
 export const TAKEAWAY: Partial<Record<SectionId, string>> = {
