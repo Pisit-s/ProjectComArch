@@ -8,8 +8,10 @@ import {
   decodeWithSteps,
   exactDecimal,
   formatRational,
+  groupNibbles,
   shortestDecimal,
   splitFields,
+  toBinaryString,
   toHex,
   width,
 } from '@/lib/fp';
@@ -56,9 +58,46 @@ export interface EncodeFrame {
   rows: FracRowView[];
 }
 
+/** Place value chips of the integer part (only for short integer parts). */
+export interface IntTerm {
+  weight: string;
+  bit: Bit;
+}
+
+/**
+ * Point hop of the normalize frame: `digits` with the binary point after `from` digits moves to
+ * after `to` digits. `lead` digits in front of the leading 1 fade out afterwards.
+ */
+export interface NormalizeView {
+  digits: string;
+  /** The digit string was cut (more bits follow). */
+  more: boolean;
+  from: number;
+  to: number;
+  lead: number;
+  hops: number;
+  e: number;
+  /** Too many digits to animate: show before / after only. */
+  compact: boolean;
+  before: string;
+  after: string;
+}
+
+export interface Nibble {
+  bits: string;
+  hex: string;
+}
+
 export interface EncodeScene {
   bits: bigint;
   hex: string;
+  /** Every digit of the stored value (for the "not exact" warning). */
+  storedExact: string;
+  /** Place values of the integer part; empty when the integer part is longer than 8 bits. */
+  intTerms: IntTerm[];
+  normalize: NormalizeView | null;
+  /** 32 bits in groups of 4 with their hex digit. */
+  nibbles: Nibble[];
   /** Integer part and fraction bits (fraction cut at the bits the format needs). */
   intBin: string;
   fracBin: string;
@@ -70,6 +109,49 @@ export interface EncodeScene {
 }
 
 export const MAX_TIMES2_FRAMES = 8;
+const MAX_INT_TERMS = 8;
+/** Digits drawn in the normalize hop (more than this: before / after only). */
+const MAX_HOP_DIGITS = 26;
+/** Bits shown after the point of the normalized form. */
+const AFTER_BITS = 10;
+
+function intTermsOf(bin: string): IntTerm[] {
+  if (bin.length > MAX_INT_TERMS) return [];
+  return [...bin].map((c, i) => ({
+    weight: (1n << BigInt(bin.length - 1 - i)).toString(),
+    bit: c === '1' ? 1 : 0,
+  }));
+}
+
+function normalizeView(pt: StepOf<'point'>): NormalizeView {
+  const all = pt.intBinary + pt.fracBinary;
+  const from = pt.intBinary.length;
+  const to =
+    pt.direction === 'left' ? from - pt.amount : pt.direction === 'right' ? from + pt.amount : from;
+  const lead = Math.max(0, to - 1);
+  const want = Math.max(from, to) + 6;
+  const digits = all.slice(0, want).padEnd(Math.max(from, to), '0');
+  const tail = all.slice(to, to + AFTER_BITS);
+  return {
+    digits,
+    more: all.length > digits.length,
+    from,
+    to,
+    lead,
+    hops: pt.amount,
+    e: pt.eUsed,
+    compact: digits.length > MAX_HOP_DIGITS,
+    before: `${pt.intBinary}.${pt.fracBinary.slice(0, AFTER_BITS) || '0'}${pt.fracBinary.length > AFTER_BITS ? '…' : ''}`,
+    after: `${all[to - 1] ?? '0'}.${tail || '0'}${all.length > to + AFTER_BITS ? '…' : ''}`,
+  };
+}
+
+function nibblesOf(bits: bigint, w: number): Nibble[] {
+  const hex = toHex(bits, w).slice(2);
+  return groupNibbles(toBinaryString(bits, w))
+    .split(' ')
+    .map((b, i) => ({ bits: b, hex: hex[i] }));
+}
 
 export function buildEncodeFrames(fmt: FloatFormat, r: EncodeResult): EncodeScene {
   const W = width(fmt);
@@ -84,6 +166,8 @@ export function buildEncodeFrames(fmt: FloatFormat, r: EncodeResult): EncodeScen
     hex,
     inexact: !r.equal,
     stored: shortestDecimal(fmt, r.bits),
+    storedExact: exactDecimal(fmt, r.bits),
+    nibbles: nibblesOf(r.bits, W),
   };
 
   const special = find<StepOf<'special'>>('special');
@@ -104,7 +188,15 @@ export function buildEncodeFrames(fmt: FloatFormat, r: EncodeResult): EncodeScen
       register: full,
       rows: [],
     });
-    return { ...base, intBin: '', fracBin: '', fracTerminated: true, frames };
+    return {
+      ...base,
+      intBin: '',
+      fracBin: '',
+      fracTerminated: true,
+      intTerms: [],
+      normalize: null,
+      frames,
+    };
   }
 
   const ib = find<StepOf<'int-binary'>>('int-binary')!;
@@ -243,6 +335,8 @@ export function buildEncodeFrames(fmt: FloatFormat, r: EncodeResult): EncodeScen
 
   return {
     ...base,
+    intTerms: intTermsOf(ib.binary),
+    normalize: normalizeView(pt),
     intBin: ib.binary,
     fracBin: fb.binary,
     fracTerminated: fb.terminated,
@@ -314,7 +408,25 @@ export interface LayoutScene {
   bits: bigint;
   hex: string;
   fields: { sign: string; exp: string; sig: string };
+  /** Values plugged into the formula. */
+  plug: {
+    s: string;
+    E: string;
+    e: string;
+    /** 2^e as a decimal (or "2^e" when long). */
+    pow: string;
+    /** 1.significand in binary, trailing zeros cut. */
+    sigBin: string;
+    sigDec: string;
+    value: string;
+  };
   frames: LayoutFrame[];
+}
+
+/** 2^k as a short decimal, or "2^k" when the decimal is long (e.g. 2^-10, 2^127). */
+export function powLabel(k: number): string {
+  const s = formatRational(R.pow2(k));
+  return s.length <= 8 ? s : `2^${k}`;
 }
 
 /** Scene 3.1: split 32 bits into fields and plug them into the formula (normal numbers only). */
@@ -332,6 +444,15 @@ export function buildLayoutFrames(fmt: FloatFormat, bits: bigint): LayoutScene |
     bits,
     hex: toHex(bits, width(fmt)),
     fields: { sign: f.sign, exp: f.exp, sig: f.frac },
+    plug: {
+      s: f.sign,
+      E: String(d.expField),
+      e: String(e),
+      pow: powLabel(e),
+      sigBin: sigText(d.significand, fmt.fracBits),
+      sigDec,
+      value,
+    },
     frames: [
       { id: 'bits', captionKey: 'layout.bits', params: {}, reveal: none, plug: plug0 },
       {
