@@ -6,7 +6,7 @@ import fc from 'fast-check';
 import { OPS } from '../src/lib/fp/simulate';
 import { PAIR_KINDS, matchesOracle } from '../tests/unit/fp/oracle-gen';
 
-const PER_CASE = 42_000; // 4 ops x 6 kinds x 42,000 = 1,008,000
+const PER_CASE = 84_000; // 2 ops x 6 kinds x 84,000 = 1,008,000
 let total = 0;
 const started = Date.now();
 for (const op of OPS) {

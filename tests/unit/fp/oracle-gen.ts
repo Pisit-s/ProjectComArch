@@ -70,10 +70,6 @@ export function oracle(op: Op, a: bigint, b: bigint): number {
       return Math.fround(x + y);
     case '-':
       return Math.fround(x - y);
-    case '*':
-      return Math.fround(x * y);
-    case '/':
-      return Math.fround(x / y);
   }
 }
 

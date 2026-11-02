@@ -9,8 +9,6 @@ export * from './round';
 export * from './special';
 export * from './encode';
 export * from './add';
-export * from './mul';
-export * from './div';
 export * from './simulate';
 export * from './format-number';
 export * from './fraction';

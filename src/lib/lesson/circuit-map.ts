@@ -156,7 +156,10 @@ export function hwCaption(frame: FpFrame): { key: CaptionKey; params: Params } {
     case 'underflow':
       return { key: 'fp.underflow', params: {} };
     case 'round':
-      return { key: 'hw.round', params: { grs: `${p.g}${p.r}${p.s}`, decision: frame.decision ?? 'exact' } };
+      return {
+        key: 'hw.round',
+        params: { grs: `${p.g}${p.r}${p.s}`, decision: frame.decision ?? 'exact' },
+      };
     case 'roundCarry':
       return { key: 'fp.roundCarry', params: {} };
     case 'pack':

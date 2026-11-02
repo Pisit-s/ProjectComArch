@@ -103,11 +103,6 @@ describe('golden D.1 (add / sub binary32)', () => {
     expect(sc.result.hex).toBe('0x40000000');
     expect(frame(sc, 'pack').rows[0].exp).toBe(1);
   });
-  it('rejects multiply / divide', () => {
-    const s = simulate(F, '*', '1', '2');
-    if (!s.ok) throw new Error();
-    expect(() => buildFpFrames(F, s)).toThrow();
-  });
 });
 
 describe('frame invariants (random pairs)', () => {

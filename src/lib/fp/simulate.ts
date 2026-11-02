@@ -1,26 +1,16 @@
 import { addSub } from './add';
-import { div } from './div';
 import { type EncodeResult, encodeDecimal } from './encode';
 import type { FloatFormat } from './format';
-import { mul } from './mul';
 import type { ParseError } from './parse';
 import { decode } from './decode';
-import { type Rational, add, div as divR, mul as mulR, sub } from './rational';
+import { type Rational, add, sub } from './rational';
 import type { FpResult } from './steps';
 
-export type Op = '+' | '-' | '*' | '/';
-export const OPS: readonly Op[] = ['+', '-', '*', '/'];
+export type Op = '+' | '-';
+export const OPS: readonly Op[] = ['+', '-'];
 
 export function operate(fmt: FloatFormat, op: Op, a: bigint, b: bigint): FpResult {
-  switch (op) {
-    case '+':
-    case '-':
-      return addSub(fmt, a, b, op);
-    case '*':
-      return mul(fmt, a, b);
-    case '/':
-      return div(fmt, a, b);
-  }
+  return addSub(fmt, a, b, op);
 }
 
 export type SimulationOutcome =
@@ -56,10 +46,7 @@ export function simulate(
   const y = b.exact;
   let typed: Rational | null = null;
   if (x && y) {
-    if (op === '+') typed = add(x, y);
-    else if (op === '-') typed = sub(x, y);
-    else if (op === '*') typed = mulR(x, y);
-    else if (y.num !== 0n) typed = divR(x, y);
+    typed = op === '+' ? add(x, y) : sub(x, y);
   }
   const stored = decode(fmt, result.bits).value;
   const error = typed && stored ? sub(stored, typed) : null;

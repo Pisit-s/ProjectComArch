@@ -138,7 +138,6 @@ export function buildFpFrames(
   fmt: FloatFormat,
   sim: Extract<SimulationOutcome, { ok: true }>,
 ): FpScene {
-  if (sim.op !== '+' && sim.op !== '-') throw new RangeError('only + and - are taught');
   const op = sim.op;
   const F = fmt.fracBits;
   const FRAC = F + GRS;

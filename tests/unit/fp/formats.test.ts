@@ -22,7 +22,7 @@ const f16 = (b: bigint) => (view.setUint16(0, Number(b)), view.getFloat16(0));
 const bits16 = (x: number) => (view.setFloat16(0, x), BigInt(view.getUint16(0)));
 
 const js = (op: Op, x: number, y: number) =>
-  op === '+' ? x + y : op === '-' ? x - y : op === '*' ? x * y : x / y;
+  op === '+' ? x + y : x - y;
 
 const RUNS = 20_000;
 
