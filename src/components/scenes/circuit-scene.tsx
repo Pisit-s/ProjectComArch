@@ -39,11 +39,11 @@ export function CircuitFrame({
     // the circuit lays itself out (diagram + bit track side by side): keep it as it is when presenting
     <div
       data-present-keep
-      className="grid items-start gap-4 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]"
+      className="circuit-frame grid items-start gap-4 xl:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]"
     >
       <FpAdderDiagram frame={f} summary={caption(c.key, c.params)} testId={`${testId}-diagram`} />
       {/* the bit track beside the circuit only where both fit side by side */}
-      <div className="hidden min-w-0 xl:block" aria-hidden>
+      <div className="circuit-side hidden min-w-0 xl:block" aria-hidden>
         <FpFrameView scene={scene} index={index} full={false} compact testId={`${testId}-side`} />
       </div>
     </div>

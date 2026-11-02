@@ -62,7 +62,10 @@ export function FpAdderDiagram({
   }, [selected]);
 
   return (
-    <div className={cn('relative mx-auto w-full max-w-[26rem]', className)} data-testid={testId}>
+    <div
+      className={cn('adder-wrap relative mx-auto w-full max-w-[26rem]', className)}
+      data-testid={testId}
+    >
       <svg
         viewBox={`0 0 ${CIRCUIT_VIEWBOX.w} ${CIRCUIT_VIEWBOX.h}`}
         className="adder-diagram mx-auto block w-full max-w-[26rem]"
