@@ -17,6 +17,7 @@ export const UI_CH34 = {
   range: 'ช่วง',
   pin: 'ตำแหน่งในช่วง',
   tapBits: 'กดบิตเพื่อสลับ 0/1',
+  noRange: 'ค่านี้ไม่อยู่ในช่วงใด',
   double: 'double',
   float: 'float',
   bias: 'bias',

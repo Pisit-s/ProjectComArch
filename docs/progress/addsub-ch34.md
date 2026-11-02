@@ -6,7 +6,7 @@
 - [x] ฉาก 3.1 แบ่ง 32 บิต + สูตร (Must) · `LayoutScene` · input ทศนิยมหรือ `0x…` · e2e `chapter3.spec.ts`
 - [x] ฉาก 4.1 แปลงทีละขั้น (Must) · `EncodeScene` + `TimesTwo` · warning ค่าที่เก็บจริงขึ้นทันทีที่ใส่ค่า · e2e `chapter4.spec.ts`
 - [x] ฉาก 4.2 ถอดกลับ (Should) · `DecodeScene` · input hex 8 หลัก (มีหรือไม่มี 0x) · ∞ แสดงเป็น +∞
-- [ ] ฉาก 3.2 กดบิตเล่น (Should)
+- [x] ฉาก 3.2 กดบิตเล่น (Should) · `BitPlayScene` + `ExponentWindow` (เส้น log 5 ช่วง เลื่อนทีละช่วงเมื่อ exponent เปลี่ยน) · ค่า 0, subnormal, ∞, NaN ไม่มีช่วง: ขึ้น caption ของโซน exponent แทน
 - [ ] ฉาก 3.3 ค่าพิเศษ (Should)
 - [ ] แถบเทียบ double (Could)
 

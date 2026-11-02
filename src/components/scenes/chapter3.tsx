@@ -2,15 +2,16 @@
 
 import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useState } from 'react';
-import { BINARY32 } from '@/lib/fp';
-import { parseBitsInput } from '@/lib/lesson/ch3-special';
+import { BINARY32, encodeBits } from '@/lib/fp';
+import { buildSpecialView, parseBitsInput } from '@/lib/lesson/ch3-special';
+import { exponentWindow } from '@/lib/lesson/window';
 import {
   buildLayoutFrames,
   type LayoutFrame,
   type LayoutScene as Model,
 } from '@/lib/lesson/encode-frames';
 import { caption } from '@/content/lesson/captions';
-import { LAYOUT_DEFAULT, LAYOUT_EXAMPLES } from '@/content/lesson/examples';
+import { BITPLAY_EXAMPLES, LAYOUT_DEFAULT, LAYOUT_EXAMPLES } from '@/content/lesson/examples';
 import { sectionById } from '@/content/lesson/sections';
 import { UI_CH34 } from '@/content/lesson/ui-ch34';
 import { ScenePlaceholder } from '@/components/lesson/scene-shell';
@@ -20,7 +21,9 @@ import { usePlayerMotion } from '@/components/player/player-speed';
 import { ExampleChips } from '@/components/stage/ch34-chips';
 import { Piece, Times } from '@/components/stage/ch34-formula';
 import { Word32, type WordField } from '@/components/stage/ch34-word';
-import { minus } from '@/components/ui/num';
+import { ExponentWindow } from '@/components/stage/exponent-window';
+import { Register32 } from '@/components/stage/register32';
+import { Num, minus } from '@/components/ui/num';
 
 const sceneTitle = (id: string): string =>
   sectionById('ieee754').scenes.find((s) => s.id === id)?.title ?? id;
@@ -191,8 +194,58 @@ export function LayoutScene() {
   );
 }
 
+/** Scene 3.2: tap bits; the exponent picks a range [2^e, 2^(e+1)), the significand a spot in it. */
 export function BitPlayScene() {
-  return <ScenePlaceholder minHeight="24rem" />;
+  const [bits, setBits] = useState(() => encodeBits(BINARY32, BITPLAY_EXAMPLES[4]) ?? 0n);
+  const win = useMemo(() => exponentWindow(BINARY32, bits), [bits]);
+  const view = useMemo(() => buildSpecialView(BINARY32, bits), [bits]);
+  const live = win
+    ? caption('bitplay.live', { lo: win.lo, hi: win.hi })
+    : caption(view.zone === 'zone0' ? 'special.zone0' : 'special.zone255');
+  // flip one bit of the word (index 0 = bit 31); every value shown is decoded by the engine
+  const toggle = (i: number) => setBits((b) => b ^ (1n << BigInt(31 - i)));
+  return (
+    <div className="space-y-3" data-testid="bitplay">
+      <ExampleChips
+        items={BITPLAY_EXAMPLES}
+        current={view.value}
+        onPick={(t) => setBits(encodeBits(BINARY32, t) ?? 0n)}
+        testId="bitplay"
+      />
+      <div className="glass-solid space-y-4 rounded-2xl p-3 ring-1 ring-foreground/10 sm:p-5">
+        <p className="flex flex-wrap items-baseline justify-between gap-2">
+          <span className="text-sm text-muted">{UI_CH34.tapBits}</span>
+          <span className="num font-mono">
+            <span className="text-sm text-muted" data-testid="bitplay-hex">
+              {view.hex}
+            </span>{' '}
+            ={' '}
+            <b className="text-xl text-primary" data-testid="bitplay-value">
+              <Num value={view.value} />
+            </b>
+          </span>
+        </p>
+        {win ? (
+          <ExponentWindow win={win} testId="bitplay-window" />
+        ) : (
+          <div className="grid h-16 place-items-center rounded-xl bg-white/70 text-sm text-muted ring-1 ring-line">
+            {UI_CH34.noRange}
+          </div>
+        )}
+        <p className="min-h-12 text-base" aria-live="polite" data-testid="bitplay-caption">
+          {live}
+        </p>
+        <Register32
+          bits={bits}
+          mode="edit"
+          onToggle={toggle}
+          showHex={false}
+          name="bitplay-reg"
+          className="bg-white/60"
+        />
+      </div>
+    </div>
+  );
 }
 
 export function SpecialScene() {
