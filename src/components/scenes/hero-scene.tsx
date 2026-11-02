@@ -57,10 +57,11 @@ function TeaserStage({ rows, index }: { rows: HeroRow[]; index: number }) {
           <span className="w-4 shrink-0 text-center font-mono text-xl text-muted">
             {k === 1 ? '+' : k === 2 ? '=' : ''}
           </span>
+          {/* flip by rotation only: no half-faded text, and the first step shows at once */}
           <motion.div
             key={asBits(k) ? 'bits' : 'dec'}
-            initial={{ rotateX: -90, opacity: 0 }}
-            animate={{ rotateX: 0, opacity: 1 }}
+            initial={index === 0 ? false : { rotateX: -90 }}
+            animate={{ rotateX: 0 }}
             transition={{ duration: 0.45, delay: asBits(k) ? 0.12 * k : 0 }}
             className="flex min-w-0 flex-1 items-center"
           >
