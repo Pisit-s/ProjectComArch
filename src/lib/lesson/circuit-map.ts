@@ -1,4 +1,5 @@
 import type { FpFrame } from './fp-frames';
+import type { CaptionKey, Params } from './keys';
 
 /**
  * Chapter 6: which boxes and wires of the floating-point adder are active in each frame of the
@@ -124,5 +125,43 @@ export function circuitState(frame: FpFrame): CircuitState {
       };
     case 'special':
       return { active: ['control', 'regR'], wires: ['incdec-out'], labels: {} };
+  }
+}
+
+/** Caption of a frame when it is shown on the circuit (Chapter 6 uses its own wording). */
+export function hwCaption(frame: FpFrame): { key: CaptionKey; params: Params } {
+  const p = frame.params;
+  switch (frame.stage) {
+    case 'unpack':
+      return { key: 'hw.unpack', params: {} };
+    case 'negate':
+      return { key: 'hw.negate', params: {} };
+    case 'swap':
+      return { key: 'hw.swap', params: {} };
+    case 'compare':
+      return { key: 'hw.compare', params: { EA: p.EA, EB: p.EB, diff: p.d } };
+    case 'align':
+    case 'alignFast':
+      return { key: 'hw.align', params: { d: p.d } };
+    case 'add':
+      return { key: 'hw.add', params: {} };
+    case 'sub':
+      return { key: 'hw.sub', params: {} };
+    case 'normalize': {
+      const n = frame.normalize!;
+      return { key: 'hw.normalize', params: { dir: n.direction, k: String(n.amount) } };
+    }
+    case 'overflow':
+      return { key: 'fp.overflow', params: {} };
+    case 'underflow':
+      return { key: 'fp.underflow', params: {} };
+    case 'round':
+      return { key: 'hw.round', params: { grs: `${p.g}${p.r}${p.s}`, decision: frame.decision ?? 'exact' } };
+    case 'roundCarry':
+      return { key: 'fp.roundCarry', params: {} };
+    case 'pack':
+      return { key: 'hw.pack', params: { hex: p.hex } };
+    case 'special':
+      return { key: 'fp.special', params: { rule: p.rule } };
   }
 }
