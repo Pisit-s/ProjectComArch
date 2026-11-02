@@ -140,3 +140,21 @@ describe('special zones (3.3)', () => {
     expect(doubleCompare()).toMatchObject({ e64: '11', f64: '52', b64: '1023', b32: '127' });
   });
 });
+
+describe('scene 3.1: the format only', () => {
+  it('reveals sign, exponent, significand, hidden bit, then the formula', async () => {
+    const { buildFormatFrames } = await import('@/lib/lesson/format-frames');
+    const { BINARY32: F } = await import('@/lib/fp');
+    const s = buildFormatFrames(F);
+    expect(s.frames.map((f) => f.id)).toEqual(['bits', 'sign', 'exp', 'sig', 'hidden', 'formula']);
+    expect(s.bias).toBe(127);
+    // normal exponents −126..127 are stored as 1..254 (0 and 255 are the special values of 3.5)
+    expect(s.ruler).toEqual([
+      { real: -126, stored: 1 },
+      { real: 0, stored: 127 },
+      { real: 2, stored: 129 },
+      { real: 127, stored: 254 },
+    ]);
+    expect(s.frames.filter((f) => f.ruler).map((f) => f.id)).toEqual(['exp']);
+  });
+});

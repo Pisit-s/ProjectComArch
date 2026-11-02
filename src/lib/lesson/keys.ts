@@ -37,6 +37,7 @@ export const CAPTION_KEYS = [
   'layout.sign',
   'layout.exp',
   'layout.sig',
+  'layout.hidden',
   'layout.formula',
   'layout.plugSign',
   'layout.plugExp',

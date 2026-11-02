@@ -61,14 +61,15 @@ export const SECTIONS: SectionDef[] = [
     number: 3,
     title: 'IEEE 754: เก็บและแปลงเลข',
     short: 'IEEE 754',
-    hook: 'float 32 บิตแบ่ง 3 ส่วน อ่านความหมายก่อน แล้วแปลงเลขทศนิยมใส่ลงไปเอง',
+    hook: 'รู้จัก 32 บิตของ float ก่อน แล้วแปลงเลขทศนิยมเข้าไป และถอดกลับออกมา',
     vocab: ['sign', 'exponent', 'significand', 'hiddenBit', 'normalize', 'timesTwo'],
-    // read the format first, then write a number into it, then play, then the exceptions
+    // the format first, then write a number into it, read it back, play, then the exceptions
     scenes: [
-      { id: 'layout', title: '3.1 อ่าน 32 บิต' },
+      { id: 'layout', title: '3.1 รู้จัก 32 บิต' },
       { id: 'encode', title: '3.2 แปลงทศนิยมเป็น 32 บิต' },
-      { id: 'bit-play', title: '3.3 กดบิตเล่น' },
-      { id: 'special', title: '3.4 ค่าพิเศษ' },
+      { id: 'decode', title: '3.3 ถอดกลับ' },
+      { id: 'bit-play', title: '3.4 กดบิตเล่น' },
+      { id: 'special', title: '3.5 ค่าพิเศษ' },
     ],
     source: 'สไลด์ w03c_mult หน้า 14–20 · P&H 3.5',
   },

@@ -16,7 +16,24 @@ import {
   width,
 } from '@/lib/fp';
 import type { CaptionKey, Params } from './keys';
-import { sigText } from './fp-frames';
+import { displayValue, sigText } from './fp-frames';
+
+/** "1.10011…" : a binary significand cut to at most `max` characters for a caption. */
+const short = (s: string, max = 8): string => (s.length > max ? `${s.slice(0, max - 1)}…` : s);
+
+/** 1.101 with the point moved by e (e = 2 → 110.1), or null when it would be long. */
+function shiftPoint(sig: string, e: number): string | null {
+  const digits = sig.replace('.', '');
+  if (Math.abs(e) > 6 || digits.length > 10) return null;
+  const at = 1 + e;
+  const s =
+    at <= 0
+      ? `0.${'0'.repeat(-at)}${digits}`
+      : at >= digits.length
+        ? digits + '0'.repeat(at - digits.length)
+        : `${digits.slice(0, at)}.${digits.slice(at)}`;
+  return s.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+}
 
 /** Frames of Chapter 4 (convert / decode) and the layout scene 3.1, from engine steps. */
 
@@ -272,7 +289,12 @@ export function buildEncodeFrames(fmt: FloatFormat, r: EncodeResult): EncodeScen
     id: 'normalize',
     stage: 'normalize',
     captionKey: 'enc.normalize',
-    params: { dir: pt.direction, k: String(pt.amount), e: String(pt.eUsed) },
+    params: {
+      dir: pt.direction,
+      k: String(pt.amount),
+      e: String(pt.eUsed),
+      norm: short(sigText(pt.normalized, pt.fracBits), 10),
+    },
     register: empty,
     rows: [],
   });
@@ -366,7 +388,7 @@ export function buildDecodeFrames(fmt: FloatFormat, bits: bigint): DecodeScene {
   const f = splitFields(fmt, bits);
   const value = exactDecimal(fmt, bits);
   const frames: DecodeFrame[] = [
-    { id: 'fields', captionKey: 'dec.fields', params: {}, focus: 'fields' },
+    { id: 'fields', captionKey: 'dec.fields', params: { s: f.sign }, focus: 'fields' },
   ];
   const exp = d.steps.find((s) => s.kind === 'exponent') as StepOf<'exponent'> | undefined;
   const sig = d.steps.find((s) => s.kind === 'significand') as StepOf<'significand'> | undefined;
@@ -380,11 +402,30 @@ export function buildDecodeFrames(fmt: FloatFormat, bits: bigint): DecodeScene {
     frames.push({
       id: 'sig',
       captionKey: 'dec.sig',
-      params: { sig: sigText(sig.significand, fmt.fracBits) },
+      // subnormals have no hidden 1: 0.significand
+      params: { sig: sigText(sig.significand, fmt.fracBits), lead: String(sig.hidden) },
       focus: 'sig',
     });
   }
-  frames.push({ id: 'value', captionKey: 'dec.value', params: { value }, focus: 'value' });
+  // value = ±1.significand × 2^e: the point moves e places (shown when it stays short)
+  const sigBin = sig ? sigText(sig.significand, fmt.fracBits) : null;
+  const e = exp ? exp.result : null;
+  frames.push({
+    id: 'value',
+    captionKey: 'dec.value',
+    params:
+      sigBin !== null && e !== null
+        ? {
+            // caption only: the exact value of a tiny number has dozens of digits
+            value: value.length > 30 ? `${value.slice(0, 28)}…` : value,
+            sign: f.sign === '1' ? '−' : '+',
+            sig: short(sigBin),
+            e: String(e),
+            shifted: shiftPoint(sigBin, e) ?? '',
+          }
+        : { value: displayValue(fmt, bits) },
+    focus: 'value',
+  });
   return {
     bits,
     hex: toHex(bits, width(fmt)),
