@@ -159,7 +159,7 @@ export function buildFpFrames(
     shifted: 0,
     sticky: 0,
   });
-  let A = row('A', decA.fields.sign, decA.significand, decA.exponent);
+  const A = row('A', decA.fields.sign, decA.significand, decA.exponent);
   let B = row('B', decB.fields.sign, decB.significand, decB.exponent);
 
   const frames: FpFrame[] = [];
