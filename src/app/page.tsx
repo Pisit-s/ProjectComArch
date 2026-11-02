@@ -1,3 +1,4 @@
+import { HashAnchor } from '@/components/layout/hash-anchor';
 import { Hero } from '@/components/lesson/hero';
 import { LessonSection } from '@/components/lesson/lesson-section';
 import { PlaygroundSection } from '@/components/lesson/playground-section';
@@ -14,6 +15,7 @@ export default function HomePage() {
       ))}
       <PlaygroundSection />
       <SummarySection />
+      <HashAnchor />
     </>
   );
 }
