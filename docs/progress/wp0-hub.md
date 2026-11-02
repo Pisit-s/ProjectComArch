@@ -56,7 +56,22 @@
 - (WP-0 แก้ได้ทุกไฟล์)
 
 ## Review
-- รอบ 1 / 2 / 3: ยังไม่เริ่ม
+- รอบ 1 ใช้งานจริง (WebKit 390px แบบนักศึกษา + desktop 1920 แบบคนนำเสนอ):
+  - เจอ: ลิงก์ที่มี `#anchor` ในหัวข้อ Floating-Point (เช่น `/floating-point/mul-div#simulator` ที่ปุ่มลัดใช้) เปิดแล้วเด้งกลับบนสุดบน iPhone เพราะ `FpSubnav` ใช้ `scrollIntoView` จัดปุ่มบทให้อยู่กลาง ซึ่ง WebKit เลื่อนทั้งหน้าด้วย → แก้ให้เลื่อนเฉพาะแถบแนวนอน (`c9077c2`) · test โหมดนำเสนอบน iphone13 ที่ล้มราวครึ่งหนึ่งผ่าน 12/12 หลังแก้ · เพิ่ม e2e `chapter pills keep the page at a #anchor` (ผ่าน แต่บั๊กนี้ขึ้นกับจังหวะ hydration จึงไม่ใช่ test ที่จับได้ทุกครั้ง)
+  - เจอ: drawer มือถือโปร่งจนเนื้อหาข้างหลังทะลุ → พื้นขาวทึบ
+  - เจอ: "เร็ว ๆ นี้" บนหน้า "กำลังพัฒนา" ตัดบรรทัดจน "ๆ นี้" ตกบรรทัด → ห่อไม่ให้ตัด
+  - หน้าแรกบน 390×844 เห็นการ์ดหัวข้อแรกโดยไม่ต้องเลื่อน · ทุกการ์ดกดได้ · ปุ่มกลับหน้าแรกใช้ได้ · เมนู desktop ใช้คีย์บอร์ด Tab ได้ (เป็น link ทั้งหมด)
+- รอบ 2 ความสวยและ interface (screenshot `test-results/shots/`: `hub-390-fold.png`, `hub-390-webkit.png`, `hub-1440.png`, `multiply-390-webkit.png`, `mips-1440.png`, `mips-390-webkit.png`, `fp-390-webkit.png`, `fp-ch3-390.png`, `fp-ch3-1920.png`, `drawer-390.png`, `kit-390.png`, `kit-1440.png`, `kit-hw-390.png`):
+  - เจอ: pill บน hero ถูกตัดด้วย "..." บนมือถือ → ให้ขึ้นบรรทัดใหม่ได้
+  - เจอ: ไอคอน Floating-Point (3 แถบ) บนปุ่มเมนูที่ active สีน้ำเงิน แถบน้ำเงินกลืนกับพื้น → ใส่พื้นขาวรองไอคอนเฉพาะตอน active
+  - เจอ: ภาพ SVG ฮาร์ดแวร์บนมือถือเล็กจนอ่านไม่ออก → `HwDiagram` มี `minWidth` ให้เลื่อนแนวนอน
+  - เจอ: `BlurFade` ยัง fade อยู่แม้ตั้ง reduced motion (MotionConfig "user" ปิดแค่ transform) → ไม่ทำ animation เมื่อ reduced motion
+  - ธีม Liquid Glass เดิม · สีบิตและ token ใหม่ผ่าน contrast 4.5:1 · ตัวอักษรไทยไม่โดนตัด · ไม่มี emoji
+- รอบ 3 ความถูกต้อง:
+  - unit 185 tests ผ่าน · build ผ่าน ทุก route static (○) · e2e 3 อุปกรณ์ (ผลล่าสุดดูหัวข้อ "ผลทดสอบ")
+  - grep `0x` และสตริงบิตยาวในไฟล์ที่เปลี่ยน: ไม่มีเลขที่พิมพ์เองในเนื้อหาใหม่ (ที่เจอเป็น input เดิมของระยะที่ 1 และค่าตัวอย่างใน `/dev/kit` ที่ประกอบจาก field ด้วยโค้ด)
+  - ไม่มีคำว่า "Binary Lab" ใน UI, metadata, README (เหลือเฉพาะเอกสารประวัติระยะที่ 1 และ `docs/plans/stage1-floating-point.md`)
+  - เจอ: axe ใน e2e วัด contrast ตอนการ์ดหน้าแรกยัง fade อยู่ (WebKit) → test รอให้ opacity เป็น 1 ก่อนวัด
 
 ## บันทึกการตัดสินใจ / ต่างจากแผน
 - ขั้นที่ 1: ไฟล์แผนถูก commit บน `main` แล้ว (6d87a64 "ระยะที่ 2 comkrub") ก่อนสร้าง branch จึงไม่มี commit `docs: stage 2 plan for comkrub` แยกบน branch นี้

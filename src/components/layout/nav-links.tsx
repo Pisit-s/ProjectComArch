@@ -31,10 +31,18 @@ export function NavLinks() {
                   : 'text-ink/75 hover:bg-ice-100 hover:text-ink',
               )}
             >
-              <TopicIcon
-                name={t.icon}
-                className={cn('h-4 w-4', active ? 'text-white' : 'text-primary')}
-              />
+              {/* the three-bar mark has its own colours: give it a white chip on the blue pill */}
+              <span
+                className={cn(
+                  'grid place-items-center rounded',
+                  active && t.icon === 'floating-point' && 'bg-white p-0.5',
+                )}
+              >
+                <TopicIcon
+                  name={t.icon}
+                  className={cn('h-4 w-4', active ? 'text-white' : 'text-primary')}
+                />
+              </span>
               {t.short}
               {soon && (
                 <span

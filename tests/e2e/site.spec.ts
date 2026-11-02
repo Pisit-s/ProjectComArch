@@ -48,14 +48,11 @@ for (const path of PAGES) {
     const errors: string[] = [];
     page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
     page.on('pageerror', (e) => errors.push(e.message));
+    // measure the settled page: entrance fades are off with reduced motion (a half-faded card
+    // fails contrast)
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(path);
     await page.waitForLoadState('networkidle');
-    // entrance fades change contrast while they run; measure the settled page
-    await page.waitForFunction(() =>
-      document
-        .getAnimations()
-        .every((a) => a.playState !== 'running' || a.effect?.getTiming().iterations === Infinity),
-    );
     const result = await new AxeBuilder({ page }).analyze();
     const bad = result.violations
       .filter((v) => v.impact === 'serious' || v.impact === 'critical')
