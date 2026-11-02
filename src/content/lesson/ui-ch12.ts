@@ -33,6 +33,6 @@ export const UI_CH12 = {
   output: 'output',
   notNormalized: 'ยังไม่ normalized',
   normalized: 'normalized',
-  toChapter5: 'ดูในบทที่ 5',
+  toChapter5: 'ดูในบทที่ 4',
   code: 'โค้ด C',
 } as const;

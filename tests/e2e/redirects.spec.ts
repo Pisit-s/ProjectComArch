@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test';
 const ROWS: [string, string][] = [
   ['/learn', '/'],
   ['/learn/number-systems', '/#binary'],
-  ['/learn/binary-fractions', '/#convert'],
+  ['/learn/binary-fractions', '/#encode'],
   ['/learn/ieee-754', '/#ieee754'],
   ['/learn/add-sub', '/#fp-add'],
   ['/learn/mul-div', '/'],

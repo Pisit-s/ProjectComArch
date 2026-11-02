@@ -4,11 +4,10 @@
 
 1. บวกและลบเลขฐานสอง (ทบทวนจาก Digital: full adder, two's complement, overflow, shift)
 2. เลขทศนิยมในโปรแกรม (`int` กับ `float` ในภาษา C, scientific notation)
-3. มาตรฐาน IEEE 754 (sign, exponent, significand, ค่าพิเศษ)
-4. แปลงเลขทศนิยมเป็น IEEE 754 และถอดกลับ
-5. บวกและลบเลข Floating-Point (align → บวก/ลบ → normalize → ปัด G R S)
-6. วงจรบวก/ลบ Floating-Point (Small ALU, MUX, Shifter, Big ALU, Normalize, Round)
-7. ลองเอง (ใส่เลขเอง ดูแบบบิตหรือแบบวงจร แชร์ลิงก์ได้) และสรุป
+3. IEEE 754: เก็บและแปลงเลข (อ่าน 32 บิต → แปลงทศนิยมเป็น 32 บิต → กดบิตเล่น → ค่าพิเศษ)
+4. บวกและลบเลข Floating-Point (align → บวก/ลบ → normalize → ปัด G R S)
+5. วงจรบวก/ลบ Floating-Point (Small ALU, Control, MUX, Shifter, Big ALU, Normalize, Round)
+6. ลองเอง (ใส่เลขเอง ดูแบบบิตหรือแบบวงจร แชร์ลิงก์ได้) และสรุป
 
 - ทุกกระบวนการหลายขั้นใช้ StepPlayer (ย้อน/ถัดไป/เล่น/ความเร็ว/กดกระโดดขั้น/คีย์บอร์ด/โหมดนำเสนอ/reduced motion)
 - ตัวเลขทุกตัวบนหน้าเว็บมาจาก engine ที่ใช้ BigInt ผลตรง IEEE 754 binary32 (round to nearest, ties to even) ทุกบิต

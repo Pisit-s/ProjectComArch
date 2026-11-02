@@ -93,8 +93,9 @@ export const POINT_EXAMPLES: { text: string; exp: number }[] = [
 ];
 
 /** Scene 3.1-3.2 chips. */
-export const LAYOUT_DEFAULT = '6.5';
-export const LAYOUT_EXAMPLES = ['6.5', '3.75', '-0.75', '0xC0A00000'];
+/** Scene 3.1 reads bits (hex) before conversion is taught: 6.5, 3.75, −0.75 and P&H's −5. */
+export const LAYOUT_EXAMPLES = ['40D00000', '40700000', 'BF400000', 'C0A00000'];
+export const LAYOUT_DEFAULT = LAYOUT_EXAMPLES[0];
 export const BITPLAY_EXAMPLES = ['1', '1.5', '2', '3', '6.5', '0.75'];
 
 /** Scene 3.3: bit patterns of slide w03c_mult pages 16-17 (hex inputs; values come from the engine). */
