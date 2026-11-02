@@ -127,7 +127,11 @@ function StepPlayerInner({
     const t = e.target as HTMLElement;
     const tag = t.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || t.isContentEditable) return;
-    if (e.key === 'ArrowRight') {
+    // Esc leaves presentation mode even where fullscreen is not available (iOS Safari)
+    if (e.key === 'Escape' && presenting) {
+      e.preventDefault();
+      setPresenting(false);
+    } else if (e.key === 'ArrowRight') {
       e.preventDefault();
       next();
     } else if (e.key === 'ArrowLeft') {

@@ -25,7 +25,7 @@ export function StepBar({ active }: { active: number }) {
               on
                 ? 'bg-primary text-white ring-primary'
                 : done
-                  ? 'bg-primary/10 text-primary ring-primary/25'
+                  ? 'bg-primary/10 text-secondary ring-primary/25'
                   : 'bg-white/70 text-muted ring-line',
             )}
           >

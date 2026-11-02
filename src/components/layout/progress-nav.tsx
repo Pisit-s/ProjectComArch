@@ -21,7 +21,7 @@ export function ProgressNav() {
                 'flex items-center gap-1.5 rounded-full px-2.5 py-2 text-sm font-medium transition-colors',
                 on
                   ? 'bg-primary text-primary-content'
-                  : 'text-ink/75 hover:bg-ice-100 hover:text-ink',
+                  : 'text-ink/85 hover:bg-ice-100 hover:text-ink',
               )}
             >
               <span className={cn('num font-mono text-xs', on ? 'text-white/85' : 'text-muted')}>
