@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { type BlockId, circuitState } from '@/lib/lesson/circuit-map';
 import type { FpFrame } from '@/lib/lesson/fp-frames';
 import { BLOCKS, CIRCUIT_VIEWBOX, WIRES } from '@/content/lesson/circuit';
+import { UI } from '@/content/lesson/copy';
 import { VOCAB } from '@/content/lesson/vocab';
 import { cn } from '@/lib/utils';
 import { HwAlu, HwBox, HwMux, HwRegister, HwWire } from './primitives';
@@ -31,6 +32,13 @@ export function FpAdderDiagram({
   const active = new Set(st.active);
   const lit = new Set(st.wires);
   const sel = BLOCKS.find((b) => b.id === selected);
+  // values on the lit wires that enter / leave the tapped block in this frame
+  const io = (side: 'to' | 'from') =>
+    WIRES.filter((w) => w[side] === selected && lit.has(w.id) && st.labels[w.id])
+      .map((w) => st.labels[w.id])
+      .join(', ');
+  const inputs = io('to');
+  const outputs = io('from');
   return (
     <div className={cn('space-y-2', className)} data-testid={testId}>
       <svg
@@ -73,14 +81,32 @@ export function FpAdderDiagram({
           );
         })}
       </svg>
-      {sel?.vocab && (
-        <p
-          className="rounded-lg bg-ice-100 p-2.5 text-sm leading-relaxed"
+      {sel && (sel.vocab || inputs || outputs) && (
+        <div
+          className="space-y-1 rounded-lg bg-ice-100 p-2.5 text-sm leading-relaxed"
           role="status"
           data-testid={`${testId}-info`}
         >
-          <b className="font-semibold">{VOCAB[sel.vocab].term}</b> {VOCAB[sel.vocab].meaning}
-        </p>
+          {sel.vocab && (
+            <p>
+              <b className="font-semibold">{VOCAB[sel.vocab].term}</b> {VOCAB[sel.vocab].meaning}
+            </p>
+          )}
+          {(inputs || outputs) && (
+            <p className="num font-mono" data-testid={`${testId}-io`}>
+              {inputs && (
+                <span className="mr-3">
+                  <span className="font-sans text-muted">{UI.wireIn}</span> {inputs}
+                </span>
+              )}
+              {outputs && (
+                <span>
+                  <span className="font-sans text-muted">{UI.wireOut}</span> {outputs}
+                </span>
+              )}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

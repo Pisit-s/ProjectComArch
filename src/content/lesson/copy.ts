@@ -40,16 +40,36 @@ export const OTHER: Partial<Record<SectionId, string[]>> = {
   'fp-add': [BRIDGE.dec4],
 };
 
-export const SUMMARY: { text: string; back: SectionId }[] = [
-  { text: 'ลบ = บวกค่าติดลบ ใช้วงจรบวกตัวเดิมได้ทั้งจำนวนเต็มและ floating-point', back: 'binary' },
+/** Icon names are mapped to lucide icons in summary-section.tsx. */
+export type SummaryIcon = 'minus' | 'fields' | 'steps' | 'shift' | 'round' | 'circuit';
+
+export const SUMMARY: { text: string; back: SectionId; icon: SummaryIcon }[] = [
+  {
+    text: 'ลบ = บวกค่าติดลบ ใช้วงจรบวกตัวเดิมได้ทั้งจำนวนเต็มและ floating-point',
+    back: 'binary',
+    icon: 'minus',
+  },
   {
     text: 'float เก็บ 3 ส่วน: sign 1 บิต, exponent 8 บิต (bias 127), significand 23 บิต',
     back: 'ieee754',
+    icon: 'fields',
   },
-  { text: 'บวก/ลบ 4 ขั้น: align → บวก/ลบ significand → normalize → ปัดเศษ', back: 'fp-add' },
-  { text: 'เลื่อนขวา 1 ตำแหน่งต้องเพิ่ม exponent 1 ค่าเลยเท่าเดิม', back: 'fp-add' },
-  { text: 'G, R, S ทำให้ปัดได้ถูก แต่ผลก็ยังอาจไม่ตรงค่าจริง เช่น 0.1 + 0.2', back: 'fp-add' },
-  { text: 'ในวงจร: Small ALU → MUX + Shifter → Big ALU → Normalize → Round', back: 'circuit' },
+  {
+    text: 'บวก/ลบ 4 ขั้น: align → บวก/ลบ significand → normalize → ปัดเศษ',
+    back: 'fp-add',
+    icon: 'steps',
+  },
+  { text: 'เลื่อนขวา 1 ตำแหน่งต้องเพิ่ม exponent 1 ค่าเลยเท่าเดิม', back: 'fp-add', icon: 'shift' },
+  {
+    text: 'G, R, S ทำให้ปัดได้ถูก แต่ผลก็ยังอาจไม่ตรงค่าจริง เช่น 0.1 + 0.2',
+    back: 'fp-add',
+    icon: 'round',
+  },
+  {
+    text: 'ในวงจร: Small ALU → MUX + Shifter → Big ALU → Normalize → Round',
+    back: 'circuit',
+    icon: 'circuit',
+  },
 ];
 
 export const FOOTER = {
@@ -113,6 +133,8 @@ export const UI = {
   diff: 'ต่างกัน',
   result: 'ผลลัพธ์',
   roundDown: 'ปัดลง',
+  wireIn: 'เข้า',
+  wireOut: 'ออก',
   roundUp: 'ปัดขึ้น',
   exactValue: 'ผลจริง',
 } as const;
