@@ -11,7 +11,7 @@ export function Hero() {
   return (
     <section id="top" className="scroll-mt-20 px-4 pt-8 pb-6 sm:pt-14" data-testid="section-top">
       <div className="mx-auto grid max-w-[960px] gap-8 lg:grid-cols-[1fr_1fr] lg:items-center">
-        <div className="tb-rise space-y-4">
+        <div className="space-y-4">
           <GlassPill>
             <AnimatedShinyText className="mx-0">{HERO.pill}</AnimatedShinyText>
           </GlassPill>
