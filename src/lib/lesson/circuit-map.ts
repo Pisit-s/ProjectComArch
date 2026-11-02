@@ -26,13 +26,20 @@ export type BlockId = (typeof BLOCK_IDS)[number];
 export const WIRE_IDS = [
   'a-exp',
   'b-exp',
-  'a-sig',
-  'b-sig',
+  'a-exp-mux',
+  'b-exp-mux',
+  'a-sign',
   'b-sign',
   'alu-ctl',
-  'exp-mux',
-  'sig-small',
-  'sig-big',
+  'a-sig',
+  'a-sig-big',
+  'b-sig',
+  'b-sig-small',
+  'ctl-mux-exp',
+  'ctl-mux-small',
+  'ctl-mux-big',
+  'ctl-shift',
+  'ctl-alu',
   'mux-shift',
   'shift-alu',
   'big-alu',
@@ -57,7 +64,7 @@ export function circuitState(frame: FpFrame): CircuitState {
     case 'unpack':
       return {
         active: ['regA', 'regB'],
-        wires: ['a-exp', 'b-exp', 'a-sig', 'b-sig'],
+        wires: ['a-exp', 'b-exp', 'a-sig', 'b-sig', 'a-sign', 'b-sign'],
         labels: { 'a-exp': p.EA, 'b-exp': p.EB, 'a-sig': p.sigA, 'b-sig': p.sigB },
       };
     case 'negate':
@@ -65,7 +72,7 @@ export function circuitState(frame: FpFrame): CircuitState {
     case 'swap':
       return {
         active: ['control', 'muxSmall', 'muxBig'],
-        wires: ['sig-small', 'sig-big'],
+        wires: ['ctl-mux-small', 'ctl-mux-big', 'a-sig', 'a-sig-big', 'b-sig', 'b-sig-small'],
         labels: {},
       };
     case 'compare':
@@ -78,17 +85,30 @@ export function circuitState(frame: FpFrame): CircuitState {
     case 'alignFast': {
       const moved = frame.rows[1]?.shifted ?? 0;
       return {
-        active: ['muxExp', 'muxSmall', 'muxBig', 'shift'],
-        wires: ['exp-mux', 'sig-small', 'sig-big', 'mux-shift', 'shift-alu'],
-        labels: { 'shift-alu': `>> ${moved}` },
+        // Control picks the larger exponent and both significands, and sets the shift amount
+        active: ['control', 'muxExp', 'muxSmall', 'muxBig', 'shift'],
+        wires: [
+          'a-exp-mux',
+          'b-exp-mux',
+          'a-sig',
+          'a-sig-big',
+          'b-sig',
+          'b-sig-small',
+          'ctl-mux-exp',
+          'ctl-mux-small',
+          'ctl-mux-big',
+          'ctl-shift',
+          'mux-shift',
+        ],
+        labels: { 'ctl-shift': `>> ${moved}` },
       };
     }
     case 'add':
     case 'sub':
       return {
         active: ['bigAlu'],
-        wires: ['shift-alu', 'big-alu', 'alu-norm'],
-        labels: { 'alu-norm': p.sum },
+        wires: ['shift-alu', 'big-alu', 'ctl-alu', 'alu-norm'],
+        labels: { 'alu-norm': p.sum, 'ctl-alu': frame.stage === 'add' ? '+' : '−' },
       };
     case 'normalize': {
       const n = frame.normalize!;

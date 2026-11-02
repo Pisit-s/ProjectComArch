@@ -34,10 +34,10 @@ await page.goto(base + path, { waitUntil: 'networkidle' });
 // scroll through the page so in-view animations and lazy scenes have run
 await page.evaluate(async () => {
   for (let y = 0; y < document.body.scrollHeight; y += 500) {
-    window.scrollTo(0, y);
+    window.scrollTo({ top: y, behavior: 'instant' });
     await new Promise((r) => setTimeout(r, 120));
   }
-  window.scrollTo(0, 0);
+  window.scrollTo({ top: 0, behavior: 'instant' });
 });
 await page.waitForTimeout(900);
 if (process.env.SHOT_CLICK) {

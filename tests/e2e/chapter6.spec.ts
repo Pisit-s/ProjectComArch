@@ -17,7 +17,7 @@ test.describe('chapter 6: the adder circuit', () => {
     expect(seen).toEqual([
       'regA regB',
       'smallAlu control',
-      'muxExp muxSmall muxBig shift',
+      'control muxExp muxSmall muxBig shift',
       'bigAlu',
       'normalize incdec',
       'round',
