@@ -37,13 +37,20 @@
 - [x] `circuit.ts` layout (360 × 600) + `FpAdderDiagram` + ฉาก 6.1 (ใช้ input/frames เดียวกับ `FpOpScene`, desktop มี BitTrack ข้าง ๆ)
 - [x] DoD: test layout (ทุก id มีที่วาด ไม่ทับกัน) · e2e บทที่ 6 ผ่าน 3 อุปกรณ์ (84 ผ่านทั้งชุด) · screenshot 390/1440 ดูแล้ว
 ## Phase 5 — บทที่ 3 และ 4
+- [x] ทำบน `addsub-ch34` (เพื่อนคนที่ 1) รายละเอียดใน `docs/progress/addsub-ch34.md` · ฉาก 3.1, 3.2, 3.3 + แถบเทียบ double, 4.1, 4.2
+- [x] รวมเข้า `addsub-redesign` (`1c4ea81`) ไม่มี conflict · unit 204 · e2e ทั้งชุด 140 ผ่าน 3 อุปกรณ์
 ## Phase 6 — Hero บทที่ 1 และ 2
+- [x] ทำบน `addsub-ch12` (เพื่อนคนที่ 2) รายละเอียดใน `docs/progress/addsub-ch12.md` · hero teaser, ฉาก 1.1–1.4, 2.1, 2.2
+- [x] รวมเข้า `addsub-redesign` (`5c39dea`) conflict 1 จุด (สีปุ่ม "ทำไม?" แก้เรื่องเดียวกันทั้งสองฝั่ง ใช้ navy) · unit 211 · e2e ทั้งชุด 170 ผ่าน 3 อุปกรณ์
 ## Phase 7 — ลองเอง และสรุป
 - [x] Playground: input, chip, สลับบิต/วงจร (index ขั้นเดียวกัน), การ์ดผล (เก็บจริง/พิมพ์/ต่าง/hex/flag), คัดลอกลิงก์ `?a=&b=&op=&step=#playground`
 - [x] ลิงก์ `/lab?…` เก่า → `/` แล้ว `PlaygroundLink` ใส่ `#playground` และเลื่อนไปเอง
 - [x] สรุปท้ายหน้า (มีตั้งแต่ Phase 2)
 - [x] DoD: e2e playground (ลิงก์ที่คัดลอกเปิดแล้วได้ตัวอย่างและขั้นเดิม, /lab เก่า) · ทั้งชุด 96 ผ่าน 3 อุปกรณ์ · screenshot 390/1440 ดูแล้ว
 ## Phase 8 — ขัดเกลา review 4 รอบ และ PR
+- [x] a11y (axe ไม่มี serious/critical ทั้งหน้า 3 อุปกรณ์), reduced motion (e2e), Lighthouse มือถือ 100/100/100/100 หลังรวมทุกบท, OG image, README, ENGINE, DEPLOY
+- [x] review 4 รอบ (docs/REVIEW.md) · ไล่ PLAN ทีละข้อแล้ว (หัวข้อ 1, 3.6–3.9, 4, 5, 6, 9, 11)
+- [x] PR `addsub-redesign` → `main`: https://github.com/Pisit-s/ProjectComArch/pull/2 (Pisit merge เอง)
 
 ## บันทึกการตัดสินใจ / ต่างจากแผน
 - adapter เพิ่มจากแผน: `sci-frames.ts` (ฉาก 2.1, 2.2, 5.1) และ `fun-fact.ts` (ฉาก 5.5) · `keys.ts` เป็นรายการ caption key ที่ adapter ส่งออก (test ตรวจว่ามีข้อความครบใน Phase 2)
