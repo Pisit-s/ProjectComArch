@@ -1,5 +1,5 @@
 # WP-0 หน้าแรกใหม่ + เปลี่ยนชื่อ + ปรับโครงสร้าง: ความคืบหน้า
-- branch: wp0-hub · ผู้รับผิดชอบ: Pisit (ทำต่อโดยสมาชิกกลุ่มผ่าน Claude Code) · สถานะ: กำลังทำ
+- branch: wp0-hub · ผู้รับผิดชอบ: Pisit (ทำต่อโดยสมาชิกกลุ่มผ่าน Claude Code) · สถานะ: รอ review
 
 ## งาน (ตาม PLAN.md หัวข้อ 7)
 - [x] 1. เตรียม: branch `wp0-hub` · แผน (`PLAN.md`, `docs/plans/`) ถูก commit ไว้บน `main` แล้วใน 6d87a64 จึงไม่ต้อง commit ซ้ำ · `CLAUDE.md` = ภาคผนวก B · ไฟล์ progress 4 ไฟล์ · บรรทัดประวัติระยะที่ 1 · comment อ้าง `PLAN.md` → `docs/plans/stage1-floating-point.md`
@@ -12,8 +12,8 @@
 - [x] 8. โครงร่วมสำหรับทีม: tokens 6.1 ใน `globals.css` + `FieldKind` 11 ตัว, `BitRow` (+ `bit-format.ts`), `LessonLayout` (`ChapterLayout` เรียกใช้ หน้า FP เหมือนเดิม), `TalkingPoints`, `SelfCheck`, `OpenInSim` + `mips-example-ids.ts`, `src/components/hw/` (`HwDiagram`, `HwRegister`, `HwAlu`, `HwControl`, `HwWire`), glossary แยกโฟลเดอร์ (`arith.ts` 25 คำ), หน้า `/dev/kit` · unit test `tests/unit/topics/shared.test.ts`
 - [x] 9. ลิงก์ข้ามหัวข้อ: callout ในบทที่ 5 (การคูณ Significand → `/multiply`, การหารยาว → `/divide`) ผ่าน `TopicLink` (ใช้สถานะจาก registry · ยังไม่พร้อมเป็นข้อความ "(กำลังพัฒนา)" ไม่มีลิงก์)
 - [x] 10. ทีม: `.github/workflows/ci.yml` (Node 24, `actions/checkout@v7` + `actions/setup-node@v7` ตรวจ tag ล่าสุดด้วย `git ls-remote` วันนี้), `.github/pull_request_template.md`, `docs/TEAM.md`, `docs/DEPLOY.md` หัวข้อ "ระยะที่ 2"
-- [ ] 11. ทดสอบ
-- [ ] 12. Review 3 รอบ + PR
+- [x] 11. ทดสอบ: unit 185 ผ่าน · e2e 119/119 ผ่านบน pixel7 + iphone13 + desktop · build ผ่าน ทุก route static · screenshot ครบ · Lighthouse ยังไม่ได้วัด (WP0-Q7)
+- [x] 12. Review 3 รอบ (หัวข้อ Review) · push branch แล้ว · PR: เครื่องนี้ไม่มี `gh` ต้องกดเปิดบน GitHub เอง (ดูรายงานท้าย WP)
 
 ## คำถาม
 ### WP0-Q1 [ด่วน] ลิงก์ GitHub ใน footer
@@ -52,8 +52,21 @@
 - ถ้าคำตอบต่าง ต้องแก้: `src/lib/site.ts`, `src/content/topics.ts`, `src/app/page.tsx`
 - สถานะ: รอคำตอบ
 
+### WP0-Q7 [ไม่ด่วน] Lighthouse ยังไม่ได้วัด
+- คำถาม: ขั้นที่ 11 ให้วัด Lighthouse หน้า `/` และ `/floating-point` (เป้า stage1 10.4: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90) แต่ session นี้ระบบอนุญาตไม่ให้รัน `npx -y lighthouse@latest` (ต้องดาวน์โหลดแพ็กเกจนอก lockfile)
+- ค่าที่สมมติไว้ตอนนี้: ยังไม่ได้วัด · ช่อง Lighthouse ใน PR ยังไม่ติ๊ก · ระยะที่ 1 หน้าแรกเดิมได้ 93/98/100/100
+- ถ้าคำตอบต่าง ต้องแก้: รัน `npm run build && npx next start -p 3100` แล้ว `npx lighthouse@latest http://localhost:3100/ --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --chrome-flags="--headless=new"` (และ `/floating-point`) ถ้าต่ำกว่าเป้าให้เปิดงานแก้
+- สถานะ: รอวัด
+
 ## แก้ไฟล์ร่วม
 - (WP-0 แก้ได้ทุกไฟล์)
+
+## ผลทดสอบ (2 พ.ย. 2569)
+- `npm run lint` · `npm run typecheck`: ผ่าน
+- `npm test`: 185 tests ผ่าน (เดิม 172 + registry 7 + shared 6)
+- e2e: 119/119 ผ่านบน pixel7 + iphone13 + desktop (`hub.spec.ts` ใหม่ + spec เดิมทั้งหมดที่ path ใหม่)
+- `npm run build`: ผ่าน ทุก route เป็น static (○) · `/dev/kit` build เป็น static แต่ใน production เรียก `notFound()` จึงได้หน้า 404 (e2e ตรวจแล้ว) และไม่อยู่ใน sitemap
+- Lighthouse: ยังไม่ได้วัด (WP0-Q7)
 
 ## Review
 - รอบ 1 ใช้งานจริง (WebKit 390px แบบนักศึกษา + desktop 1920 แบบคนนำเสนอ):
@@ -84,3 +97,11 @@
 - ขั้นที่ 8 `HwDiagram` มี `minWidth` ให้ภาพเลื่อนแนวนอนบนมือถือแทนการย่อจนตัวหนังสืออ่านไม่ออก · สีใน SVG อยู่ที่ `src/components/hw/colors.ts` (unit test ตรวจว่าตรงกับ `globals.css`)
 - ขั้นที่ 8 key ใน glossary ห้ามซ้ำข้ามไฟล์ (unit test ตรวจ) · คำใน `arith.ts` ที่ซ้ำความหมายกับของ FP ใช้ key ขึ้นต้น `md` เช่น `mdMultiplicand`, `mdPartialProduct`
 - Context7 MCP ไม่มีใน session นี้ (ไม่มี tool ให้เรียก) จึงอ่าน docs ใน `node_modules/next/dist/docs/` (redirects) และใช้ API ของ daisyUI/lucide ที่ใช้อยู่แล้วในโปรเจกต์ (ตรวจชื่อไอคอนในโฟลเดอร์ของ lucide-react)
+
+## รายงานท้าย WP-0
+- เสร็จ: ขั้นที่ 1–12 ตาม PLAN.md หัวข้อ 7 ทุกข้อ ยกเว้นการวัด Lighthouse (WP0-Q7) · PR ต้องกดเปิดบน GitHub เอง
+- ยังไม่ทำ: Lighthouse · การตรวจบนเว็บจริงหลัง merge (PLAN.md 12 ข้อ 1)
+- ผล test: ดูหัวข้อ "ผลทดสอบ"
+- screenshot: `test-results/shots/` (`hub-390-fold.png`, `hub-390-webkit.png`, `hub-1440.png`, `multiply-390-webkit.png`, `multiply-1440.png`, `mips-390-webkit.png`, `mips-1440.png`, `fp-390-webkit.png`, `fp-1440.png`, `fp-ch3-390.png`, `fp-ch3-1440.png`, `fp-ch3-1920.png`, `drawer-390.png`, `kit-390.png`, `kit-1440.png`, `kit-hw-390.png`) · โฟลเดอร์นี้ไม่ถูก commit
+- คำถามเรียงตามความสำคัญ: WP0-Q1 (ด่วน: ลิงก์ GitHub) · WP0-Q4, Q5, Q6 (ยืนยันค่าเริ่มต้น) · WP0-Q7, Q2, Q3 (ไม่ด่วน)
+- PR: https://github.com/Pisit-s/ProjectComArch/compare/main...wp0-hub?expand=1 (merge แบบ "Create a merge commit")
