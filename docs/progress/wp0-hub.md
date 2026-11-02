@@ -8,7 +8,7 @@
 - [x] 4. ย้าย route: `src/app/floating-point/{5 บท,lab}` (git mv), `/floating-point` = หน้าแรกเดิม, `layout.tsx` + `FpSubnav` (breadcrumb + แถบบท), redirect 308 ใน `next.config.ts` (ตรวจด้วย curl: query ติดไป), e2e ใช้ path ใหม่ (FP 15 tests ผ่านบน pixel7)
 - [x] 5. หน้าแรกใหม่: `src/app/page.tsx` + `TopicCard` (ปกติ/กว้าง + BeamRing) · มือถือ 390×844 เห็นการ์ดแรกโดยไม่ต้องเลื่อน (`test-results/shots/hub-390-fold.png`)
 - [x] 6. หน้า "กำลังพัฒนา": `ComingSoon` + `comingSoonMetadata` (noindex) + `src/app/{multiply,divide,mips}/page.tsx` (ทำก่อนขั้นที่ 5 ดูบันทึก)
-- [ ] 7. การนำทาง
+- [x] 7. การนำทาง: header (`NavLinks` หัวข้อ 4 อัน + จุดเทา/title กำลังพัฒนา + active ตาม prefix), drawer (หัวข้อ + บท FP ซ้อนใต้เมื่ออยู่ใน FP, พื้นทึบ), footer (หัวข้อจาก registry), sitemap (ready เท่านั้น) · `tests/e2e/hub.spec.ts` ใหม่ + `site.spec.ts` ปรับตามเมนูใหม่ (48 tests ผ่านบน pixel7 + desktop)
 - [ ] 8. โครงร่วมสำหรับทีม
 - [ ] 9. ลิงก์ข้ามหัวข้อ
 - [ ] 10. ทีม: CI, PR template, TEAM.md, DEPLOY.md

@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 
 const PAGES = [
   '/',
+  '/floating-point',
   '/floating-point/number-systems',
   '/floating-point/binary-fractions',
   '/floating-point/ieee-754',
@@ -10,22 +11,18 @@ const PAGES = [
   '/floating-point/mul-div',
   '/floating-point/lab',
 ];
-const CHAPTERS = PAGES.slice(1, 6);
+const CHAPTERS = PAGES.slice(2, 7);
 
 test('navigate to every chapter and the Lab from the menu', async ({ page, isMobile }) => {
-  await page.goto('/');
+  await page.goto('/floating-point');
   for (const href of [...CHAPTERS, '/floating-point/lab']) {
     if (isMobile) {
-      await page.getByRole('button', { name: 'เมนูบทเรียน' }).click();
-      await page
-        .getByRole('navigation', { name: 'บทเรียนทั้งหมด' })
-        .locator(`a[href="${href}"]`)
-        .click();
+      await page.getByRole('button', { name: 'เมนูหัวข้อ' }).click();
+      await page.getByTestId('drawer-fp-chapters').locator(`a[href="${href}"]`).click();
     } else {
       await page
-        .getByRole('navigation', { name: 'เมนูหลัก' })
+        .getByRole('navigation', { name: 'บทของ Floating-Point' })
         .locator(`a[href="${href}"]`)
-        .first()
         .click();
     }
     await expect(page).toHaveURL(new RegExp(`${href}$`));

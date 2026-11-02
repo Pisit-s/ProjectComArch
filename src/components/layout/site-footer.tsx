@@ -1,6 +1,6 @@
 import { ChartColumn, FolderGit2 } from 'lucide-react';
 import Link from 'next/link';
-import { CHAPTERS, LAB } from '@/content/chapters';
+import { TOPICS_IN_ORDER } from '@/content/topics';
 import { site } from '@/lib/site';
 import { LogoMark } from './logo';
 
@@ -15,8 +15,7 @@ export function SiteFooter() {
               <span className="font-display text-lg font-semibold">{site.name}</span>
             </div>
             <p className="mt-2 text-sm text-muted">
-              สื่อการสอนวิชา {site.course} เรื่องเลขฐานสองและ Floating-Point (IEEE 754 Single
-              Precision) · คำนวณทุกอย่างใน browser
+              เว็บไซต์เพื่อการเรียนรู้และ Simulation วิชา {site.course} · คำนวณทุกอย่างใน browser
             </p>
             <h2 className="mt-5 text-sm font-semibold">จัดทำโดย</h2>
             <ul className="mt-2 grid gap-1.5 text-sm md:grid-cols-2 md:gap-x-6">
@@ -33,20 +32,18 @@ export function SiteFooter() {
           </div>
           <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
             <div>
-              <h2 className="text-sm font-semibold">บทเรียน</h2>
+              <h2 className="text-sm font-semibold">หัวข้อ</h2>
               <ul className="mt-2 space-y-1 text-sm">
-                {CHAPTERS.map((c) => (
-                  <li key={c.slug}>
-                    <Link href={c.href} className="link text-ink/80 link-hover">
-                      {c.number}. {c.short}
+                {TOPICS_IN_ORDER.map((t) => (
+                  <li key={t.id}>
+                    <Link href={t.href} className="link text-ink/80 link-hover">
+                      {t.title}
                     </Link>
+                    {t.status !== 'ready' && (
+                      <span className="ml-1.5 text-xs text-muted">(กำลังพัฒนา)</span>
+                    )}
                   </li>
                 ))}
-                <li>
-                  <Link href={LAB.href} className="link text-ink/80 link-hover">
-                    {LAB.title}
-                  </Link>
-                </li>
               </ul>
             </div>
             <div>
@@ -72,7 +69,7 @@ export function SiteFooter() {
         </div>
         <div className="mt-6 flex flex-col gap-3 border-t border-line/70 pt-4 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>
-            {site.name} · สื่อการสอนวิชา {site.course}
+            {site.name} · เว็บไซต์เพื่อการเรียนรู้และ Simulation วิชา {site.course}
           </p>
           <p
             className="inline-flex items-center gap-2 self-start rounded-full bg-white/80 py-1.5 pr-3 pl-1.5 ring-1 ring-line sm:self-auto"
