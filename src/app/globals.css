@@ -75,6 +75,30 @@
   --color-bit-frac-ink: #1d4ed8;
   --color-bit-grs: #cc79a7;
   --color-bit-grs-ink: #963f73;
+  /* MIPS instruction fields (PLAN.md 6.1) · ink = text colour, >= 4.5:1 on white and on 14% tint */
+  --color-mips-op: #102880;
+  --color-mips-op-ink: #102880;
+  --color-mips-rs: #0072b2;
+  --color-mips-rs-ink: #00629a;
+  --color-mips-rt: #56b4e9;
+  --color-mips-rt-ink: #1f6f9f;
+  --color-mips-rd: #009e73;
+  --color-mips-rd-ink: #007553;
+  --color-mips-const: #cc79a7;
+  --color-mips-const-ink: #963f73;
+  --color-mips-funct: #e69f00;
+  --color-mips-funct-ink: #8a5a00;
+  /* register roles in multiply / divide (PLAN.md 6.1) */
+  --color-md-operand: #0072b2;
+  --color-md-operand-ink: #00629a;
+  --color-md-step: #e69f00;
+  --color-md-step-ink: #8a5a00;
+  --color-md-acc: #009e73;
+  --color-md-acc-ink: #007553;
+  --color-md-alu: #cc79a7;
+  --color-md-alu-ink: #963f73;
+  --color-md-test: #d55e00;
+  --color-md-test-ink: #a64300;
 
   --animate-shiny-text: shiny-text 8s infinite;
   @keyframes shiny-text {
@@ -429,5 +453,21 @@
   }
   section {
     break-inside: avoid-page;
+  }
+}
+
+/* Hardware diagrams (src/components/hw): an active wire shows data moving along it */
+.hw-wire-active {
+  stroke-dasharray: 7 5;
+  animation: hw-dash 0.9s linear infinite;
+}
+@keyframes hw-dash {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hw-wire-active {
+    animation: none;
   }
 }

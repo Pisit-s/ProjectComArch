@@ -9,7 +9,7 @@
 - [x] 5. หน้าแรกใหม่: `src/app/page.tsx` + `TopicCard` (ปกติ/กว้าง + BeamRing) · มือถือ 390×844 เห็นการ์ดแรกโดยไม่ต้องเลื่อน (`test-results/shots/hub-390-fold.png`)
 - [x] 6. หน้า "กำลังพัฒนา": `ComingSoon` + `comingSoonMetadata` (noindex) + `src/app/{multiply,divide,mips}/page.tsx` (ทำก่อนขั้นที่ 5 ดูบันทึก)
 - [x] 7. การนำทาง: header (`NavLinks` หัวข้อ 4 อัน + จุดเทา/title กำลังพัฒนา + active ตาม prefix), drawer (หัวข้อ + บท FP ซ้อนใต้เมื่ออยู่ใน FP, พื้นทึบ), footer (หัวข้อจาก registry), sitemap (ready เท่านั้น) · `tests/e2e/hub.spec.ts` ใหม่ + `site.spec.ts` ปรับตามเมนูใหม่ (48 tests ผ่านบน pixel7 + desktop)
-- [ ] 8. โครงร่วมสำหรับทีม
+- [x] 8. โครงร่วมสำหรับทีม: tokens 6.1 ใน `globals.css` + `FieldKind` 11 ตัว, `BitRow` (+ `bit-format.ts`), `LessonLayout` (`ChapterLayout` เรียกใช้ หน้า FP เหมือนเดิม), `TalkingPoints`, `SelfCheck`, `OpenInSim` + `mips-example-ids.ts`, `src/components/hw/` (`HwDiagram`, `HwRegister`, `HwAlu`, `HwControl`, `HwWire`), glossary แยกโฟลเดอร์ (`arith.ts` 25 คำ), หน้า `/dev/kit` · unit test `tests/unit/topics/shared.test.ts`
 - [ ] 9. ลิงก์ข้ามหัวข้อ
 - [ ] 10. ทีม: CI, PR template, TEAM.md, DEPLOY.md
 - [ ] 11. ทดสอบ
@@ -64,3 +64,8 @@
 - ขั้นที่ 2: `package-lock.json` แก้เฉพาะชื่อ (2 บรรทัด) แทน `npm install --package-lock-only` เพราะ npm 11.13 ในเครื่องนี้เติม entry ของ `@tailwindcss/oxide-wasm32-wasi` เพิ่ม 60 กว่าบรรทัดที่ไม่เกี่ยว
 - ขั้นที่ 2: รูป 3 แถบเดิมแยกเป็น `FpMark` ใน `logo.tsx` (ไอคอนหัวข้อ Floating-Point) ส่วน `LogoMark` เป็นโลโก้ชิปของเว็บ
 - ขั้นที่ 5/6: commit หน้า "กำลังพัฒนา" (ขั้นที่ 6) ก่อนหน้าแรก (ขั้นที่ 5) เพราะ `typedRoutes` ไม่ยอมให้การ์ดลิงก์ไป `/multiply`, `/divide`, `/mips` ก่อนที่ route จะมีอยู่จริง
+- ขั้นที่ 8 สี ink ที่ใช้จริง (contrast บนพื้นขาว / พื้นสี 14%): mips-op `#102880` (12.8 / 9.8), mips-rs และ md-operand `#00629a` (6.5 / 5.4), mips-rt `#1f6f9f` (5.5 / 4.9), mips-rd และ md-acc `#007553` (5.7 / 4.9), mips-const และ md-alu `#963f73` (6.5 / 5.6), mips-funct และ md-step `#8a5a00` (5.9 / 5.3), md-test `#a64300` (6.1 / 5.1)
+- ขั้นที่ 8 `BitRow.kind` รับได้ 3 แบบ: `FieldKind`, array ตามตำแหน่งบิต (index 0 = LSB) หรือ function · function ส่งจาก server component ไม่ได้ (Next.js ส่ง function ข้าม boundary ไม่ได้) ให้ใช้ array แทนถ้าหน้าเป็น server component · `formatBitValue` อยู่ใน `bit-format.ts` (ไม่ใช่ไฟล์ client) เรียกจาก server ได้
+- ขั้นที่ 8 `HwDiagram` มี `minWidth` ให้ภาพเลื่อนแนวนอนบนมือถือแทนการย่อจนตัวหนังสืออ่านไม่ออก · สีใน SVG อยู่ที่ `src/components/hw/colors.ts` (unit test ตรวจว่าตรงกับ `globals.css`)
+- ขั้นที่ 8 key ใน glossary ห้ามซ้ำข้ามไฟล์ (unit test ตรวจ) · คำใน `arith.ts` ที่ซ้ำความหมายกับของ FP ใช้ key ขึ้นต้น `md` เช่น `mdMultiplicand`, `mdPartialProduct`
+- Context7 MCP ไม่มีใน session นี้ (ไม่มี tool ให้เรียก) จึงอ่าน docs ใน `node_modules/next/dist/docs/` (redirects) และใช้ API ของ daisyUI/lucide ที่ใช้อยู่แล้วในโปรเจกต์ (ตรวจชื่อไอคอนในโฟลเดอร์ของ lucide-react)

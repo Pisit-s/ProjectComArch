@@ -31,7 +31,10 @@ export function HomeDemo() {
         ผลแม่นยำคือ 0.3 แต่ float ได้{' '}
         <Num value={shortestDecimal(BINARY32, sim.result.bits)} className="font-bold" /> (เก็บจริง{' '}
         <Num value={fmt(sim.stored)} />) ·{' '}
-        <Link href="/floating-point/add-sub" className="inline-flex link items-center gap-1 link-primary">
+        <Link
+          href="/floating-point/add-sub"
+          className="inline-flex link items-center gap-1 link-primary"
+        >
           ดูว่าทำไมในบทที่ 4 <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
       </p>
