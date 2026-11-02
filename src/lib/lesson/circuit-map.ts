@@ -16,6 +16,7 @@ export const BLOCK_IDS = [
   'muxBig',
   'shift',
   'bigAlu',
+  'negate',
   'normalize',
   'incdec',
   'round',
@@ -24,29 +25,35 @@ export const BLOCK_IDS = [
 export type BlockId = (typeof BLOCK_IDS)[number];
 
 export const WIRE_IDS = [
+  'a-sign',
+  'b-sign',
   'a-exp',
   'b-exp',
   'a-exp-mux',
   'b-exp-mux',
-  'a-sign',
-  'b-sign',
-  'alu-ctl',
   'a-sig',
   'a-sig-big',
   'b-sig',
   'b-sig-small',
+  'alu-ctl',
+  'alu-shift',
+  'alu-far',
+  'sub-in',
   'ctl-mux-exp',
   'ctl-mux-small',
   'ctl-mux-big',
-  'ctl-shift',
   'ctl-alu',
+  'big-neg',
+  'ctl-sign',
+  'exp-incdec',
   'mux-shift',
   'shift-alu',
   'big-alu',
-  'alu-norm',
-  'exp-incdec',
+  'alu-negate',
+  'negate-norm',
+  'norm-incdec',
   'norm-round',
-  'round-back',
+  'round-ovf',
   'incdec-out',
   'round-out',
 ] as const;
@@ -68,24 +75,36 @@ export function circuitState(frame: FpFrame): CircuitState {
         labels: { 'a-exp': p.EA, 'b-exp': p.EB, 'a-sig': p.sigA, 'b-sig': p.sigB },
       };
     case 'negate':
-      return { active: ['control', 'regB'], wires: ['b-sign'], labels: { 'b-sign': 'op = −' } };
+      return {
+        active: ['control'],
+        wires: ['sub-in', 'b-sign'],
+        labels: { 'sub-in': 'sub = 1' },
+      };
     case 'swap':
       return {
         active: ['control', 'muxSmall', 'muxBig'],
         wires: ['ctl-mux-small', 'ctl-mux-big', 'a-sig', 'a-sig-big', 'b-sig', 'b-sig-small'],
-        labels: {},
+        labels: { 'ctl-mux-big': 'sel = 1' },
       };
-    case 'compare':
+    case 'compare': {
+      // neg = 1 when B has the larger exponent (the Small ALU result is negative)
+      const neg = Number(p.EA) < Number(p.EB) ? 1 : 0;
       return {
         active: ['smallAlu', 'control'],
-        wires: ['a-exp', 'b-exp', 'alu-ctl'],
-        labels: { 'a-exp': p.EA, 'b-exp': p.EB, 'alu-ctl': `d = ${p.d}` },
+        wires: ['a-exp', 'b-exp', 'alu-ctl', 'alu-shift'],
+        labels: {
+          'a-exp': p.EA,
+          'b-exp': p.EB,
+          'alu-ctl': `neg = ${neg}`,
+          'alu-shift': `absD = ${p.d}`,
+        },
       };
+    }
     case 'align':
     case 'alignFast': {
       const moved = frame.rows[1]?.shifted ?? 0;
       return {
-        // Control picks the larger exponent and both significands, and sets the shift amount
+        // Control's sel picks the larger exponent and both significands; the shifter moves by absD
         active: ['control', 'muxExp', 'muxSmall', 'muxBig', 'shift'],
         wires: [
           'a-exp-mux',
@@ -97,18 +116,21 @@ export function circuitState(frame: FpFrame): CircuitState {
           'ctl-mux-exp',
           'ctl-mux-small',
           'ctl-mux-big',
-          'ctl-shift',
+          'alu-shift',
           'mux-shift',
         ],
-        labels: { 'ctl-shift': `>> ${moved}` },
+        labels: { 'alu-shift': `>> ${moved}` },
       };
     }
     case 'add':
     case 'sub':
       return {
         active: ['bigAlu'],
-        wires: ['shift-alu', 'big-alu', 'ctl-alu', 'alu-norm'],
-        labels: { 'alu-norm': p.sum, 'ctl-alu': frame.stage === 'add' ? '+' : '−' },
+        wires: ['shift-alu', 'big-alu', 'ctl-alu', 'alu-negate'],
+        labels: {
+          'alu-negate': p.sum,
+          'ctl-alu': frame.stage === 'add' ? 'Binv = 0' : 'Binv = 1',
+        },
       };
     case 'normalize': {
       const n = frame.normalize!;
@@ -122,13 +144,13 @@ export function circuitState(frame: FpFrame): CircuitState {
         n.direction === 'right' ? `+${n.amount}` : n.direction === 'left' ? `−${n.amount}` : '+0';
       return {
         active: ['normalize', 'incdec'],
-        wires: ['alu-norm', 'exp-incdec', 'norm-round'],
-        labels: { 'norm-round': shiftLabel, 'exp-incdec': expLabel },
+        wires: ['negate-norm', 'exp-incdec', 'norm-incdec', 'norm-round'],
+        labels: { 'norm-round': shiftLabel, 'norm-incdec': expLabel },
       };
     }
     case 'overflow':
     case 'underflow':
-      return { active: ['normalize', 'incdec'], wires: ['exp-incdec'], labels: {} };
+      return { active: ['normalize', 'incdec'], wires: ['norm-incdec'], labels: {} };
     case 'round':
       return {
         active: ['round'],
@@ -136,15 +158,23 @@ export function circuitState(frame: FpFrame): CircuitState {
         labels: { 'round-out': `GRS = ${p.g}${p.r}${p.s}` },
       };
     case 'roundCarry':
-      return { active: ['round', 'normalize'], wires: ['round-back'], labels: {} };
+      return {
+        active: ['round', 'incdec'],
+        wires: ['round-ovf'],
+        labels: { 'round-ovf': 'ovf = 1' },
+      };
     case 'pack':
       return {
         active: ['regR'],
-        wires: ['round-out', 'incdec-out'],
+        wires: ['round-out', 'incdec-out', 'ctl-sign'],
         labels: { 'round-out': p.hex },
       };
     case 'special':
-      return { active: ['control', 'regR'], wires: ['incdec-out'], labels: {} };
+      return {
+        active: ['control', 'regR'],
+        wires: ['ctl-sign', 'incdec-out', 'round-out'],
+        labels: {},
+      };
   }
 }
 

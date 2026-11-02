@@ -140,6 +140,11 @@ export const UI = {
   roundDown: 'ปัดลง',
   wireIn: 'เข้า',
   wireOut: 'ออก',
+  detailWhat: 'มันคืออะไร',
+  detailHow: 'ทำงานยังไง',
+  detailIn: 'สัญญาณเข้า',
+  detailOut: 'สัญญาณออก',
+  bitsUnit: 'บิต',
   roundUp: 'ปัดขึ้น',
   exactValue: 'ผลจริง',
 } as const;
