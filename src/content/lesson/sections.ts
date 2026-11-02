@@ -85,9 +85,8 @@ export const SECTIONS: SectionDef[] = [
       { id: 'fp-add-bits', title: '4.2 บวก' },
       { id: 'fp-sub', title: '4.3 ลบ' },
       { id: 'rounding', title: '4.4 ปัดเศษ' },
-      { id: 'slide-fun-fact', title: '4.5 ลองตัวอย่างในสไลด์' },
     ],
-    source: 'P&H 3.5 · สไลด์ w03c_mult หน้า 21–22 · IEEE 754-2019',
+    source: 'P&H 3.5 · IEEE 754-2019',
   },
   {
     id: 'circuit',
