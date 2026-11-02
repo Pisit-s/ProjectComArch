@@ -28,6 +28,8 @@ export interface CircuitWire {
   kind: WireKind;
   points: [number, number][];
   dashed?: boolean;
+  /** Move the value chip off a short wire so it never covers a block. */
+  chipOffset?: [number, number];
 }
 
 export const CIRCUIT_VIEWBOX = { w: 360, h: 600 } as const;
@@ -45,7 +47,7 @@ export const BLOCKS: CircuitBlock[] = [
     h: 50,
     vocab: 'smallAlu',
   },
-  { id: 'control', kind: 'box', label: 'Control', x: 140, y: 84, w: 90, h: 32, vocab: 'control' },
+  { id: 'control', kind: 'box', label: 'Control', x: 160, y: 84, w: 80, h: 32, vocab: 'control' },
   { id: 'muxExp', kind: 'mux', label: 'MUX', x: 40, y: 170, w: 70, h: 26, vocab: 'mux' },
   { id: 'muxSmall', kind: 'mux', label: 'MUX', x: 150, y: 170, w: 80, h: 26, vocab: 'mux' },
   { id: 'muxBig', kind: 'mux', label: 'MUX', x: 262, y: 170, w: 80, h: 26, vocab: 'mux' },
@@ -137,8 +139,9 @@ export const WIRES: CircuitWire[] = [
     kind: 'ctl',
     points: [
       [106, 100],
-      [140, 100],
+      [160, 100],
     ],
+    chipOffset: [0, -13],
   },
   {
     id: 'exp-mux',

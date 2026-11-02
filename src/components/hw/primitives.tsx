@@ -11,14 +11,14 @@ const WIRE_CLASS: Record<WireKind, string> = {
   exp: 'stroke-bit-exp',
   sig: 'stroke-bit-frac',
   sign: 'stroke-bit-sign',
-  ctl: 'stroke-carry',
+  ctl: 'stroke-muted',
 };
 
 const CHIP_CLASS: Record<WireKind, string> = {
   exp: 'fill-bit-exp-ink',
   sig: 'fill-bit-frac-ink',
   sign: 'fill-bit-sign-ink',
-  ctl: 'fill-carry-ink',
+  ctl: 'fill-muted',
 };
 
 interface BoxProps {
@@ -194,6 +194,7 @@ export function HwWire({
   active = false,
   dashed = false,
   chip,
+  chipOffset = [0, 0],
 }: {
   id: string;
   points: [number, number][];
@@ -203,6 +204,7 @@ export function HwWire({
   dashed?: boolean;
   /** Value shown on the wire (from the frame). */
   chip?: string;
+  chipOffset?: [number, number];
 }) {
   const reduce = useReducedMotion();
   const d = points.map(([px, py], i) => `${i ? 'L' : 'M'}${px} ${py}`).join(' ');
@@ -212,7 +214,10 @@ export function HwWire({
   const head = (a: number) => `${ex - 7 * Math.cos(ang + a)} ${ey - 7 * Math.sin(ang + a)}`;
   // chip sits halfway along the middle segment, never on a block it points into
   const k = Math.max(1, Math.floor(points.length / 2));
-  const mid = [(points[k - 1][0] + points[k][0]) / 2, (points[k - 1][1] + points[k][1]) / 2];
+  const mid = [
+    (points[k - 1][0] + points[k][0]) / 2 + chipOffset[0],
+    (points[k - 1][1] + points[k][1]) / 2 + chipOffset[1],
+  ];
   return (
     <g data-wire={id} data-active={active ? 'true' : 'false'} aria-hidden>
       <path
@@ -220,7 +225,7 @@ export function HwWire({
         fill="none"
         strokeWidth={active ? 3 : 1.6}
         strokeLinejoin="round"
-        strokeDasharray={dashed ? '6 5' : undefined}
+        strokeDasharray={dashed || kind === 'ctl' ? '6 5' : undefined}
         className={cn(WIRE_CLASS[kind], 'transition-opacity duration-300', !active && 'opacity-35')}
       />
       {active && !reduce && (

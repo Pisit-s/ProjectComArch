@@ -198,6 +198,26 @@ export interface Dec4Frame {
   captionKey: CaptionKey;
   params: Params;
   bigStep: 0 | 1 | 2 | 3 | 4;
+  /** Add frame: powers of ten that receive a carry (digit by digit, right to left). */
+  carries?: number[];
+}
+
+/** Powers of ten that receive a carry when adding two decimals written digit by digit. */
+export function decimalCarries(a: string, b: string): number[] {
+  const [ai, af = ''] = a.split('.');
+  const [bi, bf = ''] = b.split('.');
+  const frac = Math.max(af.length, bf.length);
+  const int = Math.max(ai.length, bi.length);
+  const da = (ai.padStart(int, '0') + af.padEnd(frac, '0')).split('').map(Number);
+  const db = (bi.padStart(int, '0') + bf.padEnd(frac, '0')).split('').map(Number);
+  const out: number[] = [];
+  let carry = 0;
+  for (let i = da.length - 1; i >= 0; i--) {
+    carry = da[i] + db[i] + carry >= 10 ? 1 : 0;
+    // digit i has power (int - 1 - i); its carry goes one place to the left
+    if (carry) out.push(int - i);
+  }
+  return out;
 }
 
 export interface Dec4Scene {
@@ -224,6 +244,7 @@ export function buildDec4Frames(a: SciState, b: SciState, p = 4): Dec4Scene {
         captionKey: 'dec4.add',
         params: { a: r.add.big, b: r.add.small, sum: r.add.sum },
         bigStep: 2,
+        carries: decimalCarries(r.add.big, r.add.small),
       },
       {
         id: 'normalize',

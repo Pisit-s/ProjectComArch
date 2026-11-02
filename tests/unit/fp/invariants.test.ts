@@ -70,7 +70,6 @@ describe('step invariants', () => {
     expect(rule('+', 0n, 0x3f800000n)).toBe('add-zero');
     expect(rule('+', 0x3f800000n, 0n)).toBe('add-zero');
   });
-
 });
 
 describe('simulate', () => {

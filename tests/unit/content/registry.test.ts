@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { QUIZ } from '@/content/lesson/quiz';
 import { CHAPTERS, SECTIONS, sectionById } from '@/content/lesson/sections';
-import { BINARY32, encodeBits, toHex } from '@/lib/fp';
+import { BINARY32, encodeBits, simulate, toHex } from '@/lib/fp';
+import { buildFpFrames } from '@/lib/lesson/fp-frames';
 import { addBits, toBits, toSigned } from '@/lib/int/adder';
 
 describe('section registry', () => {
@@ -22,6 +23,17 @@ describe('section registry', () => {
       expect([...q.order].sort()).toEqual([0, 1, 2]);
     }
   });
+  it('chapter 5 quiz: G = 1, R = S = 0 with LSB = 1 rounds up (tie to even)', () => {
+    // 16777216 + 3 is exactly that case; the first option is the answer
+    const sim = simulate(BINARY32, '+', '16777216', '3');
+    if (!sim.ok) throw new Error();
+    const round = buildFpFrames(BINARY32, sim).frames.find((f) => f.stage === 'round')!;
+    expect(round.grs).toEqual({ g: 1, r: 0, s: 0, lsb: 1 });
+    expect(round.decision).toBe('tie-even-up');
+    expect(QUIZ['fp-add']!.question).toContain('G = 1, R = 0, S = 0 และ LSB = 1');
+    expect(QUIZ['fp-add']!.options[0]).toContain('ปัดขึ้น');
+  });
+
   it('quiz answers agree with the models', () => {
     const r = addBits(4, 4, 5);
     expect(QUIZ.binary!.options[0]).toBe(

@@ -55,3 +55,28 @@ describe('special values on the page', () => {
     expect(chooseWindow(sc).columns.length).toBeLessThanOrEqual(14);
   });
 });
+
+describe('round line invariants (random pairs)', () => {
+  it('0 <= pos <= 1, ties sit at 1/2, the chosen side matches the decision', async () => {
+    const fc = (await import('fast-check')).default;
+    const { PAIR_KINDS } = await import('../fp/oracle-gen');
+    const { f32FromBits } = await import('../fp/helpers');
+    const pair = fc.oneof(...PAIR_KINDS.map(([, arb]) => arb));
+    fc.assert(
+      fc.property(pair, fc.constantFrom<'+' | '-'>('+', '-'), ([a, b], op) => {
+        const sim = simulate(F, op, String(f32FromBits(a)), String(f32FromBits(b)));
+        if (!sim.ok) return true;
+        const m = buildRoundingScene(F, sim);
+        if (!m) return true;
+        const { num, den } = m.line.pos;
+        expect(num >= 0n && num <= den).toBe(true);
+        if (m.line.tie) expect(num * 2n).toBe(den);
+        expect(m.line.chosen).toBe(
+          m.line.decision === 'up' || m.line.decision === 'tie-even-up' ? 'up' : 'down',
+        );
+        return true;
+      }),
+      { numRuns: 3_000 },
+    );
+  });
+});

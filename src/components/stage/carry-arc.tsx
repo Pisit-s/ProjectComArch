@@ -46,3 +46,41 @@ export function CarryArc({
     </svg>
   );
 }
+
+/**
+ * Carry arrow stretched over grid cells: from the middle of the rightmost cell into the middle
+ * of the leftmost one. The parent grid places it (gridColumn spans the two digit columns).
+ */
+export function CarryHop({
+  gridColumn,
+  gridRow,
+  delay = 0,
+  duration = 0.3,
+}: {
+  gridColumn: string;
+  gridRow: number;
+  delay?: number;
+  duration?: number;
+}) {
+  return (
+    <svg
+      viewBox="0 0 100 24"
+      preserveAspectRatio="none"
+      style={{ gridColumn, gridRow }}
+      className="h-4 w-full self-end overflow-visible text-carry"
+      aria-hidden
+    >
+      <motion.path
+        d="M 75 22 Q 50 0 27 18"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration, delay }}
+      />
+    </svg>
+  );
+}

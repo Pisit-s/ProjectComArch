@@ -23,7 +23,7 @@
 ## แก้ไฟล์ร่วม
 - `src/components/lesson/hero.tsx`: `SceneShell id="hero-teaser"` minHeight `16rem` → `22rem` (เปลี่ยนค่าเดียว) · teaser จริงสูง 352px บนจอ 390 (แถบควบคุมขึ้น 2 แถว) ถ้าจองไว้ 16rem หน้าจะกระโดดตอน scene โหลด (CLS) · desktop สูง 320px จึงเหลือที่ว่าง 32px ใต้ teaser
 - `src/content/lesson/copy.ts`: เพิ่ม `HERO.steps` (แถวของ hero ตาม PARALLEL.md)
-- `src/components/player/step-player.tsx`: ปุ่ม "ทำไม?" สีตัวอักษร `text-primary` → `text-bit-frac-ink` (#1d4ed8) เปลี่ยน class เดียว · axe จับ color-contrast บนมือถือ (#2563eb บนพื้น primary/10 ทับพื้นหลังไล่สี ต่ำกว่า 4.5:1) · ฉาก 2.1 มี "ทำไม?" ตั้งแต่ขั้นแรกจึงเห็นตอน a11y สแกน แต่ปุ่มเดียวกันในบทที่ 5 ก็โดนเหมือนกัน
+- `src/components/player/step-player.tsx`: เคยแก้สีปุ่ม "ทำไม?" (contrast บนมือถือ) แต่ base แก้เรื่องเดียวกันแล้ว (`text-secondary`) ตอน merge ใช้ของ base ทั้งหมด · ตอนนี้ branch นี้ไม่ได้แก้ไฟล์นี้
 
 ## คำถาม + ค่าที่สมมติ
 - ไม่มี Context7 ใน session นี้ · ใช้ motion ตามแบบที่ใช้อยู่แล้วใน repo (`layoutId`, `initial/animate`, spring เดิม) ไม่ใช้ API ใหม่

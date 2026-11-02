@@ -185,3 +185,18 @@ describe('caption key registry', () => {
     expect(new Set(DETAIL_KEYS).size).toBe(DETAIL_KEYS.length);
   });
 });
+
+describe('decimal carries (scene 5.1)', () => {
+  it('9.999 + 0.016 carries into 10^-2, 10^-1, 10^0 and 10^1', async () => {
+    const { decimalCarries, buildDec4Frames } = await import('@/lib/lesson/sci-frames');
+    expect(decimalCarries('9.999', '0.016')).toEqual([-2, -1, 0, 1]);
+    expect(decimalCarries('1.2', '3.4')).toEqual([]);
+    expect(decimalCarries('5', '5')).toEqual([1]);
+    const add = buildDec4Frames(
+      { text: '9.999', exp: 1 },
+      { text: '1.610', exp: -1 },
+      4,
+    ).frames.find((f) => f.id === 'add')!;
+    expect(add.carries).toEqual([-2, -1, 0, 1]);
+  });
+});

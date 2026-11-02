@@ -241,7 +241,7 @@ function StepPlayerInner({
               type="button"
               onClick={() => setWhyOpen((o) => !o)}
               aria-expanded={whyOpen}
-              className="ml-2 inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 align-middle text-sm font-semibold text-bit-frac-ink hover:bg-primary/15"
+              className="ml-2 inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 align-middle text-sm font-semibold text-secondary hover:bg-primary/15"
               data-testid={`${testId}-why`}
             >
               {UI.why}
