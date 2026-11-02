@@ -3,29 +3,26 @@ import { expect, test } from '@playwright/test';
 
 const PAGES = [
   '/',
-  '/learn/number-systems',
-  '/learn/binary-fractions',
-  '/learn/ieee-754',
-  '/learn/add-sub',
-  '/learn/mul-div',
-  '/lab',
+  '/floating-point',
+  '/floating-point/number-systems',
+  '/floating-point/binary-fractions',
+  '/floating-point/ieee-754',
+  '/floating-point/add-sub',
+  '/floating-point/mul-div',
+  '/floating-point/lab',
 ];
-const CHAPTERS = PAGES.slice(1, 6);
+const CHAPTERS = PAGES.slice(2, 7);
 
 test('navigate to every chapter and the Lab from the menu', async ({ page, isMobile }) => {
-  await page.goto('/');
-  for (const href of [...CHAPTERS, '/lab']) {
+  await page.goto('/floating-point');
+  for (const href of [...CHAPTERS, '/floating-point/lab']) {
     if (isMobile) {
-      await page.getByRole('button', { name: 'เมนูบทเรียน' }).click();
-      await page
-        .getByRole('navigation', { name: 'บทเรียนทั้งหมด' })
-        .locator(`a[href="${href}"]`)
-        .click();
+      await page.getByRole('button', { name: 'เมนูหัวข้อ' }).click();
+      await page.getByTestId('drawer-fp-chapters').locator(`a[href="${href}"]`).click();
     } else {
       await page
-        .getByRole('navigation', { name: 'เมนูหลัก' })
+        .getByRole('navigation', { name: 'บทของ Floating-Point' })
         .locator(`a[href="${href}"]`)
-        .first()
         .click();
     }
     await expect(page).toHaveURL(new RegExp(`${href}$`));
@@ -51,6 +48,9 @@ for (const path of PAGES) {
     const errors: string[] = [];
     page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
     page.on('pageerror', (e) => errors.push(e.message));
+    // measure the settled page: entrance fades are off with reduced motion (a half-faded card
+    // fails contrast)
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(path);
     await page.waitForLoadState('networkidle');
     const result = await new AxeBuilder({ page }).analyze();

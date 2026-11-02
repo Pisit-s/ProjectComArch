@@ -2,25 +2,28 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { CHAPTERS, LAB } from '@/content/chapters';
+import { TopicIcon } from '@/components/topic/topic-icon';
+import { TOPICS_IN_ORDER, topicOfPath } from '@/content/topics';
 import { cn } from '@/lib/utils';
 
-/** Desktop chapter links; the current chapter is highlighted. */
+/**
+ * Desktop topic links from the registry (PLAN.md 2.5). A topic is active on its own page and
+ * every page under it; topics that are not ready yet carry a small grey dot.
+ */
 export function NavLinks() {
-  const pathname = usePathname();
-  const items = [
-    ...CHAPTERS.map((c) => ({ href: c.href, label: c.short, num: String(c.number) })),
-    { href: LAB.href, label: LAB.short, num: null },
-  ];
+  const current = topicOfPath(usePathname());
   return (
     <ul className="ml-2 hidden items-center gap-0.5 lg:flex">
-      {items.map((it) => {
-        const active = pathname === it.href;
+      {TOPICS_IN_ORDER.map((t) => {
+        const active = current?.id === t.id;
+        const soon = t.status !== 'ready';
         return (
-          <li key={it.href}>
+          <li key={t.id}>
             <Link
-              href={it.href}
+              href={t.href}
               aria-current={active ? 'page' : undefined}
+              title={soon ? 'กำลังพัฒนา' : undefined}
+              data-testid={`nav-topic-${t.id}`}
               className={cn(
                 'flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium transition-colors',
                 active
@@ -28,14 +31,29 @@ export function NavLinks() {
                   : 'text-ink/75 hover:bg-ice-100 hover:text-ink',
               )}
             >
-              {it.num && (
+              {/* the three-bar mark has its own colours: give it a white chip on the blue pill */}
+              <span
+                className={cn(
+                  'grid place-items-center rounded',
+                  active && t.icon === 'floating-point' && 'bg-white p-0.5',
+                )}
+              >
+                <TopicIcon
+                  name={t.icon}
+                  className={cn('h-4 w-4', active ? 'text-white' : 'text-primary')}
+                />
+              </span>
+              {t.short}
+              {soon && (
                 <span
-                  className={cn('num font-mono text-xs', active ? 'text-white/80' : 'text-muted')}
-                >
-                  {it.num}
-                </span>
+                  className={cn(
+                    'h-1.5 w-1.5 rounded-full',
+                    active ? 'bg-white/70' : 'bg-slate-400',
+                  )}
+                  aria-label="(กำลังพัฒนา)"
+                  role="img"
+                />
               )}
-              {it.label}
             </Link>
           </li>
         );

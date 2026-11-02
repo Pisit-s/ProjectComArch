@@ -1,5 +1,7 @@
-/** Terms used across the site (PLAN.md 7.9). `Term` shows the meaning the first time a term appears. */
-export const GLOSSARY = {
+import type { GlossaryEntry } from './types';
+
+/** Floating-Point terms (docs/plans/stage1-floating-point.md 7.9). */
+export const FP_GLOSSARY = {
   bit: { term: 'บิต (bit)', meaning: 'หลักหนึ่งหลักของเลขฐานสอง มีค่าได้แค่ 0 หรือ 1' },
   place: {
     term: 'ค่าประจำหลัก',
@@ -73,6 +75,4 @@ export const GLOSSARY = {
     meaning:
       'การเก็บจำนวนจริงในรูป ± significand × 2^exponent ทำให้จุดทศนิยม "ลอย" ไปตามขนาดของค่าได้',
   },
-} as const;
-
-export type TermKey = keyof typeof GLOSSARY;
+} as const satisfies Record<string, GlossaryEntry>;

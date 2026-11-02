@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('chapter 5: multiplication, division and special cases', async ({ page }) => {
-  await page.goto('/learn/mul-div');
+  await page.goto('/floating-point/mul-div');
   const sim = page.getByTestId('sim');
   const player = page.getByTestId('sim-player');
   // 6.5 x 2.75 with three partial products

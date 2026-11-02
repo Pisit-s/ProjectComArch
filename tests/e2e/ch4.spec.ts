@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('chapter 4: 0.1 + 0.2, player controls and flowchart', async ({ page }) => {
-  await page.goto('/learn/add-sub');
+  await page.goto('/floating-point/add-sub');
   const sim = page.getByTestId('sim');
   await expect(sim.getByTestId('result-hex')).toHaveText('0x3E99999A');
   const counter = page.getByTestId('sim-player-counter');

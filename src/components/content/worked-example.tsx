@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils';
 
 /**
  * Worked examples are always computed by the engine: content never types bits, hex or stored
- * values by hand (PLAN.md 2.6).
+ * values by hand (docs/plans/stage1-floating-point.md 2.6).
  */
 
 const F = BINARY32;

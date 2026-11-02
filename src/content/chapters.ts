@@ -6,7 +6,7 @@ export type IconName = 'binary' | 'divide-fraction' | 'cpu' | 'plus-minus' | 'x'
 export interface Chapter {
   number: number;
   slug: ChapterSlug;
-  href: `/learn/${ChapterSlug}`;
+  href: `/floating-point/${ChapterSlug}`;
   /** Full title (requirement FR-01). */
   title: string;
   /** Short label for menus. */
@@ -22,7 +22,7 @@ export const CHAPTERS: Chapter[] = [
   {
     number: 1,
     slug: 'number-systems',
-    href: '/learn/number-systems',
+    href: '/floating-point/number-systems',
     title: 'ระบบเลขฐานและการคำนวณเลขฐานสอง',
     short: 'เลขฐานสอง',
     blurb: 'ค่าประจำหลัก น้ำหนักของแต่ละบิต และการแปลงเลขฐานสอง 8 บิตเป็นฐานสิบ',
@@ -38,7 +38,7 @@ export const CHAPTERS: Chapter[] = [
   {
     number: 2,
     slug: 'binary-fractions',
-    href: '/learn/binary-fractions',
+    href: '/floating-point/binary-fractions',
     title: 'เศษส่วนฐานสิบและเศษส่วนฐานสอง',
     short: 'เศษส่วนฐานสอง',
     blurb: 'น้ำหนัก 2⁻¹, 2⁻², … การแปลงด้วยการคูณ 2 และทำไม 0.1 ถึงเก็บไม่พอดี',
@@ -54,7 +54,7 @@ export const CHAPTERS: Chapter[] = [
   {
     number: 3,
     slug: 'ieee-754',
-    href: '/learn/ieee-754',
+    href: '/floating-point/ieee-754',
     title: 'การแทนค่า Floating-Point ตามมาตรฐาน IEEE 754',
     short: 'IEEE 754',
     blurb: 'Sign, Exponent, Fraction ของ Single Precision · encode และ decode ทีละขั้น',
@@ -70,7 +70,7 @@ export const CHAPTERS: Chapter[] = [
   {
     number: 4,
     slug: 'add-sub',
-    href: '/learn/add-sub',
+    href: '/floating-point/add-sub',
     title: 'การบวกและการลบเลข Floating-Point',
     short: 'บวก/ลบ',
     blurb: 'ปรับ Exponent ให้เท่ากัน บวก/ลบ Significand, Normalize และปัดด้วย Guard/Round/Sticky',
@@ -86,7 +86,7 @@ export const CHAPTERS: Chapter[] = [
   {
     number: 5,
     slug: 'mul-div',
-    href: '/learn/mul-div',
+    href: '/floating-point/mul-div',
     title: 'การคูณและการหารเลข Floating-Point',
     short: 'คูณ/หาร',
     blurb: 'XOR หา Sign, แก้ Bias ของ Exponent, partial product, การหารยาว และกรณีพิเศษ',
@@ -103,7 +103,7 @@ export const CHAPTERS: Chapter[] = [
 ];
 
 export const LAB = {
-  href: '/lab' as const,
+  href: '/floating-point/lab' as const,
   title: 'Lab',
   short: 'Lab',
   blurb: 'แปลงค่าและคำนวณได้ครบ + − × ÷ แล้วส่งลิงก์ตัวอย่างให้เพื่อนเปิดดูขั้นเดียวกันได้',

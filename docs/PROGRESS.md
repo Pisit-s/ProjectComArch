@@ -1,3 +1,5 @@
+> ประวัติระยะที่ 1 (Floating-Point) · งานระยะที่ 2 ดู docs/progress/
+
 พร้อม deploy แล้ว (Milestone "พร้อมใช้สอน" ผ่านเมื่อ 30 ต.ค. 2569 · วิธี deploy: docs/DEPLOY.md)
 
 # ความคืบหน้า Binary Lab

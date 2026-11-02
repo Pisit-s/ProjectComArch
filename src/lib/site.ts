@@ -1,17 +1,19 @@
 /**
- * Everything about the site that may change later lives here (PLAN.md 2.1).
- * Assumed values are marked with the question number in docs/QUESTIONS.md.
+ * Everything about the site that may change later lives here (docs/plans/stage1-floating-point.md 2.1).
+ * Assumed values are marked with the question number in docs/QUESTIONS.md (stage 1)
+ * or docs/progress/wp0-hub.md (stage 2).
  */
 export const site = {
-  name: 'Binary Lab',
-  tagline: 'เข้าใจ Floating-Point ทีละบิต',
+  name: 'comkrub',
+  tagline: 'เรียน Computer Architecture แบบเห็นทุกขั้นตอน',
   description:
-    'สื่อการสอนแบบ interactive เรื่องเลขฐานสองและ Floating-Point (IEEE 754 Single Precision) วิชา Computer Architecture: เลขฐานสอง เศษส่วนฐานสอง encode/decode บวก ลบ คูณ หาร ดูได้ทีละขั้น',
-  ogSubtitle: 'สื่อการสอน Floating-Point · IEEE 754',
+    'เว็บไซต์เพื่อการเรียนรู้และ Simulation วิชา Computer Architecture: การคูณและการหารแบบ MIPS, Floating-Point (IEEE 754) และ MIPS Simulator ทุกกระบวนการกดดูทีละขั้นได้เอง',
+  ogSubtitle: 'Computer Architecture · เรียนรู้และ Simulation',
   course: 'Computer Architecture',
   /** Q4 answered: deployed on Pisit's own domain. */
   siteUrl: 'https://comkrub.mypisit.com',
-  githubUrl: 'https://github.com/Pisit-s/ProjectComArch',
+  /** WP0-Q1: the repo is still private · put the URL back once it is public. */
+  githubUrl: null as string | null,
   references: [
     'IEEE Std 754-2019, IEEE Standard for Floating-Point Arithmetic',
     'D. A. Patterson and J. L. Hennessy, Computer Organization and Design',

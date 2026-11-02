@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test('chapter 3: encode, inexact warning, decode and bit errors', async ({ page }) => {
-  await page.goto('/learn/ieee-754');
+  await page.goto('/floating-point/ieee-754');
   const conv = page.getByTestId('conv');
   const input = conv.getByTestId('conv-input');
   await input.fill('5.75');
