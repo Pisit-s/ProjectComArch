@@ -13,4 +13,5 @@ export const SCENES: Record<string, ComponentType> = {
   'fp-sub': dynamic(() => import('./chapter5').then((m) => m.FpSubScene)),
   rounding: dynamic(() => import('./chapter5').then((m) => m.RoundingScene)),
   'slide-fun-fact': dynamic(() => import('./chapter5').then((m) => m.FunFactScene)),
+  'circuit-flow': dynamic(() => import('./circuit-scene').then((m) => m.CircuitScene)),
 };

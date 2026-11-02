@@ -192,12 +192,15 @@ export function HwWire({
   points,
   kind,
   active = false,
+  dashed = false,
   chip,
 }: {
   id: string;
   points: [number, number][];
   kind: WireKind;
   active?: boolean;
+  /** Feedback path (the rounding carry going back to Normalize). */
+  dashed?: boolean;
   /** Value shown on the wire (from the frame). */
   chip?: string;
 }) {
@@ -207,7 +210,9 @@ export function HwWire({
   const [px, py] = points.at(-2) ?? points[0];
   const ang = Math.atan2(ey - py, ex - px);
   const head = (a: number) => `${ex - 7 * Math.cos(ang + a)} ${ey - 7 * Math.sin(ang + a)}`;
-  const mid = points[Math.floor(points.length / 2)];
+  // chip sits halfway along the middle segment, never on a block it points into
+  const k = Math.max(1, Math.floor(points.length / 2));
+  const mid = [(points[k - 1][0] + points[k][0]) / 2, (points[k - 1][1] + points[k][1]) / 2];
   return (
     <g data-wire={id} data-active={active ? 'true' : 'false'} aria-hidden>
       <path
@@ -215,6 +220,7 @@ export function HwWire({
         fill="none"
         strokeWidth={active ? 3 : 1.6}
         strokeLinejoin="round"
+        strokeDasharray={dashed ? '6 5' : undefined}
         className={cn(WIRE_CLASS[kind], 'transition-opacity duration-300', !active && 'opacity-35')}
       />
       {active && !reduce && (

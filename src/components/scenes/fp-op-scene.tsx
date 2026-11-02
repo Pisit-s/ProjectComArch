@@ -150,6 +150,10 @@ export function FpOpScene({
   testId,
   label,
   extra,
+  stepsOf = fpSteps,
+  renderFrame,
+  showFull = true,
+  minHeight = '15rem',
 }: {
   initial: FpExample;
   examples: FpExample[];
@@ -157,6 +161,12 @@ export function FpOpScene({
   label: string;
   /** Extra panel under the player (e.g. the rounding comparison). */
   extra?: (scene: FpScene) => ReactNode;
+  /** Steps and drawing of another view of the same frames (the circuit). */
+  stepsOf?: (scene: FpScene) => PlayerStep[];
+  renderFrame?: (scene: FpScene, index: number, full: boolean) => ReactNode;
+  /** Show the "all 24 bits" toggle (bits view only). */
+  showFull?: boolean;
+  minHeight?: string;
 }) {
   const [a, setA] = useState(initial.a);
   const [b, setB] = useState(initial.b);
@@ -237,28 +247,36 @@ export function FpOpScene({
       {scene && (
         <StepPlayer
           key={`${scene.result.hex}|${scene.frames.length}|${a}${op}${b}`}
-          steps={fpSteps(scene)}
+          steps={stepsOf(scene)}
           label={label}
           stepBar
           poster={!touched}
           testId={`${testId}-player`}
-          minHeight="15rem"
-          render={(i) => <FpFrameView scene={scene} index={i} full={full} testId={testId} />}
-        >
-          <button
-            type="button"
-            className="btn h-9 min-h-9 gap-1.5 btn-ghost btn-sm"
-            onClick={() => setFull((v) => !v)}
-            aria-pressed={full}
-            data-testid={`${testId}-full`}
-          >
-            {full ? (
-              <Minimize2 className="h-4 w-4" aria-hidden />
+          minHeight={minHeight}
+          render={(i) =>
+            renderFrame ? (
+              renderFrame(scene, i, full)
             ) : (
-              <Maximize2 className="h-4 w-4" aria-hidden />
-            )}
-            {full ? UI.showLess : UI.showAll}
-          </button>
+              <FpFrameView scene={scene} index={i} full={full} testId={testId} />
+            )
+          }
+        >
+          {showFull && (
+            <button
+              type="button"
+              className="btn h-9 min-h-9 gap-1.5 btn-ghost btn-sm"
+              onClick={() => setFull((v) => !v)}
+              aria-pressed={full}
+              data-testid={`${testId}-full`}
+            >
+              {full ? (
+                <Minimize2 className="h-4 w-4" aria-hidden />
+              ) : (
+                <Maximize2 className="h-4 w-4" aria-hidden />
+              )}
+              {full ? UI.showLess : UI.showAll}
+            </button>
+          )}
         </StepPlayer>
       )}
       {scene && extra?.(scene)}
