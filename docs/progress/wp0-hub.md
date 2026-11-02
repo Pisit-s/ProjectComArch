@@ -7,7 +7,7 @@
 - [x] 3. Topic registry: `src/content/topics.ts` (+ `TOPICS_IN_ORDER`, `firstReadyLesson`, `topicOfPath`), `TopicIcon`, `StatusBadge`, `tests/unit/topics/topics.test.ts`
 - [x] 4. ย้าย route: `src/app/floating-point/{5 บท,lab}` (git mv), `/floating-point` = หน้าแรกเดิม, `layout.tsx` + `FpSubnav` (breadcrumb + แถบบท), redirect 308 ใน `next.config.ts` (ตรวจด้วย curl: query ติดไป), e2e ใช้ path ใหม่ (FP 15 tests ผ่านบน pixel7)
 - [ ] 5. หน้าแรกใหม่
-- [ ] 6. หน้า "กำลังพัฒนา"
+- [x] 6. หน้า "กำลังพัฒนา": `ComingSoon` + `comingSoonMetadata` (noindex) + `src/app/{multiply,divide,mips}/page.tsx` (ทำก่อนขั้นที่ 5 ดูบันทึก)
 - [ ] 7. การนำทาง
 - [ ] 8. โครงร่วมสำหรับทีม
 - [ ] 9. ลิงก์ข้ามหัวข้อ
@@ -63,3 +63,4 @@
 - `@source not '../../docs'` มีอยู่แล้วใน `globals.css` ตั้งแต่ระยะที่ 1
 - ขั้นที่ 2: `package-lock.json` แก้เฉพาะชื่อ (2 บรรทัด) แทน `npm install --package-lock-only` เพราะ npm 11.13 ในเครื่องนี้เติม entry ของ `@tailwindcss/oxide-wasm32-wasi` เพิ่ม 60 กว่าบรรทัดที่ไม่เกี่ยว
 - ขั้นที่ 2: รูป 3 แถบเดิมแยกเป็น `FpMark` ใน `logo.tsx` (ไอคอนหัวข้อ Floating-Point) ส่วน `LogoMark` เป็นโลโก้ชิปของเว็บ
+- ขั้นที่ 5/6: commit หน้า "กำลังพัฒนา" (ขั้นที่ 6) ก่อนหน้าแรก (ขั้นที่ 5) เพราะ `typedRoutes` ไม่ยอมให้การ์ดลิงก์ไป `/multiply`, `/divide`, `/mips` ก่อนที่ route จะมีอยู่จริง
