@@ -13,14 +13,14 @@ import {
   FP_EXAMPLES,
   INT_ADD_EXAMPLES,
   INT_SUB_EXAMPLES,
-  LAYOUT_DEFAULT,
+  LAYOUT_EXAMPLES,
   POINT_EXAMPLES,
   ROUND_EXAMPLES,
   SHIFT_EXAMPLES,
   SUB_EXAMPLES,
   WHEEL_EXAMPLES,
 } from '@/content/lesson/examples';
-import { CHAPTERS } from '@/content/lesson/sections';
+import { CHAPTERS, LESSONS } from '@/content/lesson/sections';
 import { VOCAB } from '@/content/lesson/vocab';
 import { BINARY32, encodeBits, encodeDecimal, simulate, shortestDecimal } from '@/lib/fp';
 import { shiftRight } from '@/lib/int/adder';
@@ -55,7 +55,9 @@ function renderedCaptions(): { key: CaptionKey; text: string }[] {
     }
     buildRoundingScene(F, s)?.frames.forEach((f) => add(f.captionKey, f.params));
   }
-  for (const t of [...ENCODE_EXAMPLES, LAYOUT_DEFAULT, ...BITPLAY_EXAMPLES]) {
+  for (const h of LAYOUT_EXAMPLES)
+    buildLayoutFrames(F, BigInt('0x' + h))?.frames.forEach((f) => add(f.captionKey, f.params));
+  for (const t of [...ENCODE_EXAMPLES, ...BITPLAY_EXAMPLES]) {
     const r = encodeDecimal(F, t);
     if (!r.ok) throw new Error();
     const sc = buildEncodeFrames(F, r);
@@ -127,7 +129,7 @@ describe('text budget (PLAN.md 1.3)', () => {
     }
   });
   it('chapters 1-6 have 3-6 terms and every term exists', () => {
-    for (const c of CHAPTERS.filter((x) => x.number <= 6)) {
+    for (const c of LESSONS) {
       expect(c.vocab.length, c.id).toBeGreaterThanOrEqual(3);
       expect(c.vocab.length, c.id).toBeLessThanOrEqual(6);
       for (const v of c.vocab) expect(VOCAB[v]).toBeDefined();

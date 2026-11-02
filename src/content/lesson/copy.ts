@@ -22,8 +22,7 @@ export const HERO = {
 export const TAKEAWAY: Partial<Record<SectionId, string>> = {
   binary: 'ลบ = บวกค่าติดลบ วงจรเดียวทำได้ทั้งสองอย่าง แต่รู้จักแค่จำนวนเต็ม',
   'float-in-c': 'float เก็บเลขแบบ ±1.xxx × 2ᵉ: เครื่องหมาย เลขชี้กำลัง และตัวเลขหลังจุด',
-  ieee754: 'ค่า = (−1)ˢ × 1.significand × 2^(Exponent − 127)',
-  convert: 'ฐานสอง → normalize → exponent + 127 → significand 23 บิต → hex',
+  ieee754: 'อ่าน: (−1)ˢ × 1.significand × 2^(Exponent − 127) · เขียน: ฐานสอง → 1.xxx → ใส่ 3 ส่วน',
   'fp-add': 'align → บวก/ลบ significand → normalize → ปัดเศษ ใช้ทั้งบวกและลบ',
   circuit: 'วงจรบวก float คือ ALU + MUX + shifter ต่อกันตาม 4 ขั้น',
 };

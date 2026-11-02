@@ -5,7 +5,7 @@ import type { VocabId } from './vocab';
  * Takeaways, bridges and quizzes live in copy.ts / quiz.ts under the same ids.
  */
 export type SectionId =
-  'binary' | 'float-in-c' | 'ieee754' | 'convert' | 'fp-add' | 'circuit' | 'playground' | 'summary';
+  'binary' | 'float-in-c' | 'ieee754' | 'fp-add' | 'circuit' | 'playground' | 'summary';
 
 export interface SceneDef {
   /** Anchor of the scene inside the page. */
@@ -59,59 +59,48 @@ export const SECTIONS: SectionDef[] = [
   {
     id: 'ieee754',
     number: 3,
-    title: 'มาตรฐาน IEEE 754',
+    title: 'IEEE 754: เก็บและแปลงเลข',
     short: 'IEEE 754',
-    hook: 'ทุกเครื่องเก็บ float แบบเดียวกัน: 32 บิต แบ่งเป็น 3 ส่วน',
-    vocab: ['sign', 'exponent', 'bias', 'significand', 'hiddenBit', 'hex'],
+    hook: 'float 32 บิตแบ่ง 3 ส่วน อ่านความหมายก่อน แล้วแปลงเลขทศนิยมใส่ลงไปเอง',
+    vocab: ['sign', 'exponent', 'significand', 'hiddenBit', 'normalize', 'timesTwo'],
+    // read the format first, then write a number into it, then play, then the exceptions
     scenes: [
-      { id: 'layout', title: '3.1 แบ่ง 32 บิต' },
-      { id: 'bit-play', title: '3.2 กดบิตเล่น' },
-      { id: 'special', title: '3.3 ค่าพิเศษ' },
+      { id: 'layout', title: '3.1 อ่าน 32 บิต' },
+      { id: 'encode', title: '3.2 แปลงทศนิยมเป็น 32 บิต' },
+      { id: 'bit-play', title: '3.3 กดบิตเล่น' },
+      { id: 'special', title: '3.4 ค่าพิเศษ' },
     ],
-    source: 'สไลด์ w03c_mult หน้า 14–20',
-  },
-  {
-    id: 'convert',
-    number: 4,
-    title: 'แปลงเลขทศนิยมเป็น IEEE 754',
-    short: 'แปลงเลข',
-    hook: 'แปลงเป็นฐานสอง เลื่อนจุดให้เป็น 1.xxx แล้วใส่ลงช่องทั้ง 3 ส่วน',
-    vocab: ['binaryPoint', 'timesTwo', 'normalize', 'biasedExponent'],
-    scenes: [
-      { id: 'encode', title: '4.1 แปลงทีละขั้น' },
-      { id: 'decode', title: '4.2 ถอดกลับ' },
-    ],
-    source: 'สไลด์ w03c_mult หน้า 15 · P&H 3.5',
+    source: 'สไลด์ w03c_mult หน้า 14–20 · P&H 3.5',
   },
   {
     id: 'fp-add',
-    number: 5,
+    number: 4,
     title: 'บวกและลบเลข Floating-Point',
     short: 'บวก/ลบ float',
     hook: 'ทำ 4 ขั้น: ทำ exponent ให้เท่ากัน, บวก significand, normalize, ปัดเศษ',
     vocab: ['align', 'grs', 'roundEven', 'lsb', 'overUnder'],
     scenes: [
-      { id: 'dec4', title: '5.1 บวกแบบฐานสิบ 4 หลัก' },
-      { id: 'fp-add-bits', title: '5.2 บวก' },
-      { id: 'fp-sub', title: '5.3 ลบ' },
-      { id: 'rounding', title: '5.4 ปัดเศษ' },
-      { id: 'slide-fun-fact', title: '5.5 ลองตัวอย่างในสไลด์' },
+      { id: 'dec4', title: '4.1 บวกแบบฐานสิบ 4 หลัก' },
+      { id: 'fp-add-bits', title: '4.2 บวก' },
+      { id: 'fp-sub', title: '4.3 ลบ' },
+      { id: 'rounding', title: '4.4 ปัดเศษ' },
+      { id: 'slide-fun-fact', title: '4.5 ลองตัวอย่างในสไลด์' },
     ],
     source: 'P&H 3.5 · สไลด์ w03c_mult หน้า 21–22 · IEEE 754-2019',
   },
   {
     id: 'circuit',
-    number: 6,
+    number: 5,
     title: 'วงจรบวก/ลบ Floating-Point',
     short: 'วงจร',
     hook: 'เปิดดูข้างใน FPU: 4 ขั้นเดิมคือกล่องวงจรที่ต่อจาก ALU, MUX และ shifter',
     vocab: ['fpu', 'smallAlu', 'mux', 'shifter', 'bigAlu', 'control'],
-    scenes: [{ id: 'circuit-flow', title: '6.1 ข้อมูลไหลผ่านวงจร' }],
+    scenes: [{ id: 'circuit-flow', title: '5.1 ข้อมูลไหลผ่านวงจร' }],
     source: 'P&H 3.5 · สไลด์ w03c หน้า 30–33, 36–37 · w04a หน้า 7, 12',
   },
   {
     id: 'playground',
-    number: 7,
+    number: 6,
     title: 'ลองเอง',
     short: 'ลองเอง',
     hook: 'ใส่ตัวเลขสองตัว เลือกบวกหรือลบ แล้วดูทั้งแบบบิตและแบบวงจร',
@@ -130,6 +119,8 @@ export const SECTIONS: SectionDef[] = [
 ];
 
 export const CHAPTERS = SECTIONS.filter((s) => s.number > 0);
+/** Chapters that teach (vocabulary, scenes, quick check): every chapter except the playground. */
+export const LESSONS = CHAPTERS.filter((s) => s.id !== 'playground');
 
 export function sectionById(id: SectionId): SectionDef {
   const s = SECTIONS.find((x) => x.id === id);

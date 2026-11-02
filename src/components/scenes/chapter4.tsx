@@ -32,7 +32,7 @@ import { cn } from '@/lib/utils';
 const SPRING = { type: 'spring', stiffness: 420, damping: 36 } as const;
 
 const sceneTitle = (id: string): string =>
-  sectionById('convert').scenes.find((s) => s.id === id)?.title ?? id;
+  sectionById('ieee754').scenes.find((s) => s.id === id)?.title ?? id;
 
 const Big = ({ children, className }: { children: ReactNode; className?: string }) => (
   <div

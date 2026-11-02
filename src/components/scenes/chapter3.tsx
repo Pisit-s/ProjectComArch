@@ -163,7 +163,8 @@ export function LayoutScene() {
   const [touched, setTouched] = useState(false);
   const [last, setLast] = useState<Model | null>(null);
   const parsed = useMemo(() => {
-    const r = parseBitsInput(BINARY32, text);
+    // reading comes before conversion (3.1 → 3.2): this scene takes hex only
+    const r = parseBitsInput(BINARY32, text, true);
     if (!r.ok) return { model: null, error: r.error };
     const m = buildLayoutFrames(BINARY32, r.bits);
     return m ? { model: m, error: null } : { model: null, error: UI_CH34.normalOnly };
@@ -175,7 +176,7 @@ export function LayoutScene() {
   return (
     <div className="space-y-3" data-testid="layout">
       <OperandInput
-        label={UI_CH34.numberOrHex}
+        label={UI_CH34.hex}
         value={text}
         onChange={set}
         error={parsed.error}

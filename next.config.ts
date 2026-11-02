@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
     return [
       { source: '/learn', destination: '/', permanent: true },
       { source: '/learn/number-systems', destination: '/#binary', permanent: true },
-      { source: '/learn/binary-fractions', destination: '/#convert', permanent: true },
+      { source: '/learn/binary-fractions', destination: '/#encode', permanent: true },
       { source: '/learn/ieee-754', destination: '/#ieee754', permanent: true },
       { source: '/learn/add-sub', destination: '/#fp-add', permanent: true },
       { source: '/learn/mul-div', destination: '/', permanent: true },

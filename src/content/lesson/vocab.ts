@@ -33,7 +33,7 @@ export const VOCAB = {
   floatingPoint: { term: 'Floating point', meaning: 'จุดทศนิยมเลื่อนได้ โดยเปลี่ยนเลขชี้กำลังแทน' },
   fpu: {
     term: 'FPU',
-    meaning: 'วงจรคำนวณเลข floating-point ในซีพียู ทำ 4 ขั้นของบทที่ 5 ด้วยฮาร์ดแวร์',
+    meaning: 'วงจรคำนวณเลข floating-point ในซีพียู ทำ 4 ขั้นของบทที่ 4 ด้วยฮาร์ดแวร์',
   },
 
   ieee754: {
@@ -43,7 +43,7 @@ export const VOCAB = {
   sign: { term: 'Sign (s)', meaning: 'บิตเครื่องหมาย: 0 = บวก, 1 = ลบ' },
   exponent: {
     term: 'Exponent',
-    meaning: 'เลขชี้กำลังที่บวก bias ไว้ เลขชี้กำลังจริง = Exponent − 127',
+    meaning: 'เก็บเลขชี้กำลังจริง + 127 (bias) เป็น 8 บิต · อ่านกลับ: Exponent − 127',
   },
   bias: {
     term: 'Bias',

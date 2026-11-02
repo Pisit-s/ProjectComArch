@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { CHAPTERS, SECTIONS } from '../../src/content/lesson/sections';
+import { CHAPTERS, LESSONS, SECTIONS } from '../../src/content/lesson/sections';
 
 test.describe('single-page lesson', () => {
   test('every section is on the page in order, no horizontal scroll', async ({ page }) => {
@@ -45,7 +45,7 @@ test.describe('single-page lesson', () => {
 
   test('chapters 1-6 open with their vocabulary right after the hook', async ({ page }) => {
     await page.goto('/');
-    for (const c of CHAPTERS.filter((x) => x.number <= 6)) {
+    for (const c of LESSONS) {
       const first = await page
         .getByTestId(`section-${c.id}`)
         .locator('header')

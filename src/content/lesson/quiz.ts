@@ -1,7 +1,6 @@
 import { BINARY32, decode, encodeBits, splitFields, toHex } from '@/lib/fp';
 import { addBits, toBits, toSigned } from '@/lib/int/adder';
 import { sigText } from '@/lib/lesson/fp-frames';
-import { pow } from './captions/types';
 import type { SectionId } from './sections';
 
 /**
@@ -32,17 +31,6 @@ function binaryQuiz(): Quiz {
   };
 }
 
-function ieeeQuiz(): Quiz {
-  const E = parseInt('10000010', 2);
-  const e = E - 127;
-  return {
-    question: 'Exponent = 10000010₂ แปลว่าคูณด้วยเท่าไร',
-    options: [pow(2, e), pow(2, E), pow(2, e - 1)],
-    order: [2, 0, 1],
-    reason: `${E} − 127 = ${e}`,
-  };
-}
-
 function convertQuiz(): Quiz {
   const bits = encodeBits(F, '-0.75')!;
   const d = decode(F, bits);
@@ -66,8 +54,8 @@ export const QUIZ: Partial<Record<SectionId, Quiz>> = {
     order: [1, 2, 0],
     reason: 'หน้าจุดต้องมีเลขที่ไม่ใช่ 0 หลักเดียว',
   },
-  ieee754: ieeeQuiz(),
-  convert: convertQuiz(),
+  // one check for the merged chapter: −0.75 needs both the format and the conversion
+  ieee754: convertQuiz(),
   'fp-add': {
     question: 'G = 1, R = 0, S = 0 และ LSB = 1 จะปัดยังไง',
     options: ['ปัดขึ้นให้ LSB เป็น 0', 'ปัดลง', 'ไม่ต้องปัด'],
