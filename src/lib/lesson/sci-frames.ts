@@ -1,4 +1,4 @@
-import { type FloatFormat, addSub, encodeBits, printfFixed } from '@/lib/fp';
+import { type FloatFormat, addSub, encodeBits, encodeDecimal, printfFixed } from '@/lib/fp';
 import { addBits } from '@/lib/int/adder';
 import {
   type DecimalAddition,
@@ -16,10 +16,26 @@ export interface PointFrame {
   params: Params;
   state: SciState;
   normalized: boolean;
+  /** Where the point sits in `PointScene.digits` (number of digits before it). */
+  pointAt: number;
 }
 
-export function buildPointFrames(text: string, exp: number, base: 10 | 2 = 10): PointFrame[] {
+export interface PointScene {
+  base: 10 | 2;
+  /** Every digit as typed, without the point; the point hops between them. */
+  digits: string;
+  /** Index of the first non-zero digit (zeros before it carry no value once the point passes). */
+  lead: number;
+  frames: PointFrame[];
+}
+
+/** Scene 2.2: the point hops one digit at a time until the number is normalized. */
+export function buildPointScene(text: string, exp: number, base: 10 | 2 = 10): PointScene {
+  const [int, frac = ''] = text.trim().split('.');
+  const digits = int + frac;
+  const start = int.length;
   const n = normalizeDecimal(text, exp);
+  const step = n.direction === 'left' ? -1 : 1;
   const frames: PointFrame[] = [
     {
       id: 'start',
@@ -27,6 +43,7 @@ export function buildPointFrames(text: string, exp: number, base: 10 | 2 = 10): 
       params: {},
       state: n.states[0],
       normalized: n.already,
+      pointAt: start,
     },
   ];
   n.states.slice(1).forEach((s, k) =>
@@ -36,6 +53,7 @@ export function buildPointFrames(text: string, exp: number, base: 10 | 2 = 10): 
       params: { e: String(s.exp) },
       state: s,
       normalized: k === n.states.length - 2,
+      pointAt: start + step * (k + 1),
     }),
   );
   if (!n.already) {
@@ -45,9 +63,24 @@ export function buildPointFrames(text: string, exp: number, base: 10 | 2 = 10): 
       params: {},
       state: n.states.at(-1)!,
       normalized: true,
+      pointAt: frames.at(-1)!.pointAt,
     });
   }
-  return frames;
+  return { base, digits, lead: digits.search(/[1-9]/), frames };
+}
+
+export function buildPointFrames(text: string, exp: number, base: 10 | 2 = 10): PointFrame[] {
+  return buildPointScene(text, exp, base).frames;
+}
+
+/** The binary chip of scene 2.2: a decimal value written in base 2 by the engine (6.5 → 110.1). */
+export function binaryOf(fmt: FloatFormat, text: string): SciState {
+  const r = encodeDecimal(fmt, text);
+  if (!r.ok) throw new RangeError('bad decimal');
+  const p = r.steps.find((s) => s.kind === 'point');
+  if (!p || p.kind !== 'point') throw new RangeError('no binary form');
+  const frac = p.fracBinary.replace(/0+$/, '');
+  return { text: frac ? `${p.intBinary}.${frac}` : p.intBinary, exp: 0 };
 }
 
 export interface CCode {
@@ -71,6 +104,60 @@ export function runCCode(
   if (fx === null || fy === null) throw new RangeError('bad float literal');
   const floatResult = printfFixed(fmt, addSub(fmt, fx, fy, '+').bits, decimals);
   return { intResult, floatResult, output: `${intResult} ${floatResult}` };
+}
+
+export interface CFrame {
+  id: string;
+  captionKey: CaptionKey;
+  /** Code line lit in this frame. */
+  line: number;
+  /** Unit the line goes through. */
+  unit: 'alu' | 'fpu' | null;
+  /** Value that unit gives back (null when no unit). */
+  value: string | null;
+  /** Text printed so far. */
+  output: string;
+}
+
+/**
+ * Scene 2.1. main: int i = a + b; float f = x + y; printf("%d %f\n", i, f).
+ * teaser: float g = x + y; printf("%.Nf\n", g). Every printed digit comes from the models.
+ */
+export function buildCCodeFrames(
+  fmt: FloatFormat,
+  variant: 'main' | 'teaser',
+  a: number,
+  b: number,
+  x: string,
+  y: string,
+  decimals: number,
+): CFrame[] {
+  const c = runCCode(fmt, a, b, x, y, decimals);
+  if (variant === 'teaser') {
+    return [
+      {
+        id: 'float',
+        captionKey: 'c.float',
+        line: 0,
+        unit: 'fpu',
+        value: c.floatResult,
+        output: '',
+      },
+      {
+        id: 'print',
+        captionKey: 'c.teaser',
+        line: 1,
+        unit: null,
+        value: null,
+        output: c.floatResult,
+      },
+    ];
+  }
+  return [
+    { id: 'int', captionKey: 'c.int', line: 0, unit: 'alu', value: c.intResult, output: '' },
+    { id: 'float', captionKey: 'c.float', line: 1, unit: 'fpu', value: c.floatResult, output: '' },
+    { id: 'print', captionKey: 'c.print', line: 2, unit: null, value: null, output: c.output },
+  ];
 }
 
 export interface Dec4Frame {

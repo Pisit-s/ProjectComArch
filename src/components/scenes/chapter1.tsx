@@ -432,7 +432,8 @@ function BitRow({
   return (
     <div className={cn('flex items-center gap-2', className)}>
       <span className="w-6 text-right font-sans text-xs font-semibold text-muted">{label}</span>
-      <span className="flex gap-1" data-testid={testId} aria-label={bits}>
+      <span className="sr-only">{bits}</span>
+      <span className="flex gap-1" data-testid={testId}>
         {[...bits].map((c, k) => (
           <motion.span
             key={flip ? `${k}${c}` : k}
@@ -671,11 +672,8 @@ export function ShiftScene() {
         style={{ minHeight: '13rem', ['--c' as string]: 'clamp(1.75rem, 8vw, 2.6rem)' }}
       >
         <div className="num mx-auto flex w-max max-w-full flex-col items-center gap-3 text-[clamp(1.05rem,4.6vw,1.6rem)]">
-          <div
-            className="grid grid-cols-8 gap-1"
-            data-testid="shift-register"
-            aria-label={toBits(SHIFT_W, r.value)}
-          >
+          <span className="sr-only">{toBits(SHIFT_W, r.value)}</span>
+          <div className="grid grid-cols-8 gap-1" data-testid="shift-register">
             {Array.from({ length: SHIFT_W }, (_, p) =>
               p < s ? (
                 <motion.span
