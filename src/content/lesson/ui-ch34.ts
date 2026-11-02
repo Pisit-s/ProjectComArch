@@ -1,2 +1,23 @@
 /** Short labels used only by this branch's scenes (each at most 20 graphemes). */
-export const UI_CH34 = {} as const;
+export const UI_CH34 = {
+  bits: 'บิต',
+  hiddenBit: 'hidden bit (ไม่เก็บ)',
+  numberOrHex: 'ทศนิยม หรือ 0x…',
+  number: 'ทศนิยม',
+  hex: 'hex 8 หลัก',
+  normalOnly: 'ฉากนี้ใช้ได้กับเลขปกติ',
+  value: 'ค่า',
+  intPart: 'ส่วนเต็ม',
+  fracPart: 'ส่วนเศษ',
+  timesTwo: 'คูณ 2',
+  bitOut: 'บิต',
+  repeat: 'วนซ้ำ',
+  stored: 'ค่าที่เก็บจริง',
+  zones: 'โซนของ Exponent',
+  range: 'ช่วง',
+  pin: 'ตำแหน่งในช่วง',
+  tapBits: 'กดบิตเพื่อสลับ 0/1',
+  double: 'double',
+  float: 'float',
+  bias: 'bias',
+} as const;

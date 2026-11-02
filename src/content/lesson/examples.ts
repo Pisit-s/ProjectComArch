@@ -94,7 +94,20 @@ export const POINT_EXAMPLES: { text: string; exp: number }[] = [
 
 /** Scene 3.1-3.2 chips. */
 export const LAYOUT_DEFAULT = '6.5';
+export const LAYOUT_EXAMPLES = ['6.5', '3.75', '-0.75', '0xC0A00000'];
 export const BITPLAY_EXAMPLES = ['1', '1.5', '2', '3', '6.5', '0.75'];
+
+/** Scene 3.3: bit patterns of slide w03c_mult pages 16-17 (hex inputs; values come from the engine). */
+export const SPECIAL_EXAMPLES = [
+  '00000000',
+  '80000000',
+  '00000001',
+  '00800000',
+  '7F7FFFFF',
+  '7F800000',
+  'FF800000',
+  '7FC00000',
+];
 
 /** Scene 4.1 / 4.2 chips (decode inputs are hex typed by the learner). */
 export const ENCODE_EXAMPLES = ['6.5', '3.75', '-0.75', '0.1', '10.25'];
