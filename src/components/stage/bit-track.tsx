@@ -79,7 +79,7 @@ export function BitTrack({
   return (
     <div
       className={cn(
-        'num grid items-center gap-y-2 font-mono text-[length:var(--bit-size)] [--bit-size:clamp(0.85rem,3.6vw,1.35rem)] [--cell:clamp(0.95rem,3.95vw,1.9rem)]',
+        'bit-track num grid items-center gap-y-2 font-mono text-[length:var(--bit-size)] [--bit-size:clamp(0.85rem,3.6vw,1.35rem)] [--cell:clamp(0.95rem,3.95vw,1.9rem)]',
         className,
       )}
       style={style}

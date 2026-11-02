@@ -247,6 +247,12 @@
     animation: tb-glow 0.9s ease-out both;
   }
 
+  /* presentation mode (projector): bits big enough to read from the back of the room */
+  [data-presenting='1'] .bit-track {
+    --bit-size: clamp(1.4rem, 2.2vw, 2.6rem);
+    --cell: clamp(1.7rem, 2.7vw, 3.1rem);
+  }
+
   /* horizontal scrollers inside a card never scroll the page */
   .scroll-x {
     overflow-x: auto;
