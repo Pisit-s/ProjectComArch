@@ -1,4 +1,5 @@
 import { sectionById } from '@/content/lesson/sections';
+import { PlaygroundLink } from './playground-link';
 import { SceneShell } from './scene-shell';
 
 export function PlaygroundSection() {
@@ -20,6 +21,7 @@ export function PlaygroundSection() {
           </p>
         </header>
         <SceneShell id="playground" minHeight="36rem" />
+        <PlaygroundLink />
       </div>
     </section>
   );

@@ -15,6 +15,15 @@ import { MiniAlu } from '@/components/stage/mini-alu';
 import { Register32 } from '@/components/stage/register32';
 import { cn } from '@/lib/utils';
 
+/** What the scene shows right now (for share links). */
+export interface FpOpState {
+  a: string;
+  b: string;
+  op: Op;
+  /** Frame id of the current step. */
+  step: string | null;
+}
+
 export interface FpSceneState {
   scene: FpScene | null;
   errorA: string | null;
@@ -82,7 +91,8 @@ function ResultCard({ scene, testId }: { scene: FpScene; testId: string }) {
       <p className="num flex flex-wrap items-baseline gap-x-3 font-mono text-lg">
         <b data-testid={`${testId}-hex`}>{r.hex}</b>
         <span>
-          {r.inexact ? '≈' : '='} <b data-testid={`${testId}-value`}>{r.value}</b>
+          {r.inexact && r.stored !== null ? '≈' : '='}{' '}
+          <b data-testid={`${testId}-value`}>{r.value}</b>
         </span>
       </p>
     </div>
@@ -105,7 +115,7 @@ export function FpFrameView({
   if (f.stage === 'pack' || f.stage === 'special') {
     return (
       <div className="space-y-4">
-        {f.stage === 'pack' && f.rows.length === 1 && (
+        {f.stage === 'pack' && f.rows.length === 1 && scene.result.stored !== null && (
           <BitTrack
             rows={f.rows}
             fracBits={scene.fracBits}
@@ -150,6 +160,8 @@ export function FpOpScene({
   testId,
   label,
   extra,
+  initialStep = null,
+  fromLink = false,
   stepsOf = fpSteps,
   renderFrame,
   showFull = true,
@@ -160,7 +172,11 @@ export function FpOpScene({
   testId: string;
   label: string;
   /** Extra panel under the player (e.g. the rounding comparison). */
-  extra?: (scene: FpScene) => ReactNode;
+  extra?: (scene: FpScene, state: FpOpState) => ReactNode;
+  /** Frame id to open first (from a shared link). */
+  initialStep?: string | null;
+  /** Shown only when the input came from a link (opened at a step, no poster). */
+  fromLink?: boolean;
   /** Steps and drawing of another view of the same frames (the circuit). */
   stepsOf?: (scene: FpScene) => PlayerStep[];
   renderFrame?: (scene: FpScene, index: number, full: boolean) => ReactNode;
@@ -171,7 +187,14 @@ export function FpOpScene({
   const [a, setA] = useState(initial.a);
   const [b, setB] = useState(initial.b);
   const [op, setOp] = useState<Op>(initial.op);
-  const [touched, setTouched] = useState(false);
+  const [touched, setTouched] = useState(fromLink);
+  const [stepIndex, setStepIndex] = useState(0);
+  // a shared link opens at its step once; any edit starts from the first step again
+  const [linkStep, setLinkStep] = useState(initialStep);
+  const touch = () => {
+    setTouched(true);
+    setLinkStep(null);
+  };
   const [full, setFull] = useState(false);
   const [last, setLast] = useState<FpScene | null>(null);
   const state = useFpScene(a, op, b);
@@ -180,7 +203,7 @@ export function FpOpScene({
   const scene = state.scene ?? last;
 
   const pick = (ex: FpExample) => {
-    setTouched(true);
+    touch();
     setA(ex.a);
     setB(ex.b);
     setOp(ex.op);
@@ -192,7 +215,7 @@ export function FpOpScene({
         <OperandInput
           label={UI.inputA}
           value={a}
-          onChange={(v) => (setTouched(true), setA(v))}
+          onChange={(v) => (touch(), setA(v))}
           error={state.errorA}
           inputMode="decimal"
           testId={`${testId}-a`}
@@ -208,7 +231,7 @@ export function FpOpScene({
               )}
               aria-pressed={op === o}
               aria-label={o === '+' ? UI.opAdd : UI.opSub}
-              onClick={() => (setTouched(true), setOp(o))}
+              onClick={() => (touch(), setOp(o))}
               data-testid={`${testId}-op-${o === '+' ? 'add' : 'sub'}`}
             >
               {o === '+' ? '+' : '−'}
@@ -218,7 +241,7 @@ export function FpOpScene({
         <OperandInput
           label={UI.inputB}
           value={b}
-          onChange={(v) => (setTouched(true), setB(v))}
+          onChange={(v) => (touch(), setB(v))}
           error={state.errorB}
           inputMode="decimal"
           testId={`${testId}-b`}
@@ -251,6 +274,11 @@ export function FpOpScene({
           label={label}
           stepBar
           poster={!touched}
+          initialStep={Math.max(
+            0,
+            scene.frames.findIndex((f) => f.id === linkStep),
+          )}
+          onStepChange={setStepIndex}
           testId={`${testId}-player`}
           minHeight={minHeight}
           render={(i) =>
@@ -279,7 +307,7 @@ export function FpOpScene({
           )}
         </StepPlayer>
       )}
-      {scene && extra?.(scene)}
+      {scene && extra?.(scene, { a, b, op, step: scene.frames[stepIndex]?.id ?? null })}
     </div>
   );
 }

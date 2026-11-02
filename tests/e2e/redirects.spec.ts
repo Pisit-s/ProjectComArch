@@ -22,7 +22,7 @@ test.describe('redirects', () => {
 
   test('/lab keeps its query and lands on the page', async ({ page }) => {
     await page.goto('/lab?a=0.1&b=0.2&op=add');
-    await expect(page).toHaveURL(/\/\?a=0\.1&b=0\.2&op=add$/);
+    await expect(page).toHaveURL(/\/\?a=0\.1&b=0\.2&op=add(#playground)?$/);
     await expect(page.getByTestId('section-playground')).toBeAttached();
   });
 

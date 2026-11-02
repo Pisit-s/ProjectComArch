@@ -239,15 +239,18 @@
       linear-gradient(to bottom, var(--tb-border) 1px, transparent 1px);
     background-size: 32px 32px;
   }
-  .tb-rise {
-    animation: tb-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
   .tb-pop {
     animation: tb-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   }
   /* soft blue glow on bits that change in the current step */
   .tb-glow {
     animation: tb-glow 0.9s ease-out both;
+  }
+
+  /* presentation mode (projector): bits big enough to read from the back of the room */
+  [data-presenting='1'] .bit-track {
+    --bit-size: clamp(1.4rem, 2.2vw, 2.6rem);
+    --cell: clamp(1.7rem, 2.7vw, 3.1rem);
   }
 
   /* horizontal scrollers inside a card never scroll the page */
@@ -266,16 +269,6 @@
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .tb-blueprint {
     animation: tb-drift 40s linear infinite;
-  }
-}
-@keyframes tb-rise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 @keyframes tb-pop {
@@ -332,7 +325,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tb-blueprint,
-  .tb-rise,
   .tb-pop,
   .tb-glow {
     animation: none;
