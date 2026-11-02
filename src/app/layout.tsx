@@ -57,7 +57,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="th"
-      data-theme="binarylab"
+      data-theme="comkrub"
       className={`${chakraPetch.variable} ${plexSansThai.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">

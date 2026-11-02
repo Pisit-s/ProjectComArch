@@ -21,8 +21,7 @@ const bits64 = (x: number) => (view.setFloat64(0, x), view.getBigUint64(0));
 const f16 = (b: bigint) => (view.setUint16(0, Number(b)), view.getFloat16(0));
 const bits16 = (x: number) => (view.setFloat16(0, x), BigInt(view.getUint16(0)));
 
-const js = (op: Op, x: number, y: number) =>
-  op === '+' ? x + y : op === '-' ? x - y : op === '*' ? x * y : x / y;
+const js = (op: Op, x: number, y: number) => (op === '+' ? x + y : x - y);
 
 const RUNS = 20_000;
 

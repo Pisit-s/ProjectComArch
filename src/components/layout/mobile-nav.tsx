@@ -1,17 +1,16 @@
 'use client';
 
 import { Menu, X } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { CHAPTERS, LAB } from '@/content/chapters';
+import { UI } from '@/content/lesson/copy';
+import { CHAPTERS } from '@/content/lesson/sections';
 import { cn } from '@/lib/utils';
-import { ChapterIcon } from './chapter-icon';
+import { useActiveSection } from './use-active-section';
 
-/** Phone/tablet menu: daisyUI drawer from the right with every chapter and a one-line blurb. */
+/** Phone/tablet menu: daisyUI drawer from the right listing every chapter. */
 export function MobileNav() {
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
+  const active = useActiveSection();
 
   useEffect(() => {
     if (!open) return;
@@ -19,11 +18,6 @@ export function MobileNav() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
-
-  const items = [
-    ...CHAPTERS.map((c) => ({ ...c, label: `บทที่ ${c.number}`, name: c.title })),
-    { ...LAB, label: 'เครื่องมือ', name: 'Lab', number: 0 },
-  ];
 
   return (
     <div className="drawer drawer-end w-auto lg:hidden">
@@ -40,7 +34,7 @@ export function MobileNav() {
         <button
           type="button"
           className="btn btn-circle h-11 w-11 btn-ghost"
-          aria-label="เมนูบทเรียน"
+          aria-label={UI.menu}
           aria-expanded={open}
           aria-controls="mobile-nav-panel"
           onClick={() => setOpen(true)}
@@ -52,60 +46,47 @@ export function MobileNav() {
         <button
           type="button"
           tabIndex={-1}
-          aria-label="ปิดเมนู"
+          aria-label={UI.close}
           className="drawer-overlay"
           onClick={() => setOpen(false)}
         />
         <nav
           id="mobile-nav-panel"
-          aria-label="บทเรียนทั้งหมด"
-          className="glass-raised flex min-h-dvh w-[min(22rem,86vw)] flex-col gap-2 bg-white/95 p-4 pt-[max(1rem,env(safe-area-inset-top))]"
+          aria-label={UI.menu}
+          className="glass-raised flex min-h-dvh w-[min(20rem,84vw)] flex-col gap-2 bg-white/95 p-4 pt-[max(1rem,env(safe-area-inset-top))]"
         >
-          <div className="mb-2 flex items-center justify-between">
-            <span className="font-display text-lg font-semibold">บทเรียน</span>
+          <div className="mb-1 flex items-center justify-end">
             <button
               type="button"
               className="btn btn-circle h-11 w-11 btn-ghost"
-              aria-label="ปิดเมนู"
+              aria-label={UI.close}
               onClick={() => setOpen(false)}
             >
               <X className="h-5 w-5" aria-hidden />
             </button>
           </div>
-          <ul className="flex flex-col gap-2">
-            {items.map((it) => {
-              const active = pathname === it.href;
-              return (
-                <li key={it.href}>
-                  <Link
-                    href={it.href}
-                    onClick={() => setOpen(false)}
-                    aria-current={active ? 'page' : undefined}
-                    className={cn(
-                      'flex gap-3 rounded-xl p-3 ring-1 transition-colors',
-                      active ? 'bg-primary/10 ring-primary/40' : 'ring-line/70 hover:bg-ice-100',
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        'grid h-10 w-10 shrink-0 place-items-center rounded-lg',
-                        active ? 'bg-primary text-white' : 'bg-ice-100 text-primary',
-                      )}
-                    >
-                      <ChapterIcon name={it.icon} className="h-5 w-5" />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block text-xs font-medium text-muted">{it.label}</span>
-                      <span className="block leading-snug font-semibold">{it.name}</span>
-                      <span className="mt-0.5 block text-sm leading-snug text-muted">
-                        {it.blurb}
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+          <ol className="flex flex-col gap-1.5">
+            {CHAPTERS.map((c) => (
+              <li key={c.id}>
+                <a
+                  href={`#${c.id}`}
+                  onClick={() => setOpen(false)}
+                  aria-current={c.id === active ? 'location' : undefined}
+                  className={cn(
+                    'flex min-h-12 items-center gap-3 rounded-xl px-3 py-2 ring-1',
+                    c.id === active
+                      ? 'bg-primary/10 ring-primary/40'
+                      : 'ring-line/70 hover:bg-ice-100',
+                  )}
+                >
+                  <span className="num grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary font-mono text-sm text-white">
+                    {c.number}
+                  </span>
+                  <span className="leading-snug font-medium">{c.title}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
         </nav>
       </div>
     </div>

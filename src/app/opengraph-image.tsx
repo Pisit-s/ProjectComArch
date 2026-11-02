@@ -17,7 +17,7 @@ export default async function OpengraphImage() {
     font('chakra-petch-latin-600-normal.woff'),
     font('chakra-petch-thai-600-normal.woff'),
   ]);
-  const f = splitFields(BINARY32, encodeBits(BINARY32, '0.1')!);
+  const f = splitFields(BINARY32, encodeBits(BINARY32, '6.5')!);
   const cell = (bit: string, color: string, i: number) => (
     <div
       key={i}

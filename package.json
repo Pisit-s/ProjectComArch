@@ -1,5 +1,5 @@
 {
-  "name": "binary-lab",
+  "name": "comkrub",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -17,7 +17,8 @@
     "test:long": "tsx scripts/test-long.mts",
     "test:e2e": "playwright test",
     "shots": "tsx scripts/shot.mts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "text:report": "tsx scripts/text-report.mts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

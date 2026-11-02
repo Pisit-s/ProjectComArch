@@ -1,15 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ADD_SUB_EXAMPLES,
-  DECODE_EXAMPLES,
-  DIV_EXAMPLES,
-  ENCODE_EXAMPLES,
-  FRACTION_EXAMPLES,
-  INTEGER_EXAMPLES,
-  MUL_EXAMPLES,
-  findExample,
-} from '@/content/examples';
-import {
   R,
   decodeWithSteps,
   encodeDecimal,
@@ -21,6 +11,54 @@ import {
   uintValue,
 } from '@/lib/fp';
 import { F32, enc, hasStep, hex, stepOf } from './helpers';
+
+/** Inputs of the stage-1 golden vectors (docs/plans/stage1-floating-point.md appendix C). */
+const ENCODE_EXAMPLES = [
+  ['E1', '5.75'],
+  ['E2', '-13.25'],
+  ['E3', '0.1'],
+  ['E4', '0.2'],
+  ['E5', '0.3'],
+  ['E6', '1'],
+  ['E7', '0.15625'],
+  ['E8', '3.4028235e38'],
+  ['E9', '3.5e38'],
+  ['E10', '1e-40'],
+  ['E11', '1e-45'],
+  ['E12', '7e-46'],
+  ['E13', '1.00000017881393432617187499'],
+  ['E14', '16777217'],
+  ['E15', '-0'],
+].map(([id, input]) => ({ id, input }));
+const DECODE_EXAMPLES = [
+  ['X1', '0.15625'],
+  ['X2', '1e-45'],
+  ['X3', '1.17549435e-38'],
+  ['X4', '-0'],
+  ['X5', 'Infinity'],
+  ['X6', 'NaN'],
+].map(([id, source]) => ({ id, source }));
+const ADD_SUB_EXAMPLES: { id: string; op: '+' | '-'; a: string; b: string; label: string }[] = [
+  { id: 'A1', op: '+', a: '0.5', b: '-0.4375', label: '0.5 + (-0.4375)' },
+  { id: 'A2', op: '+', a: '0.1', b: '0.2', label: '0.1 + 0.2' },
+  { id: 'A3', op: '+', a: '1', b: '1e-8', label: '1 + 1e-8' },
+  { id: 'A4', op: '+', a: '16777216', b: '1', label: '16777216 + 1' },
+  { id: 'A5', op: '+', a: '16777216', b: '3', label: '16777216 + 3' },
+  { id: 'A6', op: '-', a: '1.0000001', b: '1', label: '1.0000001 - 1' },
+];
+const FRACTION_EXAMPLES: { id: string; input: string; bits: number }[] = [
+  { id: 'F1', input: '0.375', bits: 8 },
+  { id: 'F2', input: '0.625', bits: 8 },
+  { id: 'F3', input: '0.1', bits: 16 },
+  { id: 'F4', input: '0.1', bits: 23 },
+  { id: 'F5', input: '0.1', bits: 8 },
+];
+const INTEGER_EXAMPLES = [
+  { id: 'I1', bits: '00001010' },
+  { id: 'I2', bits: '00001011' },
+  { id: 'I3', bits: '11111111' },
+];
+const findExample = (id: string) => ADD_SUB_EXAMPLES.find((e) => e.id === id);
 
 function run(id: string) {
   const ex = findExample(id);
@@ -198,167 +236,6 @@ describe('C.3 add/sub', () => {
     expect(stepOf(r, 'align').shift).toBe(0);
     expect(stepOf(r, 'normalize')).toMatchObject({ direction: 'left', amount: 23 });
     expect(stepOf(r, 'round').decision).toBe('exact');
-  });
-});
-
-describe('C.4 mul/div', () => {
-  const expected: Record<string, string> = {
-    M1: '0x40700000',
-    M2: '0xBE600000',
-    M3: '0x418F0000',
-    M4: '0x3E99999A',
-    M5: '0x7F800000',
-    M6: '0x00000000',
-    M7: '0x000116C2',
-    M8: '0xC1100000',
-    M9: '0x3C23D70B',
-    M10: '0x80000000',
-    M11: '0x7FC00000',
-    D1: '0x40400000',
-    D2: '0x3F400000',
-    D3: '0x3EAAAAAB',
-    D4: '0x7F800000',
-    D5: '0x7FC00000',
-    D6: '0x3F2AAAAB',
-    D7: '0x3DCCCCCD',
-    D8: '0xC1000000',
-    D9: '0x7F800000',
-    D10: '0x000116C2',
-    D11: '0x00000000',
-    D12: '0xFF800000',
-    D13: '0x00000000',
-  };
-  for (const ex of [...MUL_EXAMPLES, ...DIV_EXAMPLES]) {
-    it(`${ex.id} ${ex.label}`, () => expect(hex(run(ex.id))).toBe(expected[ex.id]));
-  }
-
-  it('M1: E = 127 + 128 - 127 = 128, no normalize, 2 partial products', () => {
-    const r = run('M1');
-    expect(stepOf(r, 'exponent')).toMatchObject({ ea: 127, eb: 128, result: 128 });
-    expect(stepOf(r, 'normalize').direction).toBe('none');
-    expect(stepOf(r, 'sig-mul').rows).toHaveLength(2);
-  });
-  it('M2: sign 0 xor 1, E = 126 + 125 - 127 = 124', () => {
-    const r = run('M2');
-    expect(stepOf(r, 'sign')).toMatchObject({ a: 0, b: 1, result: 1 });
-    expect(stepOf(r, 'exponent')).toMatchObject({ ea: 126, eb: 125, result: 124 });
-  });
-  it('M3: E 130 -> 131, product 10.001111 shifts right, 3 partial products', () => {
-    const r = run('M3');
-    expect(stepOf(r, 'exponent').result).toBe(130);
-    const mulStep = stepOf(r, 'sig-mul');
-    expect(mulStep.rows).toHaveLength(3);
-    expect(mulStep.rows.reduce((s, x) => s + x.value, 0n)).toBe(mulStep.product);
-    // multiplier is 1.011 (2.75) as in the requirement's worked example
-    expect(mulStep.multiplier).toBe(0b1011n << 20n);
-    expect(stepOf(r, 'normalize')).toMatchObject({ direction: 'right', amount: 1, expAfter: 131 });
-    expect(stepOf(r, 'round')).toMatchObject({ guard: 0, round: 0, sticky: 0 });
-  });
-  it('M4: E 124 -> 125, G=1 R=1 S=0 up', () => {
-    const r = run('M4');
-    expect(stepOf(r, 'exponent').result).toBe(124);
-    expect(stepOf(r, 'normalize')).toMatchObject({ direction: 'right', expAfter: 125 });
-    expect(stepOf(r, 'round')).toMatchObject({ guard: 1, round: 1, sticky: 0, decision: 'up' });
-    expect(formatRational(r.exact!)).toBe('0.300000004470348358154296875');
-  });
-  it('M5: E = 257 -> 258 overflow', () => {
-    const r = run('M5');
-    expect(stepOf(r, 'exponent').result).toBe(257);
-    expect(stepOf(r, 'normalize').expAfter).toBe(258);
-    expect(stepOf(r, 'range').outcome).toBe('overflow');
-    expect(r.flags).toMatchObject({ overflow: true, inexact: true });
-  });
-  it('M6: E = 27 + 27 - 127 = -73, underflow to zero', () => {
-    const r = run('M6');
-    expect(stepOf(r, 'exponent')).toMatchObject({ ea: 27, eb: 27, result: -73 });
-    expect(stepOf(r, 'range').outcome).toBe('underflow-zero');
-    expect(r.flags.underflow).toBe(true);
-  });
-  it('M7: denormalize 7 bits, G = 0 rounds down', () => {
-    const r = run('M7');
-    expect(stepOf(r, 'range')).toMatchObject({ outcome: 'underflow-subnormal', denormShift: 7 });
-    expect(stepOf(r, 'round').guard).toBe(0);
-    expect(stepOf(r, 'round').decision).toBe('down');
-  });
-  it('M8: 1.1 x 1.1 = 10.01 shifts right', () => {
-    const r = run('M8');
-    expect(stepOf(r, 'sign').result).toBe(1);
-    expect(stepOf(r, 'normalize').direction).toBe('right');
-  });
-  it('M9: 13 partial products, G=1 R=0 S=1 up', () => {
-    const r = run('M9');
-    expect(stepOf(r, 'sig-mul').rows).toHaveLength(13);
-    expect(stepOf(r, 'round')).toMatchObject({ guard: 1, round: 0, sticky: 1, decision: 'up' });
-    expect(exactDecimal(F32, r.bits)).toBe('0.010000000707805156707763671875');
-  });
-  it('M10, M11: special rules', () => {
-    expect(stepOf(run('M10'), 'special').rule).toBe('zero-times');
-    const m11 = run('M11');
-    expect(stepOf(m11, 'special').rule).toBe('zero-times-inf');
-    expect(m11.flags.invalid).toBe(true);
-  });
-  it('D1: E = 129 - 128 + 127 = 128, remainder 0', () => {
-    const r = run('D1');
-    expect(stepOf(r, 'exponent')).toMatchObject({ ea: 129, eb: 128, result: 128 });
-    expect(stepOf(r, 'sig-div').remainder).toBe(0n);
-    expect(stepOf(r, 'normalize').direction).toBe('none');
-  });
-  it('D2: E 127 -> 126, quotient 0.11 shifts left', () => {
-    const r = run('D2');
-    expect(stepOf(r, 'exponent').result).toBe(127);
-    expect(stepOf(r, 'normalize')).toMatchObject({ direction: 'left', amount: 1, expAfter: 126 });
-  });
-  it('D3: E 126 -> 125, Q = 0.1010..., G=1 R=0 S=1 up', () => {
-    const r = run('D3');
-    expect(stepOf(r, 'exponent').result).toBe(126);
-    const d = stepOf(r, 'sig-div');
-    expect(d.rows).toHaveLength(27);
-    expect(d.quotient.toString(2).padStart(27, '0')).toBe('0' + '10'.repeat(13));
-    expect(d.remainder).not.toBe(0n);
-    expect(stepOf(r, 'normalize')).toMatchObject({ direction: 'left', expAfter: 125 });
-    expect(stepOf(r, 'round')).toMatchObject({ guard: 1, round: 0, sticky: 1, decision: 'up' });
-    expect(exactDecimal(F32, r.bits)).toBe('0.3333333432674407958984375');
-  });
-  it('D4, D5, D12: special rules and flags', () => {
-    expect(run('D4').flags.divideByZero).toBe(true);
-    expect(run('D5').flags.invalid).toBe(true);
-    expect(stepOf(run('D12'), 'special').rule).toBe('div-zero');
-  });
-  it('D6: G=1 R=0 S=1 up', () => {
-    expect(stepOf(run('D6'), 'round')).toMatchObject({
-      guard: 1,
-      round: 0,
-      sticky: 1,
-      decision: 'up',
-    });
-  });
-  it('D7: E = 127 - 130 + 127 = 124 -> 123, G=1 R=1 S=1', () => {
-    const r = run('D7');
-    expect(stepOf(r, 'exponent').result).toBe(124);
-    expect(stepOf(r, 'normalize').expAfter).toBe(123);
-    expect(stepOf(r, 'round')).toMatchObject({ guard: 1, round: 1, sticky: 1, decision: 'up' });
-  });
-  it('D8: sign 1, E = 129 - 126 + 127 = 130, remainder 0', () => {
-    const r = run('D8');
-    expect(stepOf(r, 'sign').result).toBe(1);
-    expect(stepOf(r, 'exponent')).toMatchObject({ ea: 129, eb: 126, result: 130 });
-    expect(stepOf(r, 'sig-div').remainder).toBe(0n);
-  });
-  it('D9: E = 254 - 123 + 127 = 258 overflow', () => {
-    const r = run('D9');
-    expect(stepOf(r, 'exponent').result).toBe(258);
-    expect(stepOf(r, 'range').outcome).toBe('overflow');
-  });
-  it('D10: E = 27 - 160 + 127 = -6, denormalize 7 bits', () => {
-    const r = run('D10');
-    expect(stepOf(r, 'exponent')).toMatchObject({ ea: 27, eb: 160, result: -6 });
-    expect(stepOf(r, 'range')).toMatchObject({ outcome: 'underflow-subnormal', denormShift: 7 });
-  });
-  it('D11: subnormal dividend 0x006CE3EE, result 0', () => {
-    expect(hex(enc('1e-38'))).toBe('0x006CE3EE');
-    const r = run('D11');
-    expect(stepOf(r, 'decode').cls).toBe('subnormal');
-    expect(stepOf(r, 'range').outcome).toBe('underflow-zero');
   });
 });
 

@@ -24,3 +24,7 @@ coverage/
 
 # logs
 npm-debug.log*
+
+# teacher slides and copyrighted reference (never commit)
+Slide/
+EMIPS.pdf

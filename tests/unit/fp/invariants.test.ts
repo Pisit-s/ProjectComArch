@@ -1,6 +1,6 @@
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
-import { OPS, type Op, type Step, encodeDecimal, operate, precision, simulate } from '@/lib/fp';
+import { OPS, type Op, type Step, encodeDecimal, operate, simulate } from '@/lib/fp';
 import { F32, stepOf } from './helpers';
 import { PAIR_KINDS } from './oracle-gen';
 
@@ -18,22 +18,6 @@ function checkOp(op: Op, a: bigint, b: bigint): boolean {
   const r = operate(F32, op, a, b);
   checkCommon(r.steps, r.bits);
   for (const s of r.steps) {
-    if (s.kind === 'sig-mul') {
-      expect(s.rows.reduce((acc, row) => acc + row.value, 0n)).toBe(s.product);
-      expect(s.rows.every((row) => ((s.multiplier >> BigInt(row.bitIndex)) & 1n) === 1n)).toBe(
-        true,
-      );
-    }
-    if (s.kind === 'sig-div') {
-      const q = s.rows.reduce((acc, row) => (acc << 1n) | BigInt(row.qBit), 0n);
-      expect(q).toBe(s.quotient);
-      expect(s.quotient).toBe((s.dividend << BigInt(precision(F32) + 2)) / s.divisor);
-      expect(s.rows).toHaveLength(precision(F32) + 3);
-    }
-    if (s.kind === 'normalize' && (op === '*' || op === '/')) {
-      expect(s.amount).toBeLessThanOrEqual(1);
-      expect(s.direction).not.toBe(op === '*' ? 'left' : 'right');
-    }
     if (s.kind === 'round' && s.decision.startsWith('tie')) {
       expect([s.guard, s.round, s.sticky]).toEqual([1, 0, 0]);
     }
@@ -86,19 +70,6 @@ describe('step invariants', () => {
     expect(rule('+', 0n, 0x3f800000n)).toBe('add-zero');
     expect(rule('+', 0x3f800000n, 0n)).toBe('add-zero');
   });
-
-  it('special rules for mul/div', () => {
-    const rule = (op: Op, a: bigint, b: bigint) => stepOf(operate(F32, op, a, b), 'special').rule;
-    expect(rule('*', 0x7f800000n, 0xbf800000n)).toBe('inf-times');
-    expect(operate(F32, '*', 0x7f800000n, 0xbf800000n).bits).toBe(0xff800000n);
-    expect(rule('*', 0x7fc00001n, 0n)).toBe('nan-operand');
-    expect(rule('/', 0x7f800000n, 0xff800000n)).toBe('inf-div-inf');
-    expect(rule('/', 0xff800000n, 0x40000000n)).toBe('inf-div');
-    expect(rule('/', 0x40000000n, 0xff800000n)).toBe('div-inf');
-    expect(operate(F32, '/', 0x40000000n, 0xff800000n).bits).toBe(0x80000000n);
-    expect(rule('/', 0x80000000n, 0x40000000n)).toBe('zero-div');
-    expect(rule('/', 0x7fc00000n, 0x40000000n)).toBe('nan-operand');
-  });
 });
 
 describe('simulate', () => {
@@ -108,13 +79,13 @@ describe('simulate', () => {
       errorA: { kind: 'comma' },
       errorB: null,
     });
-    expect(simulate(F32, '/', '1', '')).toEqual({
+    expect(simulate(F32, '-', '1', '')).toEqual({
       ok: false,
       errorA: null,
       errorB: { kind: 'empty' },
     });
-    const ok = simulate(F32, '*', '6.5', '2.75');
-    expect(ok.ok && ok.result.bits).toBe(0x418f0000n);
+    const ok = simulate(F32, '+', '6.5', '3.75');
+    expect(ok.ok && ok.result.bits).toBe(0x41240000n);
   });
 });
 
@@ -146,13 +117,13 @@ describe('simulate comparison values', () => {
     expect(s.error && s.error.num > 0n).toBe(true);
   });
   it('special values have no typed result', () => {
-    const s = simulate(F32, '/', '1', '0');
+    const s = simulate(F32, '+', 'inf', '1');
     if (!s.ok) throw new Error();
     expect(s.typed).toBeNull();
     expect(s.stored).toBeNull();
     const m = simulate(F32, '-', '5', '3');
     expect(m.ok && m.error).toEqual({ num: 0n, den: 1n });
-    const p = simulate(F32, '*', '-0', '3');
+    const p = simulate(F32, '-', '-0', '0');
     expect(p.ok && p.typed).toEqual({ num: 0n, den: 1n });
   });
 });

@@ -1,43 +1,29 @@
 import { describe, expect, it } from 'vitest';
-import { LAB_DEFAULT, defaultHex, parseLabQuery, toLabQuery } from '@/lib/url-state';
+import { type PlayState, parsePlayQuery, toPlayQuery } from '@/lib/url-state';
 
 const q = (s: string) => new URLSearchParams(s);
+const DEFAULT: PlayState = { op: '+', a: '6.5', b: '3.75', step: null };
 
-describe('lab url state', () => {
-  it('round trips a calculator state', () => {
-    const { state, invalid } = parseLabQuery(q('tab=calc&op=mul&a=0.1&b=3&step=round'));
+describe('playground url state', () => {
+  it('round trips a state', () => {
+    const { state, invalid, present } = parsePlayQuery(q('a=0.1&b=0.2&op=sub&step=round'), DEFAULT);
     expect(invalid).toEqual([]);
-    expect(state).toMatchObject({ tab: 'calc', op: '*', a: '0.1', b: '3', step: 'round' });
-    expect(parseLabQuery(q(toLabQuery(state))).state).toEqual(state);
+    expect(present).toBe(true);
+    expect(state).toEqual({ op: '-', a: '0.1', b: '0.2', step: 'round' });
+    expect(toPlayQuery(state)).toBe('a=0.1&b=0.2&op=sub&step=round');
+    expect(parsePlayQuery(q(toPlayQuery(state)), DEFAULT).state).toEqual(state);
   });
-  it('round trips a converter state', () => {
-    const { state } = parseLabQuery(q('tab=conv&mode=decode&hex=0x40b80000'));
-    expect(state).toMatchObject({ tab: 'conv', mode: 'decode', hex: '40B80000' });
-    expect(toLabQuery(state)).toBe('tab=conv&mode=decode&hex=40B80000');
-    expect(toLabQuery({ ...state, mode: 'encode', x: '-1e-8' })).toBe(
-      'tab=conv&mode=encode&x=-1e-8',
-    );
+  it('falls back to defaults for bad values (old lab links included)', () => {
+    const { state, invalid } = parsePlayQuery(q('op=mul&a=1,5&b=abc&step=<b>'), DEFAULT);
+    expect(invalid).toEqual(['op', 'a', 'b', 'step']);
+    expect(state).toEqual(DEFAULT);
   });
-  it('falls back to defaults for bad values', () => {
-    const { state, invalid } = parseLabQuery(
-      q('tab=x&op=pow&a=1,5&b=abc&mode=zz&hex=XYZ&step=<b>&x='),
-    );
-    expect(invalid).toEqual(['tab', 'op', 'a', 'b', 'x', 'mode', 'hex', 'step']);
-    expect(state).toEqual(LAB_DEFAULT);
-  });
-  it('formats: binary16 / binary64 with matching hex length', () => {
-    const h = parseLabQuery(q('fmt=b16&tab=conv&mode=decode&hex=2e66'));
-    expect(h.invalid).toEqual([]);
-    expect(h.state).toMatchObject({ fmt: 'b16', hex: '2E66' });
-    expect(toLabQuery(h.state)).toBe('fmt=b16&tab=conv&mode=decode&hex=2E66');
-    const d = parseLabQuery(q('fmt=b64&tab=conv&mode=decode&hex=3E200000'));
-    expect(d.invalid).toEqual(['hex']);
-    expect(d.state.hex).toBe(defaultHex('b64'));
-    expect(defaultHex('b64')).toHaveLength(16);
-    expect(parseLabQuery(q('fmt=b8')).invalid).toEqual(['fmt']);
-    expect(toLabQuery(LAB_DEFAULT)).not.toContain('fmt=');
-  });
-  it('empty query is the default', () => {
-    expect(parseLabQuery(q(''))).toEqual({ state: LAB_DEFAULT, invalid: [] });
+  it('empty query is the default and not present', () => {
+    expect(parsePlayQuery(q('tab=calc'), DEFAULT)).toEqual({
+      state: DEFAULT,
+      invalid: [],
+      present: false,
+    });
+    expect(toPlayQuery(DEFAULT)).toBe('a=6.5&b=3.75&op=add');
   });
 });

@@ -1,11 +1,18 @@
-# Binary Lab
+# comkrub
 
-เว็บสื่อการสอนแบบ interactive เรื่องเลขฐานสองและ Floating-Point (IEEE 754 Single Precision) วิชา Computer Architecture
+เว็บสื่อการสอนวิชา Computer Architecture เรื่องเดียว: **การบวกและการลบเลข Floating-Point** (IEEE 754 single precision) เป็นหน้าเดียว เลื่อนลงทีละบท ภาพเคลื่อนไหวเยอะ ข้อความน้อย ทุกขั้นกดเล่นได้
 
-- 5 บท: ระบบเลขฐาน · เศษส่วนฐานสอง · IEEE 754 encode/decode · บวก/ลบ · คูณ/หาร + หน้า Lab
-- ทุกกระบวนการหลายขั้นดูได้ทีละขั้นด้วย StepPlayer (ย้อน/ถัดไป/เล่น/ความเร็ว/กดกระโดดขั้น/คีย์บอร์ด)
-- คำนวณทั้งหมดใน browser ด้วย engine ที่ใช้ BigInt ผลตรง IEEE 754 binary32 (round to nearest, ties to even) ทุกบิต
-- static ทั้งเว็บ ไม่มี backend, database หรือ env
+1. บวกและลบเลขฐานสอง (ทบทวนจาก Digital: full adder, two's complement, overflow, shift)
+2. เลขทศนิยมในโปรแกรม (`int` กับ `float` ในภาษา C, scientific notation)
+3. มาตรฐาน IEEE 754 (sign, exponent, significand, ค่าพิเศษ)
+4. แปลงเลขทศนิยมเป็น IEEE 754 และถอดกลับ
+5. บวกและลบเลข Floating-Point (align → บวก/ลบ → normalize → ปัด G R S)
+6. วงจรบวก/ลบ Floating-Point (Small ALU, MUX, Shifter, Big ALU, Normalize, Round)
+7. ลองเอง (ใส่เลขเอง ดูแบบบิตหรือแบบวงจร แชร์ลิงก์ได้) และสรุป
+
+- ทุกกระบวนการหลายขั้นใช้ StepPlayer (ย้อน/ถัดไป/เล่น/ความเร็ว/กดกระโดดขั้น/คีย์บอร์ด/โหมดนำเสนอ/reduced motion)
+- ตัวเลขทุกตัวบนหน้าเว็บมาจาก engine ที่ใช้ BigInt ผลตรง IEEE 754 binary32 (round to nearest, ties to even) ทุกบิต
+- static ทั้งเว็บ ไม่มี backend, database หรือ env · ลิงก์เก่า `/learn/*` และ `/lab` redirect มาที่บทที่ตรงกัน
 
 ## รันในเครื่อง
 
@@ -27,16 +34,24 @@ npm run dev          # http://localhost:3000
 | `npm run test:long` | oracle 1,008,000 กรณี |
 | `npm run test:cov` | coverage ของ `src/lib/fp` |
 | `npm run test:e2e` | Playwright (ครั้งแรกรัน `npx playwright install chromium webkit`) |
+| `npm run text:report` | ตารางจำนวนตัวอักษรต่อบท เทียบงบใน PLAN.md 1.3 |
 | `npm run shots -- <path> <out.png> [width] [height]` | ถ่าย screenshot (ต้องมี server ที่ `SHOT_BASE`, ค่าเริ่มต้น `http://localhost:3200`) |
 
 ## โครงสร้าง
 
-- `src/lib/fp/` engine (อธิบายใน `docs/ENGINE.md`)
-- `src/app/` หน้าเว็บ (`/learn/*`, `/lab`)
-- `src/components/` ธีมกระจก, บิต, StepPlayer, ภาพแต่ละขั้น, เครื่องมือ
-- `src/content/` ตัวอย่าง, ข้อความของแต่ละขั้น, คำศัพท์
+- `src/app/page.tsx` หน้าเดียว (`/`) · `src/app/dev/kit` หน้ารวมชิ้นส่วนภาพ (เฉพาะ dev)
+- `src/lib/fp/` engine (อธิบายใน `docs/ENGINE.md`) · `src/lib/int/`, `src/lib/sci/` โมเดลบทที่ 1–2 และ 5.1
+- `src/lib/lesson/` frame adapters: แปลงผลของ engine เป็นเฟรมที่ UI วาดได้โดยไม่ต้องคำนวณเอง
+- `src/components/scenes/` ฉากของแต่ละบท · `stage/` ชิ้นส่วนภาพ (BitTrack, RoundLine, …) · `hw/` วงจร · `player/` StepPlayer
+- `src/content/lesson/` ข้อความทั้งหมดที่ผู้ใช้เห็น (บท, คำศัพท์, caption, คำถามเช็ก, ตัวอย่าง) · มี test ตรวจงบข้อความ
 - `src/lib/site.ts` ชื่อเว็บ เครดิต ลิงก์ (แก้ที่เดียว)
-- `docs/` แผนงาน ความคืบหน้า คำถาม และคู่มือ deploy (`docs/DEPLOY.md`)
+- `PLAN.md` แผนงาน · `docs/` ความคืบหน้า คำถาม review คู่มือ deploy และการแบ่งงาน (`docs/PARALLEL.md`)
+
+## แหล่งอ้างอิง
+
+- สไลด์ Computer Architecture: Arithmetic for Computers (w03c, w03c_mult), Tatpong Katanyukul, CoE KKU
+- D. A. Patterson and J. L. Hennessy, Computer Organization and Design, 5th ed., หัวข้อ 3.2 และ 3.5
+- IEEE Std 754-2019, IEEE Standard for Floating-Point Arithmetic
 
 ## ผู้จัดทำ
 

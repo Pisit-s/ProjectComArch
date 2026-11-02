@@ -39,9 +39,9 @@ const INF_NEG = 0b1_1111_000n;
 function bruteForce(op: Op, a: bigint, b: bigint): bigint | 'nan' {
   const x = asNumber(a);
   const y = asNumber(b);
-  const js = op === '+' ? x + y : op === '-' ? x - y : op === '*' ? x * y : x / y;
+  const js = op === '+' ? x + y : x - y;
   if (Number.isNaN(js)) return 'nan';
-  if (!Number.isFinite(x) || !Number.isFinite(y) || (op === '/' && y === 0)) {
+  if (!Number.isFinite(x) || !Number.isFinite(y)) {
     // special operands: IEEE double semantics give the same class and sign
     if (js === Infinity) return INF_POS;
     if (js === -Infinity) return INF_NEG;
@@ -49,24 +49,18 @@ function bruteForce(op: Op, a: bigint, b: bigint): bigint | 'nan' {
   }
   if (js === 0) return Object.is(js, -0) ? 0b1_0000_000n : 0n;
 
-  // exact result N/D in units
+  // exact result N in units
   const ua = units(a);
   const ub = units(b);
-  let N: number;
-  let D: number;
-  if (op === '+') [N, D] = [ua + ub, 1];
-  else if (op === '-') [N, D] = [ua - ub, 1];
-  else if (op === '*') [N, D] = [ua * ub, 512];
-  else [N, D] = [ua * 512, ub];
-  if (D < 0) [N, D] = [-N, -D];
+  const N = op === '+' ? ua + ub : ua - ub;
   const negative = N < 0;
-  if (Math.abs(N) >= OVERFLOW_UNITS * D) return negative ? INF_NEG : INF_POS;
+  if (Math.abs(N) >= OVERFLOW_UNITS) return negative ? INF_NEG : INF_POS;
 
   let best: (typeof FINITE)[number] | null = null;
   let bestDist = Infinity;
   for (const c of FINITE) {
     if (c.neg !== negative) continue;
-    const dist = Math.abs(c.u * D - N);
+    const dist = Math.abs(c.u - N);
     if (dist < bestDist || (dist === bestDist && (c.bits & 1n) === 0n)) {
       best = c;
       bestDist = dist;

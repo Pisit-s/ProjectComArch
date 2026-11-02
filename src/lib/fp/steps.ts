@@ -20,18 +20,7 @@ export type SpecialRule =
   | 'inf-minus-inf'
   | 'inf-operand'
   | 'zero-plus-zero'
-  | 'add-zero'
-  // mul
-  | 'zero-times-inf'
-  | 'inf-times'
-  | 'zero-times'
-  // div
-  | 'inf-div-inf'
-  | 'zero-div-zero'
-  | 'inf-div'
-  | 'div-inf'
-  | 'div-zero'
-  | 'zero-div';
+  | 'add-zero';
 
 export type RangeOutcome = 'ok' | 'overflow' | 'underflow-subnormal' | 'underflow-zero';
 
@@ -85,23 +74,6 @@ export interface IntRow {
   bit: Bit;
 }
 
-export interface DivRow {
-  /** Partial remainder before the compare (scaled like the significands). */
-  remainder: bigint;
-  /** remainder >= divisor, so the divisor was subtracted. */
-  subtracted: boolean;
-  qBit: Bit;
-  /** Remainder after the optional subtraction, before the shift. */
-  after: bigint;
-}
-
-export interface MulRow {
-  /** Multiplier bit position counted from the LSB. */
-  bitIndex: number;
-  /** multiplicand << bitIndex */
-  value: bigint;
-}
-
 type StepBody =
   | {
       kind: 'decode';
@@ -111,9 +83,9 @@ type StepBody =
       cls: FloatClass;
       /** Integer significand (hidden bit included for normal numbers). */
       significand: bigint;
-      /** Effective biased exponent (subnormal: 1, or less after normalizing in mul/div). */
+      /** Effective biased exponent (subnormal: 1). */
       exponent: number;
-      /** Subnormal operands in mul/div are normalized by this many left shifts. */
+      /** Left shifts that would normalize a subnormal operand (0 for normal ones). */
       normalizeShift: number;
       value: Rational | null;
     }
@@ -159,30 +131,6 @@ type StepBody =
       result: bigint;
       fracBits: number;
       sign: Bit;
-    }
-  | {
-      kind: 'sig-mul';
-      multiplicand: bigint;
-      multiplier: bigint;
-      /** true when operand B is the multiplicand (A had fewer 1 bits). */
-      swapped: boolean;
-      rows: MulRow[];
-      product: bigint;
-      /** Bits after the point in multiplicand/multiplier. */
-      operandFracBits: number;
-      /** Bits after the point in rows/product. */
-      fracBits: number;
-    }
-  | {
-      kind: 'sig-div';
-      dividend: bigint;
-      divisor: bigint;
-      rows: DivRow[];
-      quotient: bigint;
-      remainder: bigint;
-      operandFracBits: number;
-      /** Bits after the point in the quotient. */
-      fracBits: number;
     }
   | {
       kind: 'normalize';

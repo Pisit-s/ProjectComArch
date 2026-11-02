@@ -1,6 +1,6 @@
 export type FieldKind = 'sign' | 'exp' | 'frac' | 'hidden' | 'grs' | 'plain';
 
-/** One colour set per field, the same in every chapter (FR-08, PLAN.md 9.4). */
+/** One colour set per field, the same in every chapter (FR-08, docs/plans/stage1-floating-point.md 9.4). */
 export const FIELD_STYLE: Record<
   FieldKind,
   {
@@ -37,7 +37,7 @@ export const FIELD_STYLE: Record<
     border: 'border-bit-frac',
     text: 'text-bit-frac-ink',
     chip: 'bg-bit-frac',
-    label: 'Fraction',
+    label: 'Significand',
     short: 'F',
   },
   hidden: {

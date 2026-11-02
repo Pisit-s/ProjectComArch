@@ -1,70 +1,64 @@
-พร้อม deploy แล้ว (Milestone "พร้อมใช้สอน" ผ่านเมื่อ 30 ต.ค. 2569 · วิธี deploy: docs/DEPLOY.md)
+# ความคืบหน้า comkrub (รอบบวก/ลบ หน้าเดียว)
 
-# ความคืบหน้า Binary Lab
+> session ใหม่: อ่าน CLAUDE.md แล้วดูงานแรกที่ยังไม่ติ๊ก · branch `addsub-redesign` (upstream ตั้งเป็น `origin/addsub-redesign` เท่านั้น ห้าม push เข้า main)
+> เอกสารรอบแรก (Binary Lab) อยู่ที่ `docs/history/stage1/`
 
-> session ใหม่: อ่าน CLAUDE.md แล้วดูงานแรกที่ยังไม่ติ๊กด้านล่าง
+## Phase 0 — เริ่มงานและยกเลิกแผนเดิม
+- [x] branch `addsub-redesign` จาก `origin/main` · commit PLAN.md (`833a5ff`) · ยกเลิก upstream ที่ชี้ไป origin/main
+- [x] CLAUDE.md ใหม่ (ภาคผนวก B)
+- [x] 6.1 ลบแผน wp1–wp3 + golden · `EMIPS.pdf` untrack + gitignore
+- [x] 6.3 ย้ายเอกสารรอบแรกไป `docs/history/stage1/` · สร้าง PROGRESS/QUESTIONS/REVIEW ใหม่ · comment ที่อ้าง PLAN.md ชี้ไป stage1
+- [x] 6.4 `.gitignore` (Slide/, EMIPS.pdf) · `@source not '../../Slide'`
+- [x] DoD: lint/typecheck/test (172) / build ผ่าน · git status สะอาด · Slide/ ไม่ถูก track
 
-## Phase 0 — Setup และกติกา
-- [x] อ่าน PLAN.md + requirement 4 ไฟล์
-- [x] ตรวจเครื่อง: Node 26.11.1, npm 11.20.0, gh login `Pisit-s`
-- [x] commit การลบ `floating_web/` (`9bbaac5`) · untrack `.DS_Store` + `.gitignore` · commit plan/requirement/reference (`aea38ff`)
-- [x] scaffold create-next-app 16.4.3 ใน scratchpad แล้ว copy เข้ามา (ใช้ `@tailwindcss/turbopack` ตาม scaffold — ดู STACK.md)
-- [x] ติดตั้ง dependency ตามหัวข้อ 5 · config Prettier, Vitest, ESLint, tsconfig (ES2022, exclude docs)
-- [x] CLAUDE.md, docs/PROGRESS.md, docs/QUESTIONS.md, docs/STACK.md
-- [x] Playwright config + browsers · push
+## Phase 1 — โมเดลและ frame adapters
+- [x] int/adder.ts + test (exhaustive 4/8 บิต + D.2)
+- [x] sci/decimal.ts + test (D.3 + property)
+- [x] fp/format-c.ts + test (D.4)
+- [x] lesson adapters: keys, fp-frames, bit-window, round-line, window, circuit-map, int-frames, encode-frames (encode/decode/layout), sci-frames (point, C code, dec4), fun-fact + test (D.1, D.5, D.6, invariants)
+- [x] DoD: test 239 ผ่าน · coverage src/lib/{fp,int,sci,lesson} 99.2% statements / 97.7% branches · engine algorithm ไม่เปลี่ยน · build ผ่าน
 
-## Phase 1 — Engine
-- [x] format, bits, rational, parse, decode, round, encode
-- [x] add, mul, div, special, simulate
-- [x] fraction, integer, format-number
-- [x] src/content/examples.ts (input ของตัวอย่างทั้งหมด · decode ใช้ทศนิยมต้นทางแทน hex)
-- [x] golden vectors 91 test ผ่าน · oracle 480k ผ่าน · exhaustive MINI8 262k ผ่าน · encode random · round-trip · invariants · parse
-- [x] test:long 1,008,000 ผ่าน (6.5 s) · coverage 98.9% · docs/ENGINE.md
+## Phase 2 — โครงหน้าเดียว ชื่อ comkrub ลบของเก่า
+- [x] เปลี่ยนชื่อ comkrub
+- [x] registry + content + test งบข้อความ
+- [x] page.tsx หน้าเดียว + LessonSection ฯลฯ + header/drawer/footer
+- [x] StepPlayer stage-first + SceneShell + stage/ + hw/ + /dev/kit
+- [x] ลบหน้าเก่า + redirect + sitemap
+- [x] ลบคูณ/หารจาก engine (test:long 1,008,000 กรณี ผ่าน)
+- [x] DoD: redirect e2e (42 ผ่าน 3 อุปกรณ์) · screenshot 390/1440 ของ `/` และ `/dev/kit` ดูแล้ว · build static
 
-## Phase 2 — Design system + StepPlayer
-- [x] globals.css + ฟอนต์ + glass port
-- [x] SiteHeader / MobileNav / SiteFooter / หน้าแรกโครง / ChapterLayout (header, Toc, Section, Summary, ChapterNav)
-- [x] bits/* (BitCell, Register + BitInfo, FieldLegend) · player/* (StepPlayer, Flowchart, usePlayer, speed context)
-- [x] viz/* ครบทุก step kind (StepView) + FpSimulator + ResultCompare (ใช้ชั่วคราวใน /lab)
-- [x] screenshot 390 + 1280 · REVIEW.md · e2e player 4 ข้อผ่าน (pixel7)
-
-## Phase 3 — บทที่ 1–2
-- [x] บทที่ 1: เนื้อหา + PlaceValue + ตัวอย่าง 1011 + IntegerExplorer + สรุป
-- [x] บทที่ 2: เนื้อหา + FractionExplorer + NumberLine + FractionConverter + สรุป
-- [x] e2e ข้อ 2–3 ผ่าน (pixel7) · screenshot 390 ดูแล้ว
-## Phase 4 — บทที่ 3
-- [x] เนื้อหา + WorkedExample (render จาก engine) + IEEE 754 Converter (encode/decode tabs) + สรุป
-- [x] e2e ข้อ 4 ผ่าน (pixel7 + iphone13) · e2e ทั้งหมด 7 ข้อผ่านบน WebKit
-## Phase 5 — บทที่ 4
-- [x] เนื้อหา + FpSimulator (+/−) + ตัวอย่าง A1–A6 (OpWorked render จาก engine) + สรุป
-- [x] e2e ข้อ 5 ผ่าน (pixel7 + iphone13)
-## Phase 6 — บทที่ 5
-- [x] เนื้อหา + FpSimulator (×/÷ + ค่าพิเศษ) + M1–M6, D1–D5 + M3/D3 ละเอียด (OpDetail) + ตารางกรณีพิเศษ + สรุป
-- [x] e2e ข้อ 6 ผ่าน (pixel7 + iphone13)
-## Milestone "พร้อมใช้สอน"
-- [x] acceptance criteria ของ requirement 4 ไฟล์ครบ (ตรวจละเอียดอีกครั้งในรอบ review 3)
-- [x] e2e 36 ข้อผ่านบน pixel7 + iphone13 กับ production build (นำทาง, บท 1–5, player, reduced motion, ไม่มี console error, axe ไม่มี serious/critical ทุกหน้า)
-- [x] build ผ่าน ทุก route static · README + docs/DEPLOY.md
-- หมายเหตุ: e2e ข้อ 7 (share link ของ Lab) อยู่ใน Phase 7 ตามแผน · หน้าแรกยังเป็นแบบโครง (ฉบับเต็มใน Phase 7)
-## Phase 7 — Lab + polish
-- [x] /lab: tabs Calculator / Converter + share link (query string, `src/lib/url-state.ts` + unit test) + Suspense
-- [x] หน้าแรกฉบับเต็ม (demo สด 0.1 + 0.2 เล่นเอง หยุดเมื่อแตะ/hover/โฟกัส, timeline, ทางลัด + BeamRing)
-- [x] icon, OG image (ไทยแสดงถูก), sitemap, robots, 404, error
-- [x] Lighthouse ผ่านเป้าทั้ง 3 หน้า (REVIEW.md) · e2e ข้อ 7–10 ผ่าน · e2e รวม 65 ข้อผ่านบน pixel7 + iphone13 + desktop
-- [x] stretch: print stylesheet
-- [x] stretch (ทำหลังได้คำตอบ Q7/Q8): Half/Single/Double ใน Lab (`?fmt=b16|b64`, oracle binary16 `Math.f16round` + binary64 native) · โหมดนำเสนอใน StepPlayer (เต็มจอ ตัวใหญ่ ลูกศร/Space ได้ทั้งหน้า Esc ออก)
-- [x] Q9: Vercel Web Analytics + ป้ายมุมขวาล่างของ footer (Pisit ต้องกด Enable ใน Vercel ตาม DEPLOY.md)
-## Phase 8 — พร้อม deploy
-- [x] build + start production ผ่าน · ไม่มี secret · security headers ครบ (ไม่มี X-Frame-Options ตามแผน) · DEPLOY.md + README ตรงงานล่าสุด
-## Phase 9 — Review 3 รอบ
-- [x] รอบ 1 ใช้งานจริง · [x] รอบ 2 ความสวย/interface · [x] รอบ 3 ความถูกต้อง (รายละเอียดใน docs/REVIEW.md)
-- [x] ไล่อ่านเนื้อหาทุกบทเทียบ requirement แบบละเอียด · เพิ่มตัวอย่างแปลงฐานสองเป็นฐานสิบในบทที่ 1–2 (requirement ขอตัวอย่างหลายข้อ) · e2e 65 ผ่านอีกรอบ
-## Phase 10 — รายงานสุดท้าย
-- [x] docs/FINAL_REPORT.md: สรุปตาม phase, ตาราง acceptance criteria, ผล test/coverage/Lighthouse, path screenshot, คำถามทั้งหมดเรียงตามความสำคัญ
-- งานตามแผนเสร็จครบ · Pisit deploy แล้วที่ https://comkrub.mypisit.com และตอบคำถามครบทุกข้อแล้ว
+## Phase 3 — บทที่ 5 (Milestone A)
+- [x] ฉาก 5.1 ฐานสิบ 4 หลัก (`Dec4Scene`)
+- [x] ฉาก 5.2 บวก / 5.3 ลบ (`FpOpScene` ใช้ร่วมกับ playground) · BitTrack compact/tail/full · MiniAlu ตอนลบ
+- [x] ฉาก 5.4 ปัดเศษ (`rounding-frames.ts` + RoundLine + ตารางกติกา + เทียบค่าที่พิมพ์)
+- [x] ฉาก 5.5 ตัวอย่างในสไลด์ (double)
+- [x] DoD: e2e บทที่ 5 + player + reduced motion ผ่าน 3 อุปกรณ์ · screenshot align/normalize/round ที่ 390/1440/1920 ดูแล้ว · งบข้อความผ่าน
+## Phase 4 — บทที่ 6 วงจร
+- [x] `circuit.ts` layout (360 × 600) + `FpAdderDiagram` + ฉาก 6.1 (ใช้ input/frames เดียวกับ `FpOpScene`, desktop มี BitTrack ข้าง ๆ)
+- [x] DoD: test layout (ทุก id มีที่วาด ไม่ทับกัน) · e2e บทที่ 6 ผ่าน 3 อุปกรณ์ (84 ผ่านทั้งชุด) · screenshot 390/1440 ดูแล้ว
+## Phase 5 — บทที่ 3 และ 4
+- [x] ทำบน `addsub-ch34` (เพื่อนคนที่ 1) รายละเอียดใน `docs/progress/addsub-ch34.md` · ฉาก 3.1, 3.2, 3.3 + แถบเทียบ double, 4.1, 4.2
+- [x] รวมเข้า `addsub-redesign` (`1c4ea81`) ไม่มี conflict · unit 204 · e2e ทั้งชุด 140 ผ่าน 3 อุปกรณ์
+## Phase 6 — Hero บทที่ 1 และ 2
+- [x] ทำบน `addsub-ch12` (เพื่อนคนที่ 2) รายละเอียดใน `docs/progress/addsub-ch12.md` · hero teaser, ฉาก 1.1–1.4, 2.1, 2.2
+- [x] รวมเข้า `addsub-redesign` (`5c39dea`) conflict 1 จุด (สีปุ่ม "ทำไม?" แก้เรื่องเดียวกันทั้งสองฝั่ง ใช้ navy) · unit 211 · e2e ทั้งชุด 170 ผ่าน 3 อุปกรณ์
+## Phase 7 — ลองเอง และสรุป
+- [x] Playground: input, chip, สลับบิต/วงจร (index ขั้นเดียวกัน), การ์ดผล (เก็บจริง/พิมพ์/ต่าง/hex/flag), คัดลอกลิงก์ `?a=&b=&op=&step=#playground`
+- [x] ลิงก์ `/lab?…` เก่า → `/` แล้ว `PlaygroundLink` ใส่ `#playground` และเลื่อนไปเอง
+- [x] สรุปท้ายหน้า (มีตั้งแต่ Phase 2)
+- [x] DoD: e2e playground (ลิงก์ที่คัดลอกเปิดแล้วได้ตัวอย่างและขั้นเดิม, /lab เก่า) · ทั้งชุด 96 ผ่าน 3 อุปกรณ์ · screenshot 390/1440 ดูแล้ว
+## Phase 8 — ขัดเกลา review 4 รอบ และ PR
+- [x] a11y (axe ไม่มี serious/critical ทั้งหน้า 3 อุปกรณ์), reduced motion (e2e), Lighthouse มือถือ 100/100/100/100 หลังรวมทุกบท, OG image, README, ENGINE, DEPLOY
+- [x] review 4 รอบ (docs/REVIEW.md) · ไล่ PLAN ทีละข้อแล้ว (หัวข้อ 1, 3.6–3.9, 4, 5, 6, 9, 11)
+- [x] PR `addsub-redesign` → `main`: https://github.com/Pisit-s/ProjectComArch/pull/2 (Pisit merge เอง)
 
 ## บันทึกการตัดสินใจ / ต่างจากแผน
-- Tailwind ใช้ `@tailwindcss/turbopack` แทน `@tailwindcss/postcss` (ค่าเริ่มต้นของ create-next-app 16.4.3)
-- คูณ/หาร: ขั้น range อยู่ก่อน round ตาม flowchart ใน PLAN.md 8.2 (requirement เขียน round ก่อน range) — เหตุผลใน docs/ENGINE.md
-- ชื่อผู้จัดทำคนที่ 4: Pisit แก้เองใน `src/lib/site.ts` เป็น "นายณัฐิวุฒิ แสงสารพันธ์" (commit `5ed58bd`) ต่างจาก PLAN.md 7.1 → ยึดตาม site.ts และแก้ README ให้ตรง
-- `parseDecimal` คืน `magnitude` + `negative` แยกกัน (แผนเขียน `value`) เพื่อเก็บ −0 ได้
+- adapter เพิ่มจากแผน: `sci-frames.ts` (ฉาก 2.1, 2.2, 5.1) และ `fun-fact.ts` (ฉาก 5.5) · `keys.ts` เป็นรายการ caption key ที่ adapter ส่งออก (test ตรวจว่ามีข้อความครบใน Phase 2)
+- `decimalAdd` ไม่มีกรณีปัดแล้วทด (หลัง normalize ผลต่ำกว่า 2.000 เสมอ) จึงไม่มี field `carry`
+- `/lab` redirect ไป `/` (ไม่ใส่ `#playground` ในปลายทาง กัน URL ผิดรูป) query ส่งต่อเอง playground อ่าน query แล้วเลื่อนไปเอง (Phase 7)
+- `url-state.ts` เหลือ `PlayState { op, a, b, step }` ค่า default ส่งเข้ามาจาก content · `parsePlayQuery` บอก `present` ว่ามี query ไหม
+- `TrackRow.shifted` นับการเลื่อนของแถวผลด้วย (normalize และตัวทดตอนปัด) ให้บิตแต่ละตัวมี key เดิมตอนเลื่อน
+- ชิ้นส่วน `NumberWheel`, `TimesTwo`, `CodeCard`, `ExponentWindow` ทำพร้อมบทที่ใช้ (Phase 5-6) · `player.spec` เขียนใน Phase 3 เมื่อมี scene จริงบนหน้า
+- test `no-thai-in-components` ย้ายข้อความของ register (คำอธิบายบิต) และ error boundary ไป `copy.ts`
+- `wp0-hub` ของเพื่อนทำตามแผนระยะที่ 2 ที่ยกเลิกแล้ว ไม่ merge (Q11) ยกมาแค่ CI และ BlurFade reduced motion
+- StepPlayer: Esc ออกจากโหมดนำเสนอได้แม้โฟกัสอยู่ใน player (เดิมพึ่ง fullscreen ของเบราว์เซอร์ ใช้ไม่ได้บน iOS)

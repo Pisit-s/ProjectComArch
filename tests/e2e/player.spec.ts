@@ -1,59 +1,60 @@
 import { expect, test } from '@playwright/test';
+import { openScene } from './helpers';
+
+const P = 'fp-add-player';
 
 test.describe('StepPlayer', () => {
-  test('buttons, indicator, keyboard and flowchart', async ({ page }) => {
-    await page.goto('/lab');
-    const player = page.getByTestId('sim-player');
-    const counter = page.getByTestId('sim-player-counter');
-    await expect(counter).toHaveText('ขั้นที่ 1/9');
-    await page.getByTestId('sim-player-next').click();
-    await expect(counter).toHaveText('ขั้นที่ 2/9');
-    await page.getByTestId('sim-player-prev').click();
-    await expect(counter).toHaveText('ขั้นที่ 1/9');
-    // jump with the step indicator
-    await player.getByRole('button', { name: /^ไปขั้นที่ 8/ }).click();
-    await expect(counter).toHaveText('ขั้นที่ 8/9');
-    // keyboard while focus is inside the player
-    await player.focus();
-    await page.keyboard.press('ArrowLeft');
-    await expect(counter).toHaveText('ขั้นที่ 7/9');
-    await page.keyboard.press('Home');
-    await expect(counter).toHaveText('ขั้นที่ 1/9');
+  test('poster plays to the last step', async ({ page }) => {
+    test.setTimeout(60_000);
+    await openScene(page, 'fp-add-bits');
+    await page.getByTestId(P).locator('select').selectOption({ index: 2 });
+    await page.getByTestId(`${P}-poster`).click();
+    await expect(page.getByTestId(`${P}-poster`)).toHaveCount(0);
+    await expect(page.getByTestId(`${P}-counter`)).toHaveText('7/7', { timeout: 40_000 });
+  });
+
+  test('prev, next, dots and keyboard', async ({ page }) => {
+    await openScene(page, 'fp-add-bits');
+    const region = page.getByTestId(P);
+    await page.getByTestId(`${P}-next`).click();
+    await expect(region).toHaveAttribute('data-step-index', '1');
+    await page.getByTestId(`${P}-prev`).click();
+    await expect(region).toHaveAttribute('data-step-index', '0');
+    await page.getByTestId(`${P}-dots`).getByRole('button').nth(3).click();
+    await expect(region).toHaveAttribute('data-step-index', '3');
+    await region.focus();
     await page.keyboard.press('ArrowRight');
-    await expect(counter).toHaveText('ขั้นที่ 2/9');
-    // flowchart box jumps to its step
-    await page.getByTestId('sim-player-flow').locator('[data-flow="round"]').click();
-    await expect(player).toHaveAttribute('data-step', 'round');
+    await expect(region).toHaveAttribute('data-step-index', '4');
+    await page.keyboard.press('ArrowLeft');
+    await expect(region).toHaveAttribute('data-step-index', '3');
+    await page.getByTestId(`${P}-restart`).click();
+    await expect(region).toHaveAttribute('data-step-index', '0');
   });
 
-  test('auto play advances and stops when the user steps', async ({ page }) => {
-    await page.goto('/lab');
-    const counter = page.getByTestId('sim-player-counter');
-    await page.getByTestId('sim-player').getByLabel('ความเร็วในการเล่น').selectOption('2');
-    await page.getByTestId('sim-player-play').click();
-    await expect(counter).toHaveText('ขั้นที่ 3/9', { timeout: 6000 });
-    await page.getByTestId('sim-player-prev').click();
-    const now = await counter.textContent();
-    await page.waitForTimeout(1600);
-    await expect(counter).toHaveText(now!);
+  test('presentation mode opens and closes', async ({ page }) => {
+    await openScene(page, 'fp-add-bits');
+    await page.getByTestId(`${P}-present`).click();
+    await expect(page.locator(`[data-testid=${P}][data-presenting="1"]`)).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator(`[data-testid=${P}][data-presenting="1"]`)).toHaveCount(0);
   });
 
-  test('works with reduced motion', async ({ browser }) => {
-    const ctx = await browser.newContext({ reducedMotion: 'reduce' });
-    const page = await ctx.newPage();
-    await page.goto('/lab');
-    const counter = page.getByTestId('sim-player-counter');
-    for (let i = 2; i <= 9; i++) {
-      await page.getByTestId('sim-player-next').click();
-      await expect(counter).toHaveText(`ขั้นที่ ${i}/9`);
-    }
-    await expect(page.getByTestId('final-hex')).toHaveText('0x418F0000');
-    await ctx.close();
+  test('why button opens the detail', async ({ page }) => {
+    await openScene(page, 'fp-add-bits');
+    await page.getByTestId(`${P}-dots`).getByRole('button').nth(1).click();
+    await page.getByTestId(`${P}-why`).click();
+    await expect(page.getByTestId(`${P}-detail`)).toBeVisible();
   });
+});
 
-  test('tapping a bit explains it', async ({ page }) => {
-    await page.goto('/lab');
-    await page.getByTestId('sim-reg-a-bit-1').click();
-    await expect(page.getByTestId('bit-info').first()).toContainText('Exponent');
+test.describe('reduced motion', () => {
+  test.use({ reducedMotion: 'reduce' });
+  test('nothing plays by itself and every step is reachable', async ({ page }) => {
+    await openScene(page, 'fp-add-bits');
+    await page.waitForTimeout(3000);
+    await expect(page.getByTestId(`${P}-counter`)).toHaveText('1/7');
+    for (let i = 0; i < 6; i++) await page.getByTestId(`${P}-next`).click();
+    await expect(page.getByTestId(`${P}-counter`)).toHaveText('7/7');
+    await expect(page.getByTestId('fp-add-hex')).toHaveText('0x41240000');
   });
 });
