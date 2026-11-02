@@ -1,5 +1,23 @@
-import { ArrowUp, CheckCircle2 } from 'lucide-react';
-import { SUMMARY, UI } from '@/content/lesson/copy';
+import {
+  ArrowRightToLine,
+  ArrowUp,
+  CircleMinus,
+  Cpu,
+  ListOrdered,
+  type LucideIcon,
+  Rows3,
+  Target,
+} from 'lucide-react';
+import { SUMMARY, type SummaryIcon, UI } from '@/content/lesson/copy';
+
+const ICONS: Record<SummaryIcon, LucideIcon> = {
+  minus: CircleMinus,
+  fields: Rows3,
+  steps: ListOrdered,
+  shift: ArrowRightToLine,
+  round: Target,
+  circuit: Cpu,
+};
 import { sectionById } from '@/content/lesson/sections';
 import { site } from '@/lib/site';
 
@@ -17,22 +35,25 @@ export function SummarySection() {
           {s.title}
         </h2>
         <ol className="grid gap-2.5 sm:grid-cols-2">
-          {SUMMARY.map((item, i) => (
-            <li
-              key={i}
-              className="glass flex items-start gap-3 rounded-xl bg-card p-4 ring-1 ring-foreground/10"
-            >
-              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
-              <span className="flex-1">{item.text}</span>
-              <a
-                href={`#${item.back}`}
-                className="btn btn-circle h-9 min-h-9 w-9 shrink-0 btn-ghost btn-sm"
-                aria-label={`${UI.backTo} ${sectionById(item.back).number}`}
+          {SUMMARY.map((item, i) => {
+            const Icon = ICONS[item.icon];
+            return (
+              <li
+                key={i}
+                className="glass flex items-start gap-3 rounded-xl bg-card p-4 ring-1 ring-foreground/10"
               >
-                <ArrowUp className="h-4 w-4" aria-hidden />
-              </a>
-            </li>
-          ))}
+                <Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+                <span className="flex-1">{item.text}</span>
+                <a
+                  href={`#${item.back}`}
+                  className="btn btn-circle h-9 min-h-9 w-9 shrink-0 btn-ghost btn-sm"
+                  aria-label={`${UI.backTo} ${sectionById(item.back).number}`}
+                >
+                  <ArrowUp className="h-4 w-4" aria-hidden />
+                </a>
+              </li>
+            );
+          })}
         </ol>
         <div className="text-sm text-muted">
           <p className="font-semibold text-ink">{UI.source}</p>

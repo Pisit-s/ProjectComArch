@@ -22,6 +22,9 @@ export interface CircuitBlock {
 
 export interface CircuitWire {
   id: WireId;
+  /** Block the wire leaves and the block it enters (values shown when a block is tapped). */
+  from: BlockId;
+  to: BlockId;
   kind: WireKind;
   points: [number, number][];
   dashed?: boolean;
@@ -75,6 +78,8 @@ export const BLOCKS: CircuitBlock[] = [
 export const WIRES: CircuitWire[] = [
   {
     id: 'a-exp',
+    from: 'regA',
+    to: 'smallAlu',
     kind: 'exp',
     points: [
       [50, 40],
@@ -85,6 +90,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'b-exp',
+    from: 'regB',
+    to: 'smallAlu',
     kind: 'exp',
     points: [
       [230, 40],
@@ -95,6 +102,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'a-sig',
+    from: 'regA',
+    to: 'muxSmall',
     kind: 'sig',
     points: [
       [122, 40],
@@ -103,6 +112,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'b-sig',
+    from: 'regB',
+    to: 'muxBig',
     kind: 'sig',
     points: [
       [302, 40],
@@ -111,6 +122,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'b-sign',
+    from: 'regB',
+    to: 'control',
     kind: 'sign',
     points: [
       [198, 40],
@@ -119,6 +132,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'alu-ctl',
+    from: 'smallAlu',
+    to: 'control',
     kind: 'ctl',
     points: [
       [106, 100],
@@ -127,6 +142,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'exp-mux',
+    from: 'smallAlu',
+    to: 'muxExp',
     kind: 'exp',
     points: [
       [65, 130],
@@ -135,6 +152,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'sig-small',
+    from: 'regA',
+    to: 'muxSmall',
     kind: 'sig',
     points: [
       [122, 150],
@@ -144,6 +163,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'sig-big',
+    from: 'regB',
+    to: 'muxBig',
     kind: 'sig',
     points: [
       [302, 150],
@@ -152,6 +173,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'mux-shift',
+    from: 'muxSmall',
+    to: 'shift',
     kind: 'sig',
     points: [
       [190, 196],
@@ -160,6 +183,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'shift-alu',
+    from: 'shift',
+    to: 'bigAlu',
     kind: 'sig',
     points: [
       [190, 252],
@@ -170,6 +195,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'big-alu',
+    from: 'muxBig',
+    to: 'bigAlu',
     kind: 'sig',
     points: [
       [305, 196],
@@ -178,6 +205,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'alu-norm',
+    from: 'bigAlu',
+    to: 'normalize',
     kind: 'sig',
     points: [
       [270, 350],
@@ -186,6 +215,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'exp-incdec',
+    from: 'muxExp',
+    to: 'incdec',
     kind: 'exp',
     points: [
       [75, 196],
@@ -194,6 +225,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'norm-round',
+    from: 'normalize',
+    to: 'round',
     kind: 'sig',
     points: [
       [270, 422],
@@ -202,6 +235,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'round-back',
+    from: 'round',
+    to: 'normalize',
     kind: 'sig',
     dashed: true,
     points: [
@@ -213,6 +248,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'incdec-out',
+    from: 'incdec',
+    to: 'regR',
     kind: 'exp',
     points: [
       [65, 422],
@@ -223,6 +260,8 @@ export const WIRES: CircuitWire[] = [
   },
   {
     id: 'round-out',
+    from: 'round',
+    to: 'regR',
     kind: 'sig',
     points: [
       [270, 502],

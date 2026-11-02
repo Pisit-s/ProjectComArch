@@ -5,16 +5,24 @@ import { useState } from 'react';
 import { UI } from '@/content/lesson/copy';
 import { cn } from '@/lib/utils';
 
-/** Copies the current page URL (share link). */
-export function CopyLinkButton({ className }: { className?: string }) {
+/** Copies a share link (default: the current page URL). */
+export function CopyLinkButton({
+  className,
+  url: link,
+  testId = 'copy-link',
+}: {
+  className?: string;
+  url?: () => string;
+  testId?: string;
+}) {
   const [done, setDone] = useState(false);
   return (
     <button
       type="button"
       className={cn('btn h-11 min-h-11 btn-primary', className)}
-      data-testid="copy-link"
+      data-testid={testId}
       onClick={async () => {
-        const url = window.location.href;
+        const url = link ? link() : window.location.href;
         try {
           await navigator.clipboard.writeText(url);
         } catch {

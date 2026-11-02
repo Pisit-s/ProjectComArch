@@ -41,3 +41,17 @@ describe('rounding scene (5.4)', () => {
     expect(scene('2', '2', '-')).toBeNull();
   });
 });
+
+describe('special values on the page', () => {
+  it('overflow shows ∞ and a window that fits a phone', async () => {
+    const { chooseWindow } = await import('@/lib/lesson/bit-window');
+    const { buildFpFrames, displayValue } = await import('@/lib/lesson/fp-frames');
+    const sim = simulate(F, '+', '3e38', '3e38');
+    if (!sim.ok) throw new Error();
+    const sc = buildFpFrames(F, sim);
+    expect(sc.result.value).toBe('∞');
+    expect(displayValue(F, 0xff800000n)).toBe('−∞');
+    expect(displayValue(F, 0x7fc00000n)).toBe('NaN');
+    expect(chooseWindow(sc).columns.length).toBeLessThanOrEqual(14);
+  });
+});

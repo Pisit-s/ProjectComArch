@@ -1,5 +1,5 @@
-import { type FloatFormat, type SimulationOutcome, type StepOf, shortestDecimal } from '@/lib/fp';
-import { type FpFrame, type FpScene, buildFpFrames } from './fp-frames';
+import type { FloatFormat, SimulationOutcome, StepOf } from '@/lib/fp';
+import { type FpFrame, type FpScene, buildFpFrames, displayValue } from './fp-frames';
 import type { CaptionKey, Params } from './keys';
 import { type RoundLine, buildRoundLine } from './round-line';
 
@@ -64,8 +64,8 @@ export function buildRoundingScene(
     fp,
     round,
     line,
-    downShort: shortestDecimal(fmt, line.downBits),
-    upShort: shortestDecimal(fmt, line.upBits),
+    downShort: displayValue(fmt, line.downBits),
+    upShort: displayValue(fmt, line.upBits),
     rule,
     frames,
   };

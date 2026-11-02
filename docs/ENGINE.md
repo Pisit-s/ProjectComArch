@@ -19,6 +19,7 @@ engine เป็น TypeScript ล้วน ไม่แตะ DOM/React · ท�
 | `formatRational`, `exactDecimal`, `shortestDecimal`, `rationalToDecimal` | `format-number.ts` | แสดงตัวเลข: ค่าที่เก็บจริงครบทุกหลัก / ทศนิยมสั้นที่สุดที่ encode กลับได้บิตเดิม / ผลที่อาจไม่จบ (ตัดแล้วต่อ `…`) · scientific เมื่อ < 1e−6 หรือ ≥ 1e21 |
 | `fractionToBinary(text, n)`, `fractionValue(bits)` | `fraction.ts` | บทที่ 2: คูณ 2 ซ้ำแบบ exact, ค่าประมาณแบบตัดบิต, ผลต่าง, วงซ้ำ `{ start, length }` |
 | `uintTerms`, `uintValue`, `uintSteps`, `parseUint` | `integer.ts` | บทที่ 1: unsigned 8 บิต |
+| `printfFixed(fmt, bits, decimals)` | `format-c.ts` | ผลของ `printf("%.6f")` แบบ exact (ปัด half-even ตาม glibc) สำหรับบทที่ 2 |
 
 ทุก operation คืน `FpResult = { bits, steps, flags, exact }` · `exact` = ผลทางคณิตศาสตร์ของ operand ที่เก็บจริง (null เมื่อมีค่าพิเศษ)
 
@@ -45,6 +46,19 @@ engine เป็น TypeScript ล้วน ไม่แตะ DOM/React · ท�
 
 ลำดับขั้น: บวก/ลบ `decode-a, decode-b, [negate], compare, align, sig-add, normalize, [range], round, encode` · ค่าพิเศษ `decode-a, decode-b, [negate], special, encode` · encode `int-binary, frac-binary, point, sign, exponent, [range], round, encode`
 
+
+## Frame adapters (`src/lib/lesson/`)
+
+UI ไม่คำนวณเอง: adapter แปลงผลของ engine/โมเดลเป็น "เฟรม" ที่วาดได้ตรง ๆ (ข้อมูลล้วน ไม่มี React) และส่ง caption key + params ไปให้ `src/content/lesson/captions`
+
+| ไฟล์ | ให้อะไร | ใช้ที่ |
+|---|---|---|
+| `fp-frames.ts` | `buildFpFrames(fmt, sim)` → `FpScene` (unpack, negate, swap, compare, align-1..4/align-fast, add, normalize, range, round, round-carry, pack, special) · แถว `TrackRow` เป็น fixed point มี G R S และ `shifted` ให้บิตแต่ละตัวมี key เดิมตอนเลื่อน | ฉาก 5.2, 5.3, 6.1, บทที่ 7 |
+| `bit-window.ts` | คอลัมน์ที่ BitTrack แสดง (compact / tail / full) | BitTrack |
+| `round-line.ts`, `rounding-frames.ts` | เส้นจำนวนของการปัด (ค่าลง/ขึ้น, ตำแหน่ง exact) และ 5 เฟรมของฉากปัดเศษ | ฉาก 5.4 |
+| `circuit-map.ts` | กล่อง/สายที่สว่างและป้ายบนสายของแต่ละเฟรม · caption ฝั่งวงจร | ฉาก 6.1, บทที่ 7 |
+| `int-frames.ts`, `sci-frames.ts`, `encode-frames.ts`, `window.ts`, `fun-fact.ts` | บทที่ 1, 2, 3–4, ฉาก 5.1 และ 5.5 | ฉากของบทนั้น |
+| `keys.ts` | รายการ caption key ทั้งหมด (test ตรวจว่ามีข้อความครบ) | content |
 
 ## Test
 | ชุด | ไฟล์ | จำนวน |

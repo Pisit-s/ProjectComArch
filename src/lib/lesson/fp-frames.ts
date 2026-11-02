@@ -7,6 +7,8 @@ import {
   type SpecialRule,
   type StepOf,
   bias,
+  classify,
+  fieldsOf,
   exactDecimal,
   formatRational,
   shortestDecimal,
@@ -129,6 +131,14 @@ const BIG_STEP: Record<FpStage, FpFrame['bigStep']> = {
 
 const MAX_ALIGN_FRAMES = 4;
 
+/** Value as shown on the page: shortest decimal, or ∞ / −∞ / NaN for the special values. */
+export function displayValue(fmt: FloatFormat, bits: bigint): string {
+  const cls = classify(fmt, bits);
+  if (cls === 'nan') return 'NaN';
+  if (cls === 'infinity') return fieldsOf(fmt, bits).sign ? '−∞' : '∞';
+  return shortestDecimal(fmt, bits);
+}
+
 /** "1.101" style significand text of a fixed-point value, trailing zeros dropped. */
 export function sigText(value: bigint, fracBits: number, minFrac = 1): string {
   const s = value.toString(2).padStart(fracBits + 1, '0');
@@ -190,7 +200,7 @@ export function buildFpFrames(
   const resultInfo: FpScene['result'] = {
     bits,
     hex: toHex(bits, W),
-    value: shortestDecimal(fmt, bits),
+    value: displayValue(fmt, bits),
     stored: sim.stored ? exactDecimal(fmt, bits) : null,
     typed: sim.typed ? formatRational(sim.typed) : null,
     error: sim.error ? formatRational(sim.error, { maxSignificant: 12 }) : null,

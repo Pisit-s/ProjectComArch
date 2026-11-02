@@ -31,6 +31,10 @@
 `src/lib/fp/**`, `src/lib/lesson/{fp-frames,bit-window,round-line,rounding-frames,circuit-map,keys,fun-fact}.ts`, `src/components/player/**`, `src/components/stage/{bit-track,bit-line,step-bar,exponent-tag,carry-arc,mini-alu,register32,field-brackets,grs-lens,sticky-bucket,round-line}.tsx`, `src/components/bits/**`, `src/components/hw/**`, `src/components/lesson/**`, `src/components/layout/**`, `src/components/scenes/{registry,fp-op-scene,chapter5,dec4-scene,circuit-scene,playground-scene}.tsx|ts`, `src/content/lesson/{sections,budget,circuit,config}.ts`, `src/app/**`, `globals.css`, `next.config.ts`, `package.json`, `PLAN.md`, `CLAUDE.md`, `docs/PROGRESS.md`, `docs/QUESTIONS.md`, `tests/unit/content/**`, `tests/e2e/helpers.ts` และ e2e ของคนอื่น
 - caption key ใหม่ต้องเพิ่มใน `src/lib/lesson/keys.ts` (ไฟล์ร่วม): เพิ่มได้เฉพาะ key ของบทตัวเอง ต่อท้ายกลุ่มของบทนั้น
 
+## ของร่วมที่เรียกใช้ได้ (ห้ามแก้)
+- `displayValue(fmt, bits)` ใน `src/lib/lesson/fp-frames.ts`: ค่าที่แสดงบนหน้า (∞ / −∞ / NaN แทน "Infinity") ใช้แทน `shortestDecimal` ทุกที่ที่ผู้ใช้เห็น
+- `BitTrack` มี class `bit-track` ขยายเองในโหมดนำเสนอ · scene ใหม่ที่อยากให้ใหญ่ในโหมดนำเสนอให้ใช้ CSS variable แบบเดียวกัน
+
 ## กติกา git
 1. เริ่ม: `git fetch origin && git switch -c <branch> origin/addsub-redesign`
 2. ห้าม push เข้า `addsub-redesign` หรือ `main` · ห้าม merge เข้า branch อื่น · ห้าม push --force, rebase, reset --hard

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { openScene } from './helpers';
+import { openScene, stepTo } from './helpers';
 
 test.describe('chapter 6: the adder circuit', () => {
   test('6.5 + 3.75 lights Small ALU, MUX + shift, Big ALU, Normalize, Round, result', async ({
@@ -31,6 +31,16 @@ test.describe('chapter 6: the adder circuit', () => {
     await page.getByTestId('circuit-player-next').click(); // leaves the poster
     await page.locator('[data-block=shift]').click();
     await expect(page.getByTestId('circuit-diagram-info')).toContainText('Shifter');
+  });
+
+  test('a tapped block shows the values going in and out in this step', async ({ page }) => {
+    await openScene(page, 'circuit-flow');
+    await stepTo(page, 'circuit-player', 'add');
+    await page.locator('[data-block=bigAlu]').click();
+    await expect(page.getByTestId('circuit-diagram-io')).toContainText('10.1001');
+    await stepTo(page, 'circuit-player', 'normalize');
+    await page.locator('[data-block=incdec]').click();
+    await expect(page.getByTestId('circuit-diagram-io')).toContainText('+1');
   });
 
   test('subtraction routes through Control first', async ({ page }) => {
