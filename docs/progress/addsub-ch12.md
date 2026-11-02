@@ -36,7 +36,7 @@
 - **ฝาก Pisit**: `a11y.spec.ts` บน desktop เคย fail แบบสุ่ม 1 ใน ~5 รอบ ที่ลิงก์ "7 ลองเอง" ของ `layout/progress-nav.tsx` · สาเหตุน่าจะเป็น scrollspy ทำให้ลิงก์ active ตอน test เลื่อนผ่านบทที่ 7 แล้ว `transition-colors` ยังเปลี่ยนสีไม่เสร็จตอน axe สแกน (สแกน contrast แยก 6 รอบผ่านหมด, `--repeat-each=4` ผ่าน 12/12) · ไม่ได้แก้เพราะเป็นไฟล์ร่วม · ทางแก้ที่เสนอ: test รอให้ scrollspy นิ่งก่อนสแกน หรือเอา `transition-colors` ออกจากลิงก์ nav
 
 ## ผล test (2 พ.ย. 2569, production build)
-- `npm run lint`, `npm run typecheck`, `npm test` (197 tests) ผ่าน · `npm run build` ผ่าน ทุก route static
+- `npm run lint`, `npm run typecheck`, `npm test` (200 tests หลัง merge base ล่าสุด) ผ่าน · `npm run build` ผ่าน ทุก route static
 - e2e chapter1 + chapter2 + hero + a11y + lesson บน pixel7, iphone13, desktop: 57 ผ่าน, 2 skipped (ตามที่ spec กำหนด), 1 fail คือ a11y desktop แบบสุ่มด้านบน · รัน a11y ซ้ำ 4 รอบต่อเครื่อง ผ่าน 12/12
 - งบข้อความ: บทที่ 1 = 487/600, บทที่ 2 = 482/600
 
