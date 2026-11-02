@@ -39,7 +39,7 @@ export interface CircuitWire {
   chipAt?: [number, number];
 }
 
-export const CIRCUIT_VIEWBOX = { w: 360, h: 680 } as const;
+export const CIRCUIT_VIEWBOX = { w: 360, h: 700 } as const;
 
 export const BLOCKS: CircuitBlock[] = [
   { id: 'regA', kind: 'register', label: 'A', x: 5, y: 10, w: 170, h: 30 },
@@ -69,20 +69,20 @@ export const BLOCKS: CircuitBlock[] = [
     vocab: 'shifter',
   },
   { id: 'bigAlu', kind: 'alu', label: 'Big ALU', x: 150, y: 380, w: 160, h: 52, vocab: 'bigAlu' },
-  { id: 'negate', kind: 'box', label: 'Negate if < 0', x: 165, y: 448, w: 130, h: 24 },
+  { id: 'negate', kind: 'box', label: 'Negate if < 0', x: 165, y: 468, w: 130, h: 24 },
   {
     id: 'normalize',
     kind: 'box',
     label: 'Normalize',
     x: 165,
-    y: 495,
+    y: 515,
     w: 130,
     h: 30,
     vocab: 'normalize',
   },
-  { id: 'incdec', kind: 'box', label: 'Inc / Dec', x: 10, y: 555, w: 100, h: 35 },
-  { id: 'round', kind: 'box', label: 'Round', x: 165, y: 555, w: 130, h: 30, vocab: 'roundingHw' },
-  { id: 'regR', kind: 'register', label: 'ผลลัพธ์', x: 30, y: 640, w: 300, h: 30 },
+  { id: 'incdec', kind: 'box', label: 'Inc / Dec', x: 10, y: 575, w: 100, h: 35 },
+  { id: 'round', kind: 'box', label: 'Round', x: 165, y: 575, w: 130, h: 30, vocab: 'roundingHw' },
+  { id: 'regR', kind: 'register', label: 'ผลลัพธ์', x: 30, y: 660, w: 300, h: 30 },
 ];
 
 type P = [number, number];
@@ -241,7 +241,7 @@ export const WIRES: CircuitWire[] = [
       [96, 330],
       [115, 330],
     ],
-    { chipAt: [116, 94] },
+    { chipAt: [106, 94] },
   ),
   w('alu-far', 'ctl', 'smallAlu', 'shift', 'far', [
     [141, 108],
@@ -311,14 +311,14 @@ export const WIRES: CircuitWire[] = [
   w('ctl-sign', 'sign', 'control', 'regR', 'signR', [
     [112, 175],
     [5, 175],
-    [5, 625],
-    [45, 625],
-    [45, 640],
+    [5, 645],
+    [45, 645],
+    [45, 660],
   ]),
   // data path
   w('exp-incdec', 'exp', 'muxExp', 'incdec', 'E0[7:0]', [
     [60, 292],
-    [60, 555],
+    [60, 575],
   ]),
   w('mux-shift', 'sig', 'muxSmall', 'shift', 'mSmall', [
     [160, 292],
@@ -344,9 +344,9 @@ export const WIRES: CircuitWire[] = [
     'T[27:0]',
     [
       [230, 432],
-      [230, 448],
+      [230, 468],
     ],
-    { chipAt: [282, 440] },
+    { chipAt: [272, 450] },
   ),
   w(
     'negate-norm',
@@ -355,15 +355,15 @@ export const WIRES: CircuitWire[] = [
     'normalize',
     'Z, G2 R2 S2',
     [
-      [230, 472],
-      [230, 495],
+      [230, 492],
+      [230, 515],
     ],
     { chipOffset: [40, 0] },
   ),
   w('norm-incdec', 'exp', 'normalize', 'incdec', 'dir, cnt', [
-    [165, 510],
-    [85, 510],
-    [85, 555],
+    [165, 530],
+    [85, 530],
+    [85, 575],
   ]),
   w(
     'norm-round',
@@ -372,10 +372,10 @@ export const WIRES: CircuitWire[] = [
     'round',
     'M, G3 R3 S3',
     [
-      [230, 525],
-      [230, 555],
+      [230, 545],
+      [230, 575],
     ],
-    { chipAt: [270, 540] },
+    { chipAt: [270, 560] },
   ),
   w(
     'round-ovf',
@@ -384,16 +384,16 @@ export const WIRES: CircuitWire[] = [
     'incdec',
     'ovf',
     [
-      [165, 575],
-      [110, 575],
+      [165, 595],
+      [110, 595],
     ],
-    { chipAt: [137, 563] },
+    { chipAt: [137, 583] },
   ),
   w('incdec-out', 'exp', 'incdec', 'regR', 'E[7:0]', [
-    [60, 590],
-    [60, 615],
-    [105, 615],
-    [105, 640],
+    [60, 610],
+    [60, 635],
+    [105, 635],
+    [105, 660],
   ]),
   w(
     'round-out',
@@ -402,9 +402,9 @@ export const WIRES: CircuitWire[] = [
     'regR',
     'F[22:0]',
     [
-      [230, 585],
-      [230, 640],
+      [230, 605],
+      [230, 660],
     ],
-    { chipAt: [230, 612] },
+    { chipAt: [230, 632] },
   ),
 ];

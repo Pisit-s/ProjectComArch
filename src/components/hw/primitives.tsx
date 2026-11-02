@@ -234,6 +234,8 @@ export function HwWire({
   junction?: boolean;
 }) {
   const reduce = useReducedMotion();
+  // wires not used in this step fade back so the lit path reads first; control lines even more
+  const dim = kind === 'ctl' ? 'opacity-20' : 'opacity-30';
   const d = points.map(([px, py], i) => `${i ? 'L' : 'M'}${px} ${py}`).join(' ');
   const [ex, ey] = points.at(-1)!;
   const [px, py] = points.at(-2) ?? points[0];
@@ -253,14 +255,14 @@ export function HwWire({
         strokeWidth={active ? 3 : 1.6}
         strokeLinejoin="round"
         strokeDasharray={dashed || kind === 'ctl' ? '6 5' : undefined}
-        className={cn(WIRE_CLASS[kind], 'transition-opacity duration-300', !active && 'opacity-35')}
+        className={cn(WIRE_CLASS[kind], 'transition-opacity duration-300', !active && dim)}
       />
       {junction && (
         <circle
           cx={points[0][0]}
           cy={points[0][1]}
           r={3}
-          className={cn(DOT_CLASS[kind], !active && 'opacity-35')}
+          className={cn(DOT_CLASS[kind], !active && dim)}
         />
       )}
       {active && !reduce && (
@@ -280,7 +282,7 @@ export function HwWire({
         fill="none"
         strokeWidth={active ? 3 : 1.6}
         strokeLinecap="round"
-        className={cn(WIRE_CLASS[kind], !active && 'opacity-35')}
+        className={cn(WIRE_CLASS[kind], !active && dim)}
       />
       {active && chip && (
         <g transform={`translate(${mid[0]} ${mid[1]})`}>

@@ -261,6 +261,27 @@
   }
 
   /* presentation mode (projector): bits big enough to read from the back of the room */
+  /* presenting the circuit: the diagram fills the screen height on the left, the bits and
+     values of the step sit on the right */
+  [data-presenting='1'] .circuit-frame {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 2.5rem;
+  }
+  [data-presenting='1'] .circuit-side {
+    display: block;
+  }
+  [data-presenting='1'] .circuit-side > * {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  [data-presenting='1'] .adder-wrap {
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+
   /* the whole circuit fits one projector screen, with step bar, caption and controls */
   [data-presenting='1'] .adder-diagram {
     width: auto;
