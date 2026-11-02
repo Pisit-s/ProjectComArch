@@ -2,7 +2,7 @@
 
 import { motion } from 'motion/react';
 import { type CSSProperties, useId, useMemo, useState } from 'react';
-import { type Width, mask } from '@/lib/int/adder';
+import { type Width, mask, shiftRight, toBits } from '@/lib/int/adder';
 import {
   type IntAddScene as AddModel,
   type IntSubScene as SubModel,
@@ -16,11 +16,12 @@ import {
   INT_ADD_EXAMPLES,
   INT_SUB_EXAMPLES,
   type IntExample,
+  SHIFT_DEFAULT,
+  SHIFT_EXAMPLES,
   WHEEL_EXAMPLES,
 } from '@/content/lesson/examples';
 import { sectionById } from '@/content/lesson/sections';
 import { UI_CH12 } from '@/content/lesson/ui-ch12';
-import { ScenePlaceholder } from '@/components/lesson/scene-shell';
 import { StepPlayer } from '@/components/player/step-player';
 import { CarryArc } from '@/components/stage/carry-arc';
 import { MiniAlu } from '@/components/stage/mini-alu';
@@ -106,7 +107,7 @@ function IntInput({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-err` : undefined}
         className={cn(
-          'input num h-11 w-full bg-white/90 font-mono text-base',
+          'num input h-11 w-full bg-white/90 font-mono text-base',
           error && 'input-error',
         )}
         data-testid={testId}
@@ -228,7 +229,10 @@ function AddStage({ m, index }: { m: AddModel; index: number }) {
         >
           <span
             className="absolute inset-y-0"
-            style={{ left: 'calc(var(--c) * 0.5 - 0.3rem)', right: 'calc(var(--c) * 0.5 - 0.3rem)' }}
+            style={{
+              left: 'calc(var(--c) * 0.5 - 0.3rem)',
+              right: 'calc(var(--c) * 0.5 - 0.3rem)',
+            }}
           >
             <CarryArc className="h-full w-full" testId="int-add-arc" />
           </span>
@@ -459,8 +463,7 @@ function SubStage({ m, index }: { m: SubModel; index: number }) {
     >
       <p className="text-[0.85em]" data-testid="int-sub-equation">
         <span>{a}</span> <span className="text-muted">−</span> <span>{b}</span>{' '}
-        <span className="text-muted">=</span> <span>{a}</span>{' '}
-        <span className="text-muted">+</span>{' '}
+        <span className="text-muted">=</span> <span>{a}</span> <span className="text-muted">+</span>{' '}
         <span className="font-semibold text-primary">(−{b})</span>
       </p>
       <div className="flex flex-col gap-1.5">
@@ -637,6 +640,133 @@ export function OverflowScene() {
   );
 }
 
+/* ------------------------------------------------------------------------------------------ */
+/* 1.4 shift right                                                                            */
+/* ------------------------------------------------------------------------------------------ */
+
+const SHIFT_W: Width = 8;
+const SHIFT_MAX = 4;
+
+/** Scene 1.4: shift right s places = divide by 2 s times; bits that fall off land in a tray. */
 export function ShiftScene() {
-  return <ScenePlaceholder minHeight="16rem" />;
+  const uid = useId();
+  const [v, setV] = useState(SHIFT_DEFAULT);
+  const [s, setS] = useState(0);
+  const bits = toBits(SHIFT_W, v);
+  const r = shiftRight(SHIFT_W, v, s);
+  const chain = Array.from({ length: s + 1 }, (_, t) => shiftRight(SHIFT_W, v, t).value);
+  const cell =
+    'grid h-[var(--c)] w-[var(--c)] place-items-center rounded-md ring-1 font-mono font-semibold';
+  return (
+    <div className="space-y-3" data-testid="shift">
+      <Chips>
+        {SHIFT_EXAMPLES.map((x) => (
+          <Chip key={x} on={x === v} onClick={() => (setV(x), setS(0))} testId="shift-chip">
+            {x}
+          </Chip>
+        ))}
+      </Chips>
+      <div
+        className="glass-solid space-y-4 rounded-2xl p-3 ring-1 ring-foreground/10 sm:p-5"
+        style={{ minHeight: '13rem', ['--c' as string]: 'clamp(1.75rem, 8vw, 2.6rem)' }}
+      >
+        <div className="num mx-auto flex w-max max-w-full flex-col items-center gap-3 text-[clamp(1.05rem,4.6vw,1.6rem)]">
+          <div
+            className="grid grid-cols-8 gap-1"
+            data-testid="shift-register"
+            aria-label={toBits(SHIFT_W, r.value)}
+          >
+            {Array.from({ length: SHIFT_W }, (_, p) =>
+              p < s ? (
+                <motion.span
+                  key={`z${p}`}
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={SPRING}
+                  style={{ gridColumn: p + 1, gridRow: 1 }}
+                  className={cn(cell, 'bg-white text-muted ring-line')}
+                  aria-hidden
+                >
+                  0
+                </motion.span>
+              ) : (
+                <motion.span
+                  key={`b${p - s}`}
+                  layoutId={`${uid}-${p - s}`}
+                  transition={SPRING}
+                  style={{ gridColumn: p + 1, gridRow: 1 }}
+                  className={cn(cell, 'bg-ice-100 text-ink ring-sky-200')}
+                  aria-hidden
+                >
+                  {bits[p - s]}
+                </motion.span>
+              ),
+            )}
+          </div>
+          <p className="font-mono">
+            <span className="text-muted">= </span>
+            <b className="text-primary" data-testid="shift-dec">
+              {r.value}
+            </b>
+          </p>
+          <div className="flex items-center gap-2 self-end">
+            <span className="font-sans text-xs font-semibold text-muted">{UI_CH12.lost}</span>
+            <span
+              className="flex min-h-[calc(var(--c)+0.5rem)] min-w-[calc(var(--c)+0.5rem)] flex-row-reverse gap-1 rounded-lg border-2 border-dashed border-line p-1"
+              data-testid="shift-tray"
+            >
+              {r.lost.map((b, k) => (
+                <motion.span
+                  key={`b${SHIFT_W - 1 - k}`}
+                  layoutId={`${uid}-${SHIFT_W - 1 - k}`}
+                  transition={SPRING}
+                  className={cn(
+                    cell,
+                    'text-[0.8em]',
+                    b
+                      ? 'bg-bit-grs/15 text-bit-grs-ink ring-bit-grs'
+                      : 'bg-white text-muted ring-line',
+                  )}
+                >
+                  {b}
+                </motion.span>
+              ))}
+            </span>
+          </div>
+        </div>
+        <p className="num text-center font-mono text-sm text-muted" data-testid="shift-chain">
+          {chain.map((x, t) => (
+            <span key={t}>
+              {t > 0 && <span className="px-1">→</span>}
+              <span className={t === s ? 'font-bold text-primary' : undefined}>{x}</span>
+            </span>
+          ))}
+        </p>
+      </div>
+      <label className="flex items-center gap-3 px-1">
+        <span className="shrink-0 text-sm font-semibold text-ink">{UI_CH12.shiftBy}</span>
+        <input
+          type="range"
+          min={0}
+          max={SHIFT_MAX}
+          step={1}
+          value={s}
+          onChange={(e) => setS(Number(e.target.value))}
+          className="range min-w-0 flex-1 range-primary range-sm"
+          aria-valuetext={`${s} ${UI_CH12.places}`}
+          data-testid="shift-range"
+        />
+        <span className="num w-[5.5rem] shrink-0 text-sm text-muted">
+          <b className="font-mono text-ink">{s}</b> {UI_CH12.places}
+        </span>
+      </label>
+      <p
+        aria-live="polite"
+        className="px-1 text-[1.05rem] leading-relaxed font-medium text-ink"
+        data-testid="shift-caption"
+      >
+        {caption('int.shift.live', { s: String(s), dec: String(r.value) })}
+      </p>
+    </div>
+  );
 }

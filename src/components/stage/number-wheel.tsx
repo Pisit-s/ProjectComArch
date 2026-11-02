@@ -97,14 +97,20 @@ export function NumberWheel({
         fill="none"
         strokeWidth={14}
         strokeLinecap="round"
-        className={cn('stroke-primary transition-opacity', emphasizeRange ? 'opacity-30' : 'opacity-0')}
+        className={cn(
+          'stroke-primary transition-opacity',
+          emphasizeRange ? 'opacity-30' : 'opacity-0',
+        )}
       />
       <path
         d={neg}
         fill="none"
         strokeWidth={14}
         strokeLinecap="round"
-        className={cn('stroke-bit-sign transition-opacity', emphasizeRange ? 'opacity-30' : 'opacity-0')}
+        className={cn(
+          'stroke-bit-sign transition-opacity',
+          emphasizeRange ? 'opacity-30' : 'opacity-0',
+        )}
       />
 
       {/* walked path */}
