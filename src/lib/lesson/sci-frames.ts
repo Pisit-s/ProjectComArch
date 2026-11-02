@@ -1,4 +1,14 @@
-import { type FloatFormat, addSub, encodeBits, encodeDecimal, printfFixed } from '@/lib/fp';
+import {
+  type FloatFormat,
+  addSub,
+  encodeBits,
+  encodeDecimal,
+  printfFixed,
+  shortestDecimal,
+  toBinaryString,
+  toHex,
+  width,
+} from '@/lib/fp';
 import { addBits } from '@/lib/int/adder';
 import {
   type DecimalAddition,
@@ -104,6 +114,29 @@ export function runCCode(
   if (fx === null || fy === null) throw new RangeError('bad float literal');
   const floatResult = printfFixed(fmt, addSub(fmt, fx, fy, '+').bits, decimals);
   return { intResult, floatResult, output: `${intResult} ${floatResult}` };
+}
+
+export interface HeroRow {
+  /** Decimal as the learner reads it (the sum is the engine's shortest round-trip decimal). */
+  text: string;
+  /** All bits, sign first. */
+  bits: string;
+  hex: string;
+}
+
+/** Hero teaser: x + y = sum, each also as its stored bits and hex (PLAN.md 3.1). */
+export function buildHeroTeaser(fmt: FloatFormat, x: string, y: string): HeroRow[] {
+  const w = width(fmt);
+  const a = encodeBits(fmt, x);
+  const b = encodeBits(fmt, y);
+  if (a === null || b === null) throw new RangeError('bad float literal');
+  const s = addSub(fmt, a, b, '+').bits;
+  const row = (text: string, v: bigint): HeroRow => ({
+    text,
+    bits: toBinaryString(v, w),
+    hex: toHex(v, w),
+  });
+  return [row(x, a), row(y, b), row(shortestDecimal(fmt, s), s)];
 }
 
 export interface CFrame {

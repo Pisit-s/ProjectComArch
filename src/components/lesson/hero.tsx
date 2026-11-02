@@ -37,7 +37,7 @@ export function Hero() {
           </div>
         </div>
         <div className="space-y-2">
-          <SceneShell id="hero-teaser" minHeight="16rem" />
+          <SceneShell id="hero-teaser" minHeight="22rem" />
           <p className="flex items-center justify-center gap-1.5 text-sm text-muted">
             <ArrowDown className="h-4 w-4" aria-hidden />
             {HERO.teaser}

@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { BINARY32 as F } from '@/lib/fp';
 import { buildIntAddFrames, buildIntSubFrames, buildWheelFrames } from '@/lib/lesson/int-frames';
-import { binaryOf, buildCCodeFrames, buildPointScene } from '@/lib/lesson/sci-frames';
+import {
+  binaryOf,
+  buildCCodeFrames,
+  buildHeroTeaser,
+  buildPointScene,
+} from '@/lib/lesson/sci-frames';
 import { C_CODE } from '@/content/lesson/examples';
 
 /** Chapter 1-2 adapters against PLAN.md appendix D. */
@@ -59,6 +64,16 @@ describe('chapter 2 frames', () => {
     expect(b.frames.map((f) => f.pointAt)).toEqual([3, 2, 1, 1]);
     expect(b.frames.at(-1)!.state).toEqual({ text: '9.8702', exp: 11 });
     expect(buildPointScene('2.34', 56).frames).toHaveLength(1);
+  });
+
+  it('hero: 6.5 + 3.75 = 10.25 as 0x40D00000 + 0x40700000 = 0x41240000', () => {
+    const rows = buildHeroTeaser(F, '6.5', '3.75');
+    expect(rows.map((r) => [r.text, r.hex])).toEqual([
+      ['6.5', '0x40D00000'],
+      ['3.75', '0x40700000'],
+      ['10.25', '0x41240000'],
+    ]);
+    expect(rows[2].bits).toBe('01000001001001000000000000000000');
   });
 
   it('6.5 in base 2 comes from the engine: 110.1 → 1.101 × 2²', () => {

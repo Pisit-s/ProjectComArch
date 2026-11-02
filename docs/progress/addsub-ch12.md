@@ -9,18 +9,20 @@
 - [x] ฉาก 1.4 เลื่อนบิต (`ShiftScene`) · slider 0–4 ไม่ใช่ StepPlayer (ตาม PLAN 3.2) · บิตไหลขวา 0 เติมซ้าย · บิตที่หลุดลงถาด บิต 1 สีชมพู (G/R/S) · แถว 104 → 52 → 26 → 13
 - [x] ฉาก 2.1 โค้ด C (`CCodeScene` + `stage/code-card.tsx`) · โค้ดอยู่ใน `ui-ch12.ts` (`C_SOURCE`) สร้างจาก `C_CODE` · ผล printf จาก `buildCCodeFrames` (ใหม่ใน sci-frames.ts) · chip 0.1f + 0.2f พิมพ์ 0.300000012 สั่น + ลิงก์ไป #rounding · "ทำไม?" why.c.overflow อยู่ที่ขั้น int
 - [x] ฉาก 2.2 จุดที่เลื่อนได้ (`PointScene`) · `buildPointScene` (ใหม่) ส่งตำแหน่งจุดของแต่ละเฟรม · chip ฐานสอง 110.1₂ มาจาก engine (`binaryOf`) · `buildPointFrames` เดิมยังอยู่และคืนค่าเหมือนเดิม
-- [ ] Hero teaser
-- [ ] e2e chapter1 / chapter2 / hero
+- [x] Hero teaser (`HeroTeaser`) · 6.5 + 3.75 = 10.25 → แถบ 32 บิตสีตามส่วน + hex จาก `buildHeroTeaser` (ใหม่ใน sci-frames.ts) · StepPlayer `autoPlay` เล่นครั้งเดียว · reduced motion แสดงขั้นสุดท้ายทันทีและไม่เล่น · caption 3 ขั้นอยู่ใน `HERO.steps` (copy.ts) · CLS ที่ 390 = 0.00006
+- [x] e2e `chapter1.spec.ts` (5), `chapter2.spec.ts` (2), `hero.spec.ts` (3)
 
 ## Screenshot (test-results/shots/)
 - `ch1-add-390.png`, `ch1-add-1440.png` (หลัก 2 ของ 7 + 6) · `ch1-add-end-390.png`, `ch1-add-end-1440.png` (9 + 8 แบบ 4 บิต มีตัวทดออก)
 - `ch1-wheel-range-*.png` · `ch1-wheel-end-*.png` (4 + 5 overflow) · `ch1-wheel-ok-*.png` (3 + (−2))
 - `ch1-shift-104-*.png` (เลื่อน 3 ได้ 13) · `ch1-shift-13-*.png` (เลื่อน 1 ได้ 6 บิต 1 หลุด)
 - `ch2-c-float-*.png` · `ch2-c-print-*.png` · `ch2-c-teaser-*.png` · `ch2-point-hop-*.png` · `ch2-point-bin-*.png`
+- `hero-step0-*.png` · `hero-end-*.png` · `hero-reduced-*.png` (เต็มหน้า ส่วนบน)
 - `ch1-sub-mid-*.png` (ขั้น CarryIn) · `ch1-sub-end-*.png` (ได้ 0001 = 1)
 
 ## แก้ไฟล์ร่วม
-- (ไม่มี)
+- `src/components/lesson/hero.tsx`: `SceneShell id="hero-teaser"` minHeight `16rem` → `22rem` (เปลี่ยนค่าเดียว) · teaser จริงสูง 352px บนจอ 390 (แถบควบคุมขึ้น 2 แถว) ถ้าจองไว้ 16rem หน้าจะกระโดดตอน scene โหลด (CLS) · desktop สูง 320px จึงเหลือที่ว่าง 32px ใต้ teaser
+- `src/content/lesson/copy.ts`: เพิ่ม `HERO.steps` (แถวของ hero ตาม PARALLEL.md)
 
 ## คำถาม + ค่าที่สมมติ
 - ไม่มี Context7 ใน session นี้ · ใช้ motion ตามแบบที่ใช้อยู่แล้วใน repo (`layoutId`, `initial/animate`, spring เดิม) ไม่ใช้ API ใหม่
