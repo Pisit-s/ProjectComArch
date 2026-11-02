@@ -49,7 +49,11 @@ function ResultPanel({ scene, state }: { scene: FpScene; state: FpOpState }) {
         {row(UI.typed, r.typed)}
         {row(UI.diff, r.error, 'text-bit-grs-ink')}
         {row('hex', r.hex, '', 'play-hex')}
-        {row('flag', flags || null, 'text-warning')}
+        {row(
+          'flag',
+          flags || null,
+          r.flags.overflow || r.flags.invalid ? 'font-semibold text-error' : 'text-muted',
+        )}
       </dl>
       <CopyLinkButton
         testId="play-copy"

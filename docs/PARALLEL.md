@@ -35,6 +35,8 @@
 - `displayValue(fmt, bits)` ใน `src/lib/lesson/fp-frames.ts`: ค่าที่แสดงบนหน้า (∞ / −∞ / NaN แทน "Infinity") ใช้แทน `shortestDecimal` ทุกที่ที่ผู้ใช้เห็น
 - `BitTrack` มี class `bit-track` ขยายเองในโหมดนำเสนอ · scene ใหม่ที่อยากให้ใหญ่ในโหมดนำเสนอให้ใช้ CSS variable แบบเดียวกัน
 
+- Pisit แก้ `src/lib/lesson/sci-frames.ts` เฉพาะส่วน Dec4 (`decimalCarries`, `Dec4Frame.carries`) และ `fp-frames.ts` (`hexA`/`hexB`, `carries`) · `scripts/shot.mts` รับ `--el <selector>` และ `--steps <n>` แล้ว (เก็บรูปที่ test-results/shots/)
+
 ## กติกา git
 1. เริ่ม: `git fetch origin && git switch -c <branch> origin/addsub-redesign`
 2. ห้าม push เข้า `addsub-redesign` หรือ `main` · ห้าม merge เข้า branch อื่น · ห้าม push --force, rebase, reset --hard

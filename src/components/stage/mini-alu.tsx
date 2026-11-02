@@ -42,8 +42,9 @@ export function MiniAlu({
         x2={90 + ((y - 14) * 18) / 66}
         y1={y}
         y2={y}
-        className="stroke-carry"
+        className="stroke-muted"
         strokeWidth={2}
+        strokeDasharray="5 4"
       />
     </g>
   );

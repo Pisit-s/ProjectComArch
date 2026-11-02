@@ -8,11 +8,12 @@ import type { BitWindow } from '@/lib/lesson/bit-window';
 import { GRS, type TrackRow } from '@/lib/lesson/fp-frames';
 import { UI } from '@/content/lesson/copy';
 import { cn } from '@/lib/utils';
+import { CarryHop } from './carry-arc';
 import { ExponentTag } from './exponent-tag';
 import { GrsLens } from './grs-lens';
 import { StickyBucket } from './sticky-bucket';
 
-type Slot = number | 'gap' | 'point';
+type Slot = number | 'gap';
 
 export interface BitTrackProps {
   rows: TrackRow[];
@@ -29,6 +30,11 @@ export interface BitTrackProps {
   carries?: bigint;
   /** Highlight the "× 2^e" tags (comparing exponents). */
   expFocus?: boolean;
+  /**
+   * Normalize: the binary point jumps this many columns to the left (negative = right) while
+   * the bits stay put. Ignored when the target column is not on screen.
+   */
+  pointShift?: number;
   className?: string;
   testId?: string;
 }
@@ -56,17 +62,16 @@ export function BitTrack({
   focusRow,
   carries,
   expFocus = false,
+  pointShift = 0,
   className,
   testId = 'bit-track',
 }: BitTrackProps) {
   const SPRING = useStageSpring();
   const stagger = useStageDuration(0.07);
   const carryAt = (c: number) => carries !== undefined && ((carries >> BigInt(c)) & 1n) === 1n;
-  const slots: Slot[] = [];
-  for (const c of win.columns) {
-    slots.push(c);
-    if (c === fracBits) slots.push('point');
-  }
+  const slots: Slot[] = [...win.columns];
+  // the point sits on the right edge of this column; that column holds the leading (hidden) bit
+  const lead = slots.includes(fracBits + pointShift) ? fracBits + pointShift : fracBits;
   const line = new Map<Slot, number>(slots.map((s, i) => [s, i + 2]));
   const ids = rowIds(rows);
   const expCol = slots.length + 2;
@@ -75,8 +80,8 @@ export function BitTrack({
   } as CSSProperties;
 
   const roleClass = (c: number, bit: 0 | 1): string => {
-    if (c === fracBits + 1) return 'text-carry-ink';
-    if (c === fracBits) return 'text-bit-frac-ink underline decoration-dashed underline-offset-4';
+    if (c === lead) return 'text-bit-frac-ink underline decoration-dashed underline-offset-4';
+    if (c > lead) return bit ? 'text-carry-ink' : 'text-muted/50';
     if (c < GRS) return cn('text-bit-grs-ink', bit && 'font-bold');
     return 'text-bit-frac-ink';
   };
@@ -96,7 +101,7 @@ export function BitTrack({
     >
       {/* column hints: hidden bit, G R S */}
       {slots.map((s) =>
-        s === 'point' || s === 'gap' || carryAt(s) ? null : s < GRS || s === fracBits ? (
+        s === 'gap' || carryAt(s) ? null : s < GRS || s === lead ? (
           <span
             key={`h${s}`}
             style={{ gridColumn: line.get(s), gridRow: 1 }}
@@ -106,7 +111,7 @@ export function BitTrack({
             )}
             aria-hidden
           >
-            {s === fracBits ? '2⁰' : ['S', 'R', 'G'][s]}
+            {s === lead ? '2⁰' : ['S', 'R', 'G'][s]}
           </span>
         ) : null,
       )}
@@ -117,17 +122,27 @@ export function BitTrack({
           .filter((s): s is number => typeof s === 'number' && carryAt(s))
           .sort((x, y) => x - y)
           .map((c, k) => (
-            <motion.span
-              key={`carry${c}`}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...SPRING, delay: k * stagger }}
-              style={{ gridColumn: line.get(c), gridRow: 1 }}
-              className="text-center font-sans text-[0.7em] font-bold text-carry-ink"
-              data-testid={`${testId}-carry`}
-            >
-              1
-            </motion.span>
+            <span key={`carry${c}`} className="contents">
+              {/* curved arrow from the column on the right into this one */}
+              {line.has(c - 1) && (
+                <CarryHop
+                  gridColumn={`${line.get(c)} / ${line.get(c - 1)! + 1}`}
+                  gridRow={1}
+                  delay={k * stagger}
+                  duration={stagger * 3}
+                />
+              )}
+              <motion.span
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ ...SPRING, delay: k * stagger + stagger }}
+                style={{ gridColumn: line.get(c), gridRow: 1 }}
+                className="-translate-x-1 self-start text-center font-sans text-[0.7em] leading-none font-bold text-carry-ink"
+                data-testid={`${testId}-carry`}
+              >
+                1
+              </motion.span>
+            </span>
           ))}
 
       {rows.map((row, i) => {
@@ -150,23 +165,22 @@ export function BitTrack({
                 layoutId={`${testId}-focus`}
                 transition={SPRING}
                 style={{ gridRow, gridColumn: `2 / ${expCol}` }}
-                className="-mx-1 h-full rounded-md bg-primary/8"
+                className="-mx-1 h-full rounded-md bg-sky-400/10 shadow-[0_0_14px_rgba(56,182,255,0.45)] ring-2 ring-sky-400"
                 aria-hidden
               />
             )}
             <AnimatePresence initial={false}>
+              <motion.span
+                key={`${id}-pt`}
+                layout="position"
+                transition={SPRING}
+                style={{ gridRow, gridColumn: line.get(lead) }}
+                className="pointer-events-none translate-x-1/2 justify-self-end font-bold text-primary"
+                data-testid={`${testId}-point`}
+              >
+                .
+              </motion.span>
               {slots.map((s) => {
-                if (s === 'point') {
-                  return (
-                    <span
-                      key={`${id}-pt`}
-                      style={{ gridRow, gridColumn: line.get(s) }}
-                      className="text-center font-bold text-primary"
-                    >
-                      .
-                    </span>
-                  );
-                }
                 if (s === 'gap') {
                   return (
                     <span
@@ -180,7 +194,7 @@ export function BitTrack({
                   );
                 }
                 const bit = ((row.value >> BigInt(s)) & 1n) === 1n ? 1 : 0;
-                if (s === fracBits + 1 && bit === 0) return null;
+                if (s > lead && bit === 0 && s === fracBits + 1) return null;
                 return (
                   <motion.span
                     key={`${id}-${s + row.shifted}`}

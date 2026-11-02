@@ -189,6 +189,8 @@ export function buildFpFrames(
       EB: String(decB.exponent),
       sigA: sigText(A.value, FRAC),
       sigB: sigText(B.value, FRAC),
+      hexA: toHex(decA.bits, width(fmt)),
+      hexB: toHex(decB.bits, width(fmt)),
     },
   });
 

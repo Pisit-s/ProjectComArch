@@ -1,11 +1,14 @@
 'use client';
 
+import { ArrowDown, ArrowUp, Scale } from 'lucide-react';
+import { motion } from 'motion/react';
+import { useStageDuration, useStageSpring } from '@/components/player/player-speed';
 import { useMemo, useState } from 'react';
 import { BINARY32, simulate } from '@/lib/fp';
 import { chooseWindow } from '@/lib/lesson/bit-window';
 import { buildFunFact } from '@/lib/lesson/fun-fact';
 import { buildRoundingScene, type RoundingScene as Model } from '@/lib/lesson/rounding-frames';
-import { caption } from '@/content/lesson/captions';
+import { caption, detail } from '@/content/lesson/captions';
 import { ROUND_RULES, UI } from '@/content/lesson/copy';
 import {
   FP_EXAMPLES,
@@ -113,7 +116,16 @@ function RoundingFrameView({ m, id }: { m: Model; id: string }) {
               )}
             >
               <span className="num font-mono">{r.when}</span>
-              <span className="font-semibold">{r.then}</span>
+              <span className="flex items-center gap-1.5 font-semibold">
+                {r.id === 'down' ? (
+                  <ArrowDown className="h-4 w-4" aria-hidden />
+                ) : r.id === 'up' ? (
+                  <ArrowUp className="h-4 w-4" aria-hidden />
+                ) : (
+                  <Scale className="h-4 w-4" aria-hidden />
+                )}
+                {r.then}
+              </span>
             </li>
           ))}
         </ul>
@@ -149,7 +161,8 @@ export function RoundingScene() {
     id: f.id,
     title: f.id,
     caption: caption(f.captionKey, f.params),
-    detail: undefined as string | undefined,
+    // why 3 bits are enough (first look at G R S), why ties go to even (the rule table)
+    detail: f.id === 'bits' ? detail('why.grs') : f.id === 'rule' ? detail('why.even') : undefined,
     bigStep: 4 as const,
   }));
   return (
@@ -188,6 +201,65 @@ export function RoundingScene() {
   );
 }
 
+/** Ticks are the doubles x, x + ulp, x + 2 ulp; x + 20 snaps to the tick the engine rounded to. */
+function SpacingLine({ f, label }: { f: ReturnType<typeof buildFunFact>; label: string }) {
+  const spring = useStageSpring(0.5);
+  const delay = useStageDuration(0.6);
+  // pixel placement only: where x + 20 sits between the ticks
+  const at = Math.min(2, 20 / Number(f.ulp));
+  // y − x is the offset of the tick that x + 20 became
+  const snap = Math.max(0, f.offsets.indexOf(f.yMinusX));
+  return (
+    <svg viewBox="0 0 320 90" className="w-full" role="img" aria-label={label}>
+      <line x1={20} x2={300} y1={40} y2={40} className="stroke-line" strokeWidth={3} />
+      {[0, 1, 2].map((k) => (
+        <g key={k}>
+          <line
+            x1={40 + k * 120}
+            x2={40 + k * 120}
+            y1={28}
+            y2={52}
+            strokeWidth={3}
+            className={k === 1 ? 'stroke-primary' : 'stroke-ink'}
+          />
+          <text
+            x={40 + k * 120}
+            y={72}
+            textAnchor="middle"
+            className="fill-muted font-mono text-[11px]"
+          >
+            {k === 0 ? 'x' : `x + ${f.offsets[k]}`}
+          </text>
+        </g>
+      ))}
+      {/* x + 20 is not a double: it snaps to the nearest tick, x + ulp */}
+      <motion.circle
+        cy={40}
+        r={6}
+        initial={{ cx: 40 + at * 120 }}
+        animate={{ cx: 40 + snap * 120 }}
+        transition={{ ...spring, delay: delay }}
+        className="fill-bit-grs"
+      />
+      <circle
+        cx={40 + at * 120}
+        cy={40}
+        r={5}
+        className="fill-none stroke-bit-grs"
+        strokeDasharray="2 2"
+      />
+      <text
+        x={40 + at * 120}
+        y={18}
+        textAnchor="middle"
+        className="fill-bit-grs-ink font-mono text-[11px]"
+      >
+        x + 20
+      </text>
+    </svg>
+  );
+}
+
 /** Scene 5.5: the double example of the slides, computed by the engine. */
 export function FunFactScene() {
   const f = useMemo(() => buildFunFact(), []);
@@ -203,8 +275,6 @@ export function FunFactScene() {
       caption: caption('slide.funfact2', { r1: f.leftFirst, r2: f.rightFirst }),
     },
   ];
-  // pixel placement only: where x + 20 sits between the ticks x, x + ulp, x + 2 ulp
-  const at = Math.min(2, 20 / Number(f.ulp));
   return (
     <StepPlayer
       steps={steps}
@@ -213,38 +283,7 @@ export function FunFactScene() {
       minHeight="11rem"
       render={(i) =>
         i === 0 ? (
-          <svg viewBox="0 0 320 90" className="w-full" role="img" aria-label={steps[0].caption}>
-            <line x1={20} x2={300} y1={40} y2={40} className="stroke-line" strokeWidth={3} />
-            {[0, 1, 2].map((k) => (
-              <g key={k}>
-                <line
-                  x1={40 + k * 120}
-                  x2={40 + k * 120}
-                  y1={28}
-                  y2={52}
-                  strokeWidth={3}
-                  className={k === 1 ? 'stroke-primary' : 'stroke-ink'}
-                />
-                <text
-                  x={40 + k * 120}
-                  y={72}
-                  textAnchor="middle"
-                  className="fill-muted font-mono text-[11px]"
-                >
-                  {k === 0 ? 'x' : `x + ${f.offsets[k]}`}
-                </text>
-              </g>
-            ))}
-            <circle cx={40 + at * 120} cy={40} r={6} className="fill-bit-grs" />
-            <text
-              x={40 + at * 120}
-              y={18}
-              textAnchor="middle"
-              className="fill-bit-grs-ink font-mono text-[11px]"
-            >
-              x + 20
-            </text>
-          </svg>
+          <SpacingLine f={f} label={steps[0].caption} />
         ) : (
           <dl
             className="num grid grid-cols-[1fr_auto] gap-x-4 gap-y-2 font-mono"

@@ -59,6 +59,7 @@ export function FpAdderDiagram({
               points={w.points}
               kind={w.kind}
               dashed={w.dashed}
+              chipOffset={w.chipOffset}
               active={lit.has(w.id)}
               chip={st.labels[w.id]}
             />

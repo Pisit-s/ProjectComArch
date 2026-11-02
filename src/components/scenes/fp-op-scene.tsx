@@ -64,6 +64,15 @@ function FrameChips({ frame, scene }: { frame: FpFrame; scene: FpScene }) {
       <b className={cn('num font-mono', cls)}>{value}</b>
     </span>
   );
+  if (frame.stage === 'unpack' && frame.params.hexA) {
+    // the two registers, before they are split into sign, exponent and significand
+    return (
+      <span className="flex flex-wrap gap-1.5" data-testid="unpack-hex">
+        {chip('A', frame.params.hexA)}
+        {chip('B', frame.params.hexB)}
+      </span>
+    );
+  }
   if (frame.stage === 'compare') return chip('d', frame.params.d, 'text-bit-exp-ink');
   if (frame.stage === 'normalize' && frame.normalize) {
     const n = frame.normalize;
@@ -90,7 +99,7 @@ function FrameChips({ frame, scene }: { frame: FpFrame; scene: FpScene }) {
   if (frame.stage === 'overflow' || frame.stage === 'underflow') {
     return (
       <span
-        className="inline-flex items-center gap-1.5 rounded-full bg-warning/10 px-3 py-1 text-sm font-semibold text-warning ring-1 ring-warning/30"
+        className="inline-flex items-center gap-1.5 rounded-full bg-error/10 px-3 py-1 text-sm font-semibold text-error ring-1 ring-error/30"
         data-testid="range-warning"
       >
         <TriangleAlert className="h-4 w-4" aria-hidden />
@@ -158,7 +167,26 @@ export function FpFrameView({
       </div>
     );
   }
-  const moving = isAlign(f) ? f.rows.findIndex((r) => r.shifted > 0 && r.key !== 'R') : -1;
+  // the row that changes in this step gets the cyan ring (PLAN.md 1.2)
+  const changing = isAlign(f)
+    ? f.rows.findIndex((r) => r.shifted > 0 && r.key !== 'R')
+    : f.stage === 'add' || f.stage === 'sub'
+      ? f.rows.length - 1
+      : f.stage === 'round'
+        ? 1
+        : f.stage === 'normalize' || f.stage === 'roundCarry'
+          ? 0
+          : -1;
+  // normalize: show the sum as it came out of the adder and let the point jump; the next frame
+  // stores the normalized bits (they slide back under the fixed point)
+  const sum = scene.frames.find((x) => x.stage === 'add' || x.stage === 'sub')?.rows.at(-1);
+  const n = f.stage === 'normalize' ? f.normalize : undefined;
+  const jump =
+    n && sum ? (n.direction === 'right' ? n.amount : n.direction === 'left' ? -n.amount : 0) : 0;
+  const win = full ? fullWindow(scene.fracBits) : chooseWindow(scene);
+  // jump only when the point's new column is on screen; otherwise show the normalized row
+  const canJump = jump !== 0 && win.columns.includes(scene.fracBits + jump);
+  const rows = n && sum && canJump ? [{ ...sum, exp: n.expAfter }] : f.rows;
   return (
     <div className="space-y-3">
       <div className="flex min-h-8 flex-wrap items-center justify-between gap-2">
@@ -167,10 +195,11 @@ export function FpFrameView({
       </div>
       <div className={cn(full && 'scroll-x -mx-1 px-1 pb-2')}>
         <BitTrack
-          rows={f.rows}
+          rows={rows}
           fracBits={scene.fracBits}
-          window={full ? fullWindow(scene.fracBits) : chooseWindow(scene)}
-          focusRow={moving >= 0 ? moving : undefined}
+          window={win}
+          focusRow={changing >= 0 ? changing : undefined}
+          pointShift={canJump ? jump : 0}
           bucket={isAlign(f)}
           carries={f.carries}
           expFocus={f.stage === 'compare'}
