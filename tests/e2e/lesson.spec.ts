@@ -82,6 +82,14 @@ test.describe('single-page lesson', () => {
     await page.goto('/#fp-add');
     const quiz = page.getByTestId('quiz-fp-add');
     await quiz.scrollIntoViewIfNeeded();
+    // chapter links scroll smoothly: wait until the page stops moving before tapping
+    await expect
+      .poll(async () => {
+        const y = await page.evaluate(() => window.scrollY);
+        await page.waitForTimeout(250);
+        return y === (await page.evaluate(() => window.scrollY));
+      })
+      .toBe(true);
     await quiz.getByRole('radio').first().check();
     await quiz.locator('button[type=submit]').click();
     await expect(page.getByTestId('quiz-fp-add-result')).toBeVisible();

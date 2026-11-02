@@ -14,6 +14,13 @@ const WIRE_CLASS: Record<WireKind, string> = {
   ctl: 'stroke-muted',
 };
 
+const DOT_CLASS: Record<WireKind, string> = {
+  exp: 'fill-bit-exp',
+  sig: 'fill-bit-frac',
+  sign: 'fill-bit-sign',
+  ctl: 'fill-muted',
+};
+
 const CHIP_CLASS: Record<WireKind, string> = {
   exp: 'fill-bit-exp-ink',
   sig: 'fill-bit-frac-ink',
@@ -195,6 +202,7 @@ export function HwWire({
   dashed = false,
   chip,
   chipOffset = [0, 0],
+  junction = false,
 }: {
   id: string;
   points: [number, number][];
@@ -205,6 +213,7 @@ export function HwWire({
   /** Value shown on the wire (from the frame). */
   chip?: string;
   chipOffset?: [number, number];
+  junction?: boolean;
 }) {
   const reduce = useReducedMotion();
   const d = points.map(([px, py], i) => `${i ? 'L' : 'M'}${px} ${py}`).join(' ');
@@ -228,6 +237,14 @@ export function HwWire({
         strokeDasharray={dashed || kind === 'ctl' ? '6 5' : undefined}
         className={cn(WIRE_CLASS[kind], 'transition-opacity duration-300', !active && 'opacity-35')}
       />
+      {junction && (
+        <circle
+          cx={points[0][0]}
+          cy={points[0][1]}
+          r={3}
+          className={cn(DOT_CLASS[kind], !active && 'opacity-35')}
+        />
+      )}
       {active && !reduce && (
         <motion.path
           d={d}

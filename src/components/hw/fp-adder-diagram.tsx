@@ -60,6 +60,7 @@ export function FpAdderDiagram({
               kind={w.kind}
               dashed={w.dashed}
               chipOffset={w.chipOffset}
+              junction={w.junction}
               active={lit.has(w.id)}
               chip={st.labels[w.id]}
             />
