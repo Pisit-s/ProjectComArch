@@ -28,6 +28,11 @@
 - [x] DoD: redirect e2e (42 ผ่าน 3 อุปกรณ์) · screenshot 390/1440 ของ `/` และ `/dev/kit` ดูแล้ว · build static
 
 ## Phase 3 — บทที่ 5 (Milestone A)
+- [x] ฉาก 5.1 ฐานสิบ 4 หลัก (`Dec4Scene`)
+- [x] ฉาก 5.2 บวก / 5.3 ลบ (`FpOpScene` ใช้ร่วมกับ playground) · BitTrack compact/tail/full · MiniAlu ตอนลบ
+- [x] ฉาก 5.4 ปัดเศษ (`rounding-frames.ts` + RoundLine + ตารางกติกา + เทียบค่าที่พิมพ์)
+- [x] ฉาก 5.5 ตัวอย่างในสไลด์ (double)
+- [x] DoD: e2e บทที่ 5 + player + reduced motion ผ่าน 3 อุปกรณ์ · screenshot align/normalize/round ที่ 390/1440/1920 ดูแล้ว · งบข้อความผ่าน
 ## Phase 4 — บทที่ 6 วงจร
 ## Phase 5 — บทที่ 3 และ 4
 ## Phase 6 — Hero บทที่ 1 และ 2
@@ -42,3 +47,5 @@
 - `TrackRow.shifted` นับการเลื่อนของแถวผลด้วย (normalize และตัวทดตอนปัด) ให้บิตแต่ละตัวมี key เดิมตอนเลื่อน
 - ชิ้นส่วน `NumberWheel`, `TimesTwo`, `CodeCard`, `ExponentWindow` ทำพร้อมบทที่ใช้ (Phase 5-6) · `player.spec` เขียนใน Phase 3 เมื่อมี scene จริงบนหน้า
 - test `no-thai-in-components` ย้ายข้อความของ register (คำอธิบายบิต) และ error boundary ไป `copy.ts`
+- `wp0-hub` ของเพื่อนทำตามแผนระยะที่ 2 ที่ยกเลิกแล้ว ไม่ merge (Q11) ยกมาแค่ CI และ BlurFade reduced motion
+- StepPlayer: Esc ออกจากโหมดนำเสนอได้แม้โฟกัสอยู่ใน player (เดิมพึ่ง fullscreen ของเบราว์เซอร์ ใช้ไม่ได้บน iOS)

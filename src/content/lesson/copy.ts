@@ -112,7 +112,17 @@ export const UI = {
   typed: 'ค่าที่พิมพ์',
   diff: 'ต่างกัน',
   result: 'ผลลัพธ์',
+  roundDown: 'ปัดลง',
+  roundUp: 'ปัดขึ้น',
+  exactValue: 'ผลจริง',
 } as const;
+
+/** Rows of the rounding rule table (scene 5.4). */
+export const ROUND_RULES = [
+  { id: 'down', when: 'G = 0', then: 'ปัดลง' },
+  { id: 'up', when: 'G = 1, R หรือ S = 1', then: 'ปัดขึ้น' },
+  { id: 'tie', when: 'G = 1, R = S = 0', then: 'เลือกตัวที่ LSB = 0' },
+] as const;
 
 /** Explanation shown after tapping one bit of a register. */
 export const BIT_INFO = {

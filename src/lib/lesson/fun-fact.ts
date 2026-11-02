@@ -20,6 +20,8 @@ export interface FunFact {
   ulp: string;
   /** Doubles near x: x, x + ulp, x + 2 ulp (for the tick marks). */
   ticks: string[];
+  /** The same ticks as offsets from x: 0, ulp, 2 ulp. */
+  offsets: string[];
 }
 
 export function buildFunFact(xText = '1e17', add = '20'): FunFact {
@@ -35,14 +37,15 @@ export function buildFunFact(xText = '1e17', add = '20'): FunFact {
   const d = decode(F, x);
   const ulp = R.pow2(d.expField - bias(F) - F.fracBits);
   const xv = d.value!;
-  const ticks = [0, 1, 2].map((k) =>
-    formatRational(R.add(xv, R.mul(R.fromBigInt(BigInt(k)), ulp)), { scientific: false }),
-  );
+  const steps = [0, 1, 2].map((k) => R.mul(R.fromBigInt(BigInt(k)), ulp));
+  const ticks = steps.map((o) => formatRational(R.add(xv, o), { scientific: false }));
+  const offsets = steps.map((o) => formatRational(o));
   return {
     yMinusX: shortestDecimal(F, yMinusX),
     leftFirst: shortestDecimal(F, leftFirst),
     rightFirst: shortestDecimal(F, rightFirst),
     ulp: formatRational(ulp),
     ticks,
+    offsets,
   };
 }

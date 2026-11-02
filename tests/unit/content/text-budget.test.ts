@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { LIMITS, allBudgets, detailLengths, graphemes } from '@/content/lesson/budget';
 import { CAPTIONS, caption } from '@/content/lesson/captions';
+import { buildRoundingScene } from '@/lib/lesson/rounding-frames';
 import { OTHER, TAKEAWAY } from '@/content/lesson/copy';
 import {
   BITPLAY_EXAMPLES,
@@ -52,13 +53,7 @@ function renderedCaptions(): { key: CaptionKey; text: string }[] {
       const hw = hwCaption(f);
       add(hw.key, hw.params);
     }
-    const r = sc.frames.find((f) => f.id === 'round');
-    if (r) {
-      add('round.overflowBits', r.params);
-      add('round.result', { value: sc.result.value });
-      if (sc.result.typed && sc.result.error)
-        add('round.compare', { typed: ex.a + ' ' + ex.op + ' ' + ex.b, error: sc.result.error });
-    }
+    buildRoundingScene(F, s)?.frames.forEach((f) => add(f.captionKey, f.params));
   }
   for (const t of [...ENCODE_EXAMPLES, LAYOUT_DEFAULT, ...BITPLAY_EXAMPLES]) {
     const r = encodeDecimal(F, t);

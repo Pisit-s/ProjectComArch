@@ -64,7 +64,8 @@ function DigitRow({ row, index }: { row: DigitRowSpec; index: number }) {
         const c = digits.get(p);
         const col = i + 1 + (p < 0 ? 1 : 0);
         if (c === undefined) return null;
-        const tone: Tone = p < -3 ? (row.tail ?? 'normal') : p === 1 ? (row.head ?? 'normal') : 'normal';
+        const tone: Tone =
+          p < -3 ? (row.tail ?? 'normal') : p === 1 ? (row.head ?? 'normal') : 'normal';
         return (
           <motion.span
             key={`${row.id}-${p + row.shift}`}

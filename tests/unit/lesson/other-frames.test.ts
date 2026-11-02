@@ -174,6 +174,7 @@ describe('fun fact (golden D.6, double)', () => {
     const f = buildFunFact();
     expect([f.yMinusX, f.leftFirst, f.rightFirst, f.ulp]).toEqual(['16', '20', '16', '16']);
     expect(f.ticks).toEqual(['100000000000000000', '100000000000000016', '100000000000000032']);
+    expect(f.offsets).toEqual(['0', '16', '32']);
   });
 });
 

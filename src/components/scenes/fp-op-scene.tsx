@@ -122,7 +122,7 @@ export function FpFrameView({
     <div className="space-y-3">
       <div className="flex min-h-8 flex-wrap items-center justify-between gap-2">
         <FrameChips frame={f} />
-        {f.stage === 'sub' && <MiniAlu binvert={1} carryIn={1} active className="w-28" />}
+        {f.stage === 'sub' && <MiniAlu binvert={1} carryIn={1} active className="w-36 sm:w-44" />}
       </div>
       <div className={cn(full && 'scroll-x -mx-1 px-1 pb-2')}>
         <BitTrack
@@ -132,7 +132,7 @@ export function FpFrameView({
           focusRow={moving >= 0 ? moving : undefined}
           bucket={isAlign(f)}
           lens={f.decision ? { row: 0, decision: f.decision } : undefined}
-          className={cn(full && 'w-max [--cell:1.15rem]')}
+          className={cn(full ? 'w-max [--cell:1.15rem]' : 'mx-auto w-max max-w-full')}
           testId={`${testId}-track`}
         />
       </div>
