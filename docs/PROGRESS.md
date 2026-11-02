@@ -34,6 +34,8 @@
 - [x] ฉาก 5.5 ตัวอย่างในสไลด์ (double)
 - [x] DoD: e2e บทที่ 5 + player + reduced motion ผ่าน 3 อุปกรณ์ · screenshot align/normalize/round ที่ 390/1440/1920 ดูแล้ว · งบข้อความผ่าน
 ## Phase 4 — บทที่ 6 วงจร
+- [x] `circuit.ts` layout (360 × 600) + `FpAdderDiagram` + ฉาก 6.1 (ใช้ input/frames เดียวกับ `FpOpScene`, desktop มี BitTrack ข้าง ๆ)
+- [x] DoD: test layout (ทุก id มีที่วาด ไม่ทับกัน) · e2e บทที่ 6 ผ่าน 3 อุปกรณ์ (84 ผ่านทั้งชุด) · screenshot 390/1440 ดูแล้ว
 ## Phase 5 — บทที่ 3 และ 4
 ## Phase 6 — Hero บทที่ 1 และ 2
 ## Phase 7 — ลองเอง และสรุป

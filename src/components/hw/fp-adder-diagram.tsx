@@ -36,7 +36,8 @@ export function FpAdderDiagram({
       <svg
         viewBox={`0 0 ${CIRCUIT_VIEWBOX.w} ${CIRCUIT_VIEWBOX.h}`}
         className="mx-auto block w-full max-w-[26rem]"
-        role="img"
+        // group, not img: the blocks inside are buttons
+        role="group"
         aria-label={summary}
         data-active={st.active.join(' ')}
       >

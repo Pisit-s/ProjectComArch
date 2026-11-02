@@ -28,6 +28,7 @@ test.describe('chapter 6: the adder circuit', () => {
 
   test('tapping a block explains it', async ({ page }) => {
     await openScene(page, 'circuit-flow');
+    await page.getByTestId('circuit-player-next').click(); // leaves the poster
     await page.locator('[data-block=shift]').click();
     await expect(page.getByTestId('circuit-diagram-info')).toContainText('Shifter');
   });
