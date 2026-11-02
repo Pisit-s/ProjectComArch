@@ -248,6 +248,12 @@
   }
 
   /* presentation mode (projector): bits big enough to read from the back of the room */
+  /* the whole circuit fits one projector screen, with step bar, caption and controls */
+  [data-presenting='1'] .adder-diagram {
+    width: auto;
+    max-width: 100%;
+    height: calc(100dvh - 16rem);
+  }
   [data-presenting='1'] .bit-track {
     --bit-size: clamp(1.4rem, 2.2vw, 2.6rem);
     --cell: clamp(1.7rem, 2.7vw, 3.1rem);

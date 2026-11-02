@@ -43,7 +43,7 @@ export function FpAdderDiagram({
     <div className={cn('space-y-2', className)} data-testid={testId}>
       <svg
         viewBox={`0 0 ${CIRCUIT_VIEWBOX.w} ${CIRCUIT_VIEWBOX.h}`}
-        className="mx-auto block w-full max-w-[26rem]"
+        className="adder-diagram mx-auto block w-full max-w-[26rem]"
         // group, not img: the blocks inside are buttons
         role="group"
         aria-label={summary}

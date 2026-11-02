@@ -53,3 +53,17 @@ test.describe('chapter 6: the adder circuit', () => {
     );
   });
 });
+
+test('presentation mode fits the whole circuit and the controls on one screen', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'presentation is for a projector');
+  await openScene(page, 'circuit-flow');
+  await page.getByTestId('circuit-player-present').click();
+  const region = page.locator('[data-testid=circuit-player][data-presenting="1"]');
+  await expect(region).toBeVisible();
+  const [scroll, client] = await region.evaluate((r) => [r.scrollHeight, r.clientHeight]);
+  expect(scroll).toBeLessThanOrEqual(client + 1);
+  await expect(page.getByTestId('circuit-player-next')).toBeInViewport();
+});
