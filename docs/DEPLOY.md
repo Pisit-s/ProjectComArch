@@ -22,3 +22,20 @@
 - `npm run lint && npm run typecheck && npm test` ผ่าน
 - `npm run build` ผ่าน ทุก route เป็น static (○)
 - `npm run test:e2e` ผ่านบน Chromium (Pixel 7) และ WebKit (iPhone 13)
+
+## ระยะที่ 2 (comkrub)
+
+### หลัง merge PR ของ WP-0
+1. ดูว่า Vercel deploy production แล้ว (Deployments ต้องมีรายการล่าสุดเป็น Ready) ถ้ายังไม่ deploy ให้กด **Redeploy** หรือ push commit ว่างจากเครื่องตัวเอง: `git commit --allow-empty -m "chore: deploy"` แล้ว `git push`
+2. เปิด https://comkrub.mypisit.com บนมือถือจริง:
+   - หน้าแรกเป็นหน้าเลือกหัวข้อ กดการ์ดครบ 4 ใบ (คูณ หาร MIPS Simulator ต้องขึ้นหน้า "กำลังพัฒนา")
+   - เมนูบน (desktop) และเมนูมือถือ: ในหัวข้อ Floating-Point ต้องเห็นบท 1–5 และ Lab
+   - ตรวจ redirect: `/learn` → `/floating-point`, `/learn/ieee-754` → `/floating-point/ieee-754`, `/lab?tab=calc&op=mul&a=0.1&b=3&step=round` → `/floating-point/lab?...` (query ต้องติดไปด้วย)
+   - ลิงก์ Lab เก่าที่เคยแชร์ใน LINE ต้องเปิดได้และอยู่ขั้นเดิม
+3. OG image เปลี่ยนเป็น comkrub แล้ว แต่ LINE เก็บ cache รูปเดิมไว้ระยะหนึ่ง
+
+### merge PR ของเพื่อน
+- ใช้ปุ่ม **"Create a merge commit"** เท่านั้น (ไม่ใช้ squash หรือ rebase) เพื่อให้ commit ล่าสุดบน `main` เป็นของ Pisit
+- เหตุผล: โปรเจกต์ Vercel เป็นแผน Hobby และ repo เป็น private ซึ่ง Vercel ให้เฉพาะเจ้าของบัญชี trigger deployment ได้ และตรวจว่าผู้เขียน commit มีสิทธิ์ในโปรเจกต์ก่อน deploy · commit ของเพื่อนจึงไม่ขึ้น preview (Vercel Bot comment ว่า blocked ถือว่าปกติ) และถ้า commit ล่าสุดบน `main` เป็นของเพื่อน production อาจไม่ deploy
+- ถ้า merge แล้ว production ไม่ deploy: กด Redeploy หรือ push commit ว่างตามข้อ 1
+- Claude Code ห้ามแก้ settings บน Vercel (Pisit ทำเอง)
