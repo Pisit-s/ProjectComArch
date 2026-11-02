@@ -104,6 +104,14 @@ export const UI = {
   stepRound: 'ปัดเศษ',
   stepOf: 'ขั้น',
   sceneLabel: 'ภาพเคลื่อนไหว',
+  opAdd: 'บวก',
+  opSub: 'ลบ',
+  digits4: 'เก็บได้ 4 หลัก',
+  lost: 'หลุดทิ้ง',
+  stored: 'ค่าที่เก็บจริง',
+  typed: 'ค่าที่พิมพ์',
+  diff: 'ต่างกัน',
+  result: 'ผลลัพธ์',
 } as const;
 
 /** Explanation shown after tapping one bit of a register. */

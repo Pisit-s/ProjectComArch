@@ -1,4 +1,4 @@
-import type { CaptionTable } from './types';
+import { type CaptionTable, pow } from './types';
 import { SPECIAL_RULES } from './rules';
 
 export const CH5: CaptionTable = {
@@ -6,8 +6,8 @@ export const CH5: CaptionTable = {
   'dec4.compare': (p) => `เลขชี้กำลังต่างกัน ${p.d}`,
   'dec4.align': (p) => `เลื่อนตัวเล็กไปขวา ${p.d} หลัก หลักที่เกินหลุดทิ้ง`,
   'dec4.add': (p) => `บวก: ${p.a} + ${p.b} = ${p.sum}`,
-  'dec4.normalize': (p) => `normalize: ${p.norm} × 10^${p.e}`,
-  'dec4.round': (p) => `ปัดเหลือ 4 หลัก: ${p.rounded} × 10^${p.e}`,
+  'dec4.normalize': (p) => `normalize: ${p.norm} × ${pow(10, p.e)}`,
+  'dec4.round': (p) => `ปัดเหลือ 4 หลัก: ${p.rounded} × ${pow(10, p.e)}`,
   'fp.unpack': () => 'แยกเป็น sign, exponent และ 1.significand (เติม 1 ที่ซ่อนไว้)',
   'fp.negate': () => 'ลบ = บวกค่าติดลบ: กลับ sign ของ B',
   'fp.swap': () => 'B ใหญ่กว่า สลับให้ตัวใหญ่อยู่บน ผลใช้ sign ของตัวใหญ่',
