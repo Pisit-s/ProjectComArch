@@ -65,6 +65,9 @@ export interface CircuitState {
   labels: Partial<Record<WireId, string>>;
 }
 
+/** Chips must stay short to sit between wires: long significands are cut with "…". */
+const chipText = (s: string, max = 7): string => (s.length > max ? `${s.slice(0, max - 1)}…` : s);
+
 export function circuitState(frame: FpFrame): CircuitState {
   const p = frame.params;
   switch (frame.stage) {
@@ -72,7 +75,12 @@ export function circuitState(frame: FpFrame): CircuitState {
       return {
         active: ['regA', 'regB'],
         wires: ['a-exp', 'b-exp', 'a-sig', 'b-sig', 'a-sign', 'b-sign'],
-        labels: { 'a-exp': p.EA, 'b-exp': p.EB, 'a-sig': p.sigA, 'b-sig': p.sigB },
+        labels: {
+          'a-exp': p.EA,
+          'b-exp': p.EB,
+          'a-sig': chipText(p.sigA),
+          'b-sig': chipText(p.sigB),
+        },
       };
     case 'negate':
       return {
@@ -96,7 +104,7 @@ export function circuitState(frame: FpFrame): CircuitState {
           'a-exp': p.EA,
           'b-exp': p.EB,
           'alu-ctl': `neg = ${neg}`,
-          'alu-shift': `absD = ${p.d}`,
+          'alu-shift': `>> ${p.d}`,
         },
       };
     }
@@ -129,7 +137,7 @@ export function circuitState(frame: FpFrame): CircuitState {
         wires: ['shift-alu', 'big-alu', 'ctl-alu', 'alu-negate'],
         labels: {
           'alu-negate': p.sum,
-          'ctl-alu': frame.stage === 'add' ? 'Binv = 0' : 'Binv = 1',
+          'ctl-alu': frame.stage === 'add' ? '+' : '−',
         },
       };
     case 'normalize': {

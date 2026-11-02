@@ -123,11 +123,20 @@ function FrameChips({ frame, scene }: { frame: FpFrame; scene: FpScene }) {
 }
 
 /** Result card of the last frame: register, hex, value (≈ when the stored value is rounded). */
-function ResultCard({ scene, testId }: { scene: FpScene; testId: string }) {
+function ResultCard({
+  scene,
+  testId,
+  register = true,
+}: {
+  scene: FpScene;
+  testId: string;
+  /** The 32-bit register needs a full row; the narrow view beside the circuit leaves it out. */
+  register?: boolean;
+}) {
   const r = scene.result;
   return (
     <div className="space-y-2" data-testid={`${testId}-result`}>
-      <Register32 bits={r.bits} name={`${testId}-reg`} />
+      {register && <Register32 bits={r.bits} name={`${testId}-reg`} />}
       <p className="num flex flex-wrap items-baseline gap-x-3 font-mono text-lg">
         <b data-testid={`${testId}-hex`}>{r.hex}</b>
         <span>
@@ -144,11 +153,14 @@ export function FpFrameView({
   scene,
   index,
   full,
+  compact = false,
   testId,
 }: {
   scene: FpScene;
   index: number;
   full: boolean;
+  /** Smaller cells (the bit track beside the circuit). */
+  compact?: boolean;
   testId: string;
 }) {
   const f = scene.frames[index];
@@ -163,7 +175,7 @@ export function FpFrameView({
             testId={`${testId}-track`}
           />
         )}
-        <ResultCard scene={scene} testId={testId} />
+        <ResultCard scene={scene} testId={testId} register={!compact} />
       </div>
     );
   }
@@ -212,7 +224,10 @@ export function FpFrameView({
           carries={f.carries}
           expFocus={f.stage === 'compare'}
           lens={f.decision ? { row: 0, decision: f.decision } : undefined}
-          className={cn(full ? 'w-max [--cell:1.15rem]' : 'mx-auto w-max max-w-full')}
+          className={cn(
+            full ? 'w-max [--cell:1.15rem]' : 'mx-auto w-max max-w-full',
+            compact && '[--bit-size:0.95rem] [--cell:1.25rem]',
+          )}
           testId={`${testId}-track`}
         />
       </div>

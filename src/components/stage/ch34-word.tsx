@@ -51,7 +51,7 @@ export function Word32({
     const n = LEN[field];
     return (
       <div
-        className={cn('flex min-w-0 flex-col gap-0.5', field === 'sig' && 'w-full lg:w-auto')}
+        className={cn('flex min-w-0 flex-col gap-0.5', field === 'sig' && 'w-full lg:w-auto lg:shrink')}
         data-testid={`${testId}-${field}`}
         data-colored={on ? '1' : '0'}
       >
@@ -83,14 +83,14 @@ export function Word32({
           <div
             className={cn(
               'flex min-w-0 flex-col gap-0.5',
-              field === 'sig' && 'flex-1 lg:flex-none',
+              field === 'sig' && 'min-w-0 flex-1',
             )}
           >
             <div
               className={cn(
                 'grid gap-px sm:gap-0.5',
                 field === 'sig'
-                  ? 'grid-cols-[repeat(var(--n),minmax(0,1fr))] lg:grid-cols-[repeat(var(--n),1.5rem)]'
+                  ? 'grid-cols-[repeat(var(--n),minmax(0,1fr))] lg:grid-cols-[repeat(var(--n),minmax(0,1.5rem))]'
                   : 'grid-cols-[repeat(var(--n),1.35rem)] sm:grid-cols-[repeat(var(--n),1.5rem)]',
               )}
               style={{ '--n': n } as CSSProperties}

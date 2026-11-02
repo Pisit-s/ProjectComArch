@@ -35,6 +35,8 @@ export interface CircuitWire {
   junction?: boolean;
   /** Move the value chip off a short wire so it never covers a block. */
   chipOffset?: [number, number];
+  /** Exact spot of the value chip, picked by hand where no other wire runs. */
+  chipAt?: [number, number];
 }
 
 export const CIRCUIT_VIEWBOX = { w: 360, h: 680 } as const;
@@ -106,18 +108,34 @@ export const WIRES: CircuitWire[] = [
     [193, 140],
   ]),
   // each exponent goes to the Small ALU and (branch) to the exponent MUX
-  w('a-exp', 'exp', 'regA', 'smallAlu', 'eA[7:0]', [
-    [40, 40],
-    [40, 60],
-    [150, 60],
-    [150, 76],
-  ]),
-  w('b-exp', 'exp', 'regB', 'smallAlu', 'eB[7:0]', [
-    [225, 40],
-    [225, 60],
-    [200, 60],
-    [200, 76],
-  ]),
+  w(
+    'a-exp',
+    'exp',
+    'regA',
+    'smallAlu',
+    'eA[7:0]',
+    [
+      [40, 40],
+      [40, 60],
+      [150, 60],
+      [150, 76],
+    ],
+    { chipAt: [120, 60] },
+  ),
+  w(
+    'b-exp',
+    'exp',
+    'regB',
+    'smallAlu',
+    'eB[7:0]',
+    [
+      [225, 40],
+      [225, 60],
+      [200, 60],
+      [200, 76],
+    ],
+    { chipAt: [243, 50] },
+  ),
   w(
     'a-exp-mux',
     'exp',
@@ -146,12 +164,20 @@ export const WIRES: CircuitWire[] = [
     { junction: true },
   ),
   // each significand with its hidden 1 goes to both significand MUXes
-  w('a-sig', 'sig', 'regA', 'muxSmall', 'mA = {1, fA}', [
-    [85, 40],
-    [85, 215],
-    [180, 215],
-    [180, 262],
-  ]),
+  w(
+    'a-sig',
+    'sig',
+    'regA',
+    'muxSmall',
+    'mA = {1, fA}',
+    [
+      [85, 40],
+      [85, 215],
+      [180, 215],
+      [180, 262],
+    ],
+    { chipAt: [137, 215] },
+  ),
   w(
     'a-sig-big',
     'sig',
@@ -165,10 +191,18 @@ export const WIRES: CircuitWire[] = [
     ],
     { junction: true },
   ),
-  w('b-sig', 'sig', 'regB', 'muxBig', 'mB = {1, fB}', [
-    [300, 40],
-    [300, 262],
-  ]),
+  w(
+    'b-sig',
+    'sig',
+    'regB',
+    'muxBig',
+    'mB = {1, fB}',
+    [
+      [300, 40],
+      [300, 262],
+    ],
+    { chipAt: [300, 105] },
+  ),
   w(
     'b-sig-small',
     'sig',
@@ -193,25 +227,41 @@ export const WIRES: CircuitWire[] = [
       [175, 112],
       [175, 140],
     ],
-    { chipOffset: [24, 0] },
+    { chipAt: [145, 126] },
   ),
-  w('alu-shift', 'exp', 'smallAlu', 'shift', 'absD[4:0]', [
-    [136, 94],
-    [96, 94],
-    [96, 330],
-    [115, 330],
-  ]),
+  w(
+    'alu-shift',
+    'exp',
+    'smallAlu',
+    'shift',
+    'absD[4:0]',
+    [
+      [136, 94],
+      [96, 94],
+      [96, 330],
+      [115, 330],
+    ],
+    { chipAt: [116, 94] },
+  ),
   w('alu-far', 'ctl', 'smallAlu', 'shift', 'far', [
-    [140, 104],
-    [104, 104],
+    [141, 108],
+    [104, 108],
     [104, 342],
     [115, 342],
   ]),
   // Control
-  w('sub-in', 'ctl', null, 'control', 'sub', [
-    [358, 150],
-    [252, 150],
-  ]),
+  w(
+    'sub-in',
+    'ctl',
+    null,
+    'control',
+    'sub',
+    [
+      [358, 150],
+      [252, 150],
+    ],
+    { chipAt: [330, 150] },
+  ),
   w('ctl-mux-exp', 'ctl', 'control', 'muxExp', 'sel', [
     [170, 182],
     [170, 247],
@@ -224,12 +274,20 @@ export const WIRES: CircuitWire[] = [
     [160, 247],
     [160, 262],
   ]),
-  w('ctl-mux-big', 'ctl', 'control', 'muxBig', 'sel', [
-    [170, 182],
-    [170, 247],
-    [280, 247],
-    [280, 262],
-  ]),
+  w(
+    'ctl-mux-big',
+    'ctl',
+    'control',
+    'muxBig',
+    'sel',
+    [
+      [170, 182],
+      [170, 247],
+      [280, 247],
+      [280, 262],
+    ],
+    { chipAt: [220, 247] },
+  ),
   w(
     'ctl-alu',
     'ctl',
@@ -242,7 +300,7 @@ export const WIRES: CircuitWire[] = [
       [335, 405],
       [302, 405],
     ],
-    { chipOffset: [-32, 0] },
+    { chipAt: [318, 405] },
   ),
   w('big-neg', 'ctl', 'bigAlu', 'control', 'bigNeg', [
     [305, 420],
@@ -288,7 +346,7 @@ export const WIRES: CircuitWire[] = [
       [230, 432],
       [230, 448],
     ],
-    { chipOffset: [40, 0] },
+    { chipAt: [282, 440] },
   ),
   w(
     'negate-norm',
@@ -317,7 +375,7 @@ export const WIRES: CircuitWire[] = [
       [230, 525],
       [230, 555],
     ],
-    { chipOffset: [40, 0] },
+    { chipAt: [270, 540] },
   ),
   w(
     'round-ovf',
@@ -329,7 +387,7 @@ export const WIRES: CircuitWire[] = [
       [165, 575],
       [110, 575],
     ],
-    { chipOffset: [0, -12] },
+    { chipAt: [137, 563] },
   ),
   w('incdec-out', 'exp', 'incdec', 'regR', 'E[7:0]', [
     [60, 590],
@@ -337,8 +395,16 @@ export const WIRES: CircuitWire[] = [
     [105, 615],
     [105, 640],
   ]),
-  w('round-out', 'sig', 'round', 'regR', 'F[22:0]', [
-    [230, 585],
-    [230, 640],
-  ]),
+  w(
+    'round-out',
+    'sig',
+    'round',
+    'regR',
+    'F[22:0]',
+    [
+      [230, 585],
+      [230, 640],
+    ],
+    { chipAt: [230, 612] },
+  ),
 ];

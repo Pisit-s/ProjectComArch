@@ -1,7 +1,8 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { useState } from 'react';
+import { motion } from 'motion/react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { type BlockId, type WireId, circuitState } from '@/lib/lesson/circuit-map';
 import type { FpFrame } from '@/lib/lesson/fp-frames';
 import { BLOCKS, CIRCUIT_VIEWBOX, type CircuitBlock, WIRES } from '@/content/lesson/circuit';
@@ -41,8 +42,27 @@ export function FpAdderDiagram({
       .join(', ');
   const inputs = io('to');
   const outputs = io('from');
+  const box = useRef<HTMLDivElement>(null);
+
+  // the floating details close with Esc or a tap anywhere outside them (a block opens its own)
+  useEffect(() => {
+    if (!selected) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setSelected(null);
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as Element | null;
+      if (t && (box.current?.contains(t) || t.closest('[data-block]'))) return;
+      setSelected(null);
+    };
+    window.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onDown);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onDown);
+    };
+  }, [selected]);
+
   return (
-    <div className={cn('space-y-2', className)} data-testid={testId}>
+    <div className={cn('relative mx-auto w-full max-w-[26rem]', className)} data-testid={testId}>
       <svg
         viewBox={`0 0 ${CIRCUIT_VIEWBOX.w} ${CIRCUIT_VIEWBOX.h}`}
         className="adder-diagram mx-auto block w-full max-w-[26rem]"
@@ -62,6 +82,7 @@ export function FpAdderDiagram({
               kind={w.kind}
               dashed={w.dashed}
               chipOffset={w.chipOffset}
+              chipAt={w.chipAt}
               junction={w.junction}
               active={lit.has(w.id)}
               chip={st.labels[w.id]}
@@ -87,6 +108,8 @@ export function FpAdderDiagram({
       </svg>
       {sel && (
         <BlockPanel
+          ref={box}
+          style={popoverPlace(sel)}
           block={sel}
           values={st.labels}
           lit={lit}
@@ -105,7 +128,25 @@ export function FpAdderDiagram({
  * every signal in and out (with this step's value when the wire is lit). The animation above
  * stays the main explanation.
  */
+/**
+ * Where the floating details sit: next to the tapped block, on the side with more room, never
+ * taller than that room (the stage clips anything outside it).
+ */
+function popoverPlace(b: CircuitBlock): CSSProperties {
+  const { w: W, h: H } = CIRCUIT_VIEWBOX;
+  const x = ((b.x + b.w / 2) / W) * 100;
+  const below = b.y + b.h / 2 < H / 2;
+  const edge = below ? ((b.y + b.h) / H) * 100 : ((H - b.y) / H) * 100;
+  return {
+    left: `clamp(0px, calc(${x}% - 11rem), calc(100% - 22rem))`,
+    ...(below ? { top: `calc(${edge}% + 6px)` } : { bottom: `calc(${edge}% + 6px)` }),
+    maxHeight: `calc(${100 - edge}% - 12px)`,
+  };
+}
+
 function BlockPanel({
+  ref,
+  style,
   block,
   values,
   lit,
@@ -114,6 +155,8 @@ function BlockPanel({
   onClose,
   testId,
 }: {
+  ref: React.Ref<HTMLDivElement>;
+  style: CSSProperties;
   block: CircuitBlock;
   values: Partial<Record<WireId, string>>;
   lit: Set<WireId>;
@@ -151,8 +194,14 @@ function BlockPanel({
       </div>
     );
   return (
-    <section
-      className="space-y-3 rounded-xl bg-ice-100 p-3 text-sm leading-relaxed ring-1 ring-line"
+    <motion.section
+      ref={ref}
+      role="dialog"
+      initial={{ opacity: 0, y: 6, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
+      style={style}
+      className="absolute z-20 w-[min(22rem,100%)] space-y-3 overflow-y-auto rounded-xl bg-white p-3 text-sm leading-relaxed shadow-xl ring-1 ring-line"
       aria-label={block.label}
       data-testid={`${testId}-info`}
     >
@@ -199,6 +248,6 @@ function BlockPanel({
       {rows(UI.detailOut, d.outputs)}
       {d.note && <p className="text-xs text-ink/80">{d.note}</p>}
       <p className="text-xs text-muted">{CIRCUIT_SCOPE}</p>
-    </section>
+    </motion.section>
   );
 }
