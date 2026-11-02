@@ -105,6 +105,20 @@ describe('golden D.1 (add / sub binary32)', () => {
   });
 });
 
+describe('carries of the add frame', () => {
+  it('6.5 + 3.75 carries into the columns where a 1 + 1 happened, subtraction has none', () => {
+    const { sc } = scene('6.5', '+', '3.75');
+    const add = frame(sc, 'add');
+    const [a, b, sum] = add.rows.map((r) => r.value);
+    expect(sum).toBe(a + b);
+    expect(add.carries).toBe(sum ^ a ^ b);
+    expect(add.carries! > 0n).toBe(true);
+    // the carry out of the top column lands in the carry column (2^1)
+    expect((add.carries! >> BigInt(sc.fracBits + 1)) & 1n).toBe(1n);
+    expect(frame(scene('0.5', '-', '0.4375').sc, 'add').carries).toBeUndefined();
+  });
+});
+
 describe('frame invariants (random pairs)', () => {
   const pair = fc.oneof(...PAIR_KINDS.map(([, arb]) => arb));
   it('last frame packs the engine result, ids unique, four steps in order, circuit lights up', () => {

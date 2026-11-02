@@ -1,5 +1,6 @@
 'use client';
 
+import { useStageDuration, useStageSpring } from '@/components/player/player-speed';
 import { AnimatePresence, motion } from 'motion/react';
 import type { CSSProperties } from 'react';
 import type { RoundDecision } from '@/lib/fp';
@@ -10,8 +11,6 @@ import { cn } from '@/lib/utils';
 import { ExponentTag } from './exponent-tag';
 import { GrsLens } from './grs-lens';
 import { StickyBucket } from './sticky-bucket';
-
-const SPRING = { type: 'spring', stiffness: 420, damping: 36 } as const;
 
 type Slot = number | 'gap' | 'point';
 
@@ -26,6 +25,10 @@ export interface BitTrackProps {
   bucket?: boolean;
   /** Highlight the row at this index (the one that moves in this frame). */
   focusRow?: number;
+  /** Carries of an addition (bit i = carry into column i), drawn above the first row. */
+  carries?: bigint;
+  /** Highlight the "× 2^e" tags (comparing exponents). */
+  expFocus?: boolean;
   className?: string;
   testId?: string;
 }
@@ -51,9 +54,14 @@ export function BitTrack({
   lens,
   bucket = false,
   focusRow,
+  carries,
+  expFocus = false,
   className,
   testId = 'bit-track',
 }: BitTrackProps) {
+  const SPRING = useStageSpring();
+  const stagger = useStageDuration(0.07);
+  const carryAt = (c: number) => carries !== undefined && ((carries >> BigInt(c)) & 1n) === 1n;
   const slots: Slot[] = [];
   for (const c of win.columns) {
     slots.push(c);
@@ -88,7 +96,7 @@ export function BitTrack({
     >
       {/* column hints: hidden bit, G R S */}
       {slots.map((s) =>
-        s === 'point' || s === 'gap' ? null : s < GRS || s === fracBits ? (
+        s === 'point' || s === 'gap' || carryAt(s) ? null : s < GRS || s === fracBits ? (
           <span
             key={`h${s}`}
             style={{ gridColumn: line.get(s), gridRow: 1 }}
@@ -102,6 +110,25 @@ export function BitTrack({
           </span>
         ) : null,
       )}
+
+      {/* carries run from right to left, like the adder in Chapter 1 */}
+      {carries !== undefined &&
+        slots
+          .filter((s): s is number => typeof s === 'number' && carryAt(s))
+          .sort((x, y) => x - y)
+          .map((c, k) => (
+            <motion.span
+              key={`carry${c}`}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ ...SPRING, delay: k * stagger }}
+              style={{ gridColumn: line.get(c), gridRow: 1 }}
+              className="text-center font-sans text-[0.7em] font-bold text-carry-ink"
+              data-testid={`${testId}-carry`}
+            >
+              1
+            </motion.span>
+          ))}
 
       {rows.map((row, i) => {
         const id = ids[i];
@@ -171,7 +198,14 @@ export function BitTrack({
               })}
             </AnimatePresence>
             <span style={{ gridRow, gridColumn: expCol }} className="pl-1 text-[0.9em] sm:pl-2">
-              <ExponentTag exp={row.exp} testId={`${testId}-exp-${id}`} />
+              <ExponentTag
+                exp={row.exp}
+                testId={`${testId}-exp-${id}`}
+                className={cn(
+                  'rounded-md px-1 transition-colors',
+                  expFocus && 'bg-bit-exp/15 ring-1 ring-bit-exp',
+                )}
+              />
             </span>
           </div>
         );

@@ -1,5 +1,6 @@
 'use client';
 
+import { useStageSpring } from '@/components/player/player-speed';
 import { ArrowDown, ArrowUp, Check, Scale } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { RoundDecision } from '@/lib/fp';
@@ -29,12 +30,13 @@ export function GrsLens({
   className?: string;
 }) {
   const Icon = ICON[decision];
+  const spring = useStageSpring(0.35);
   return (
     <motion.div
       style={{ gridColumn, gridRow }}
       initial={{ opacity: 0, scale: 1.25 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+      transition={spring}
       className={cn(
         'pointer-events-none relative -mx-0.5 -my-1 self-stretch rounded-lg bg-bit-grs/8 ring-2 ring-bit-grs',
         className,
