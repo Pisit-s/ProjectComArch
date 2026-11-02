@@ -146,13 +146,13 @@ export const BLOCK_DETAILS: Record<BlockId, BlockDetail> = {
       { name: 'Binv, CarryIn', bits: 2, peer: 'Control', wire: 'ctl-alu' },
     ],
     outputs: [
-      { name: 'T[27:0]', bits: 28, peer: 'Negate if bigNeg', wire: 'alu-negate' },
+      { name: 'T[27:0]', bits: 28, peer: 'Negate if < 0', wire: 'alu-negate' },
       { name: 'bigNeg', bits: 1, peer: 'Control', wire: 'big-neg' },
     ],
     note: 'บวก: T[27] = 1 แปลว่าได้ 10.xxx (ผล ≥ 2) · ลบ: T[27] = 1 แปลว่าผลติดลบ เกิดได้เฉพาะตอน exponent เท่ากัน',
   },
   negate: {
-    what: 'ถ้าลบแล้วติดลบ กลับบิตแล้วบวก 1 ให้ได้ขนาดของผล (Control กลับ sign ให้)',
+    what: 'ทำงานเมื่อผลของ Big ALU ติดลบ (bigNeg = 1): กลับบิตแล้วบวก 1 ให้ได้ขนาดของผล ส่วน Control กลับ sign ให้ ถ้าไม่ติดลบก็ส่งผ่านไปเฉย ๆ',
     how: ["T' = bigNeg ? (~T + 1) : T", "Z[24:0] = T'[27:3],  {G2, R2, S2} = T'[2:0]"],
     inputs: [
       { name: 'T[27:0]', bits: 28, peer: 'Big ALU', wire: 'alu-negate' },
@@ -168,7 +168,7 @@ export const BLOCK_DETAILS: Record<BlockId, BlockDetail> = {
       'อื่น ๆ → เลื่อนซ้าย n: dir = 0, cnt = n',
       'n = จำนวน 0 นำหน้า หาด้วย priority encoder',
     ],
-    inputs: [{ name: 'Z, G2 R2 S2', bits: 28, peer: 'Negate if bigNeg', wire: 'negate-norm' }],
+    inputs: [{ name: 'Z, G2 R2 S2', bits: 28, peer: 'Negate if < 0', wire: 'negate-norm' }],
     outputs: [
       { name: 'M[23:0], G3 R3 S3', bits: 27, peer: 'Round', wire: 'norm-round' },
       { name: 'dir, cnt', bits: 6, peer: 'Inc / Dec', wire: 'norm-incdec' },
