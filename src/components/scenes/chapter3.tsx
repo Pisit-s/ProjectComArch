@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { type ReactNode, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { BINARY32 } from '@/lib/fp';
 import { parseBitsInput } from '@/lib/lesson/ch3-special';
 import {
@@ -18,61 +18,12 @@ import { OperandInput } from '@/components/lesson/operand-input';
 import { StepPlayer } from '@/components/player/step-player';
 import { usePlayerMotion } from '@/components/player/player-speed';
 import { ExampleChips } from '@/components/stage/ch34-chips';
+import { Piece, Times } from '@/components/stage/ch34-formula';
 import { Word32, type WordField } from '@/components/stage/ch34-word';
 import { minus } from '@/components/ui/num';
-import { cn } from '@/lib/utils';
 
 const sceneTitle = (id: string): string =>
   sectionById('ieee754').scenes.find((s) => s.id === id)?.title ?? id;
-
-/** One piece of the formula: its symbol, and the value plugged in once that frame comes. */
-function Piece({
-  tone,
-  plugged,
-  symbol,
-  value,
-  testId,
-}: {
-  tone: string;
-  plugged: boolean;
-  symbol: ReactNode;
-  value: ReactNode;
-  testId: string;
-}) {
-  const { d } = usePlayerMotion();
-  return (
-    <div
-      className={cn(
-        'flex min-w-0 flex-col items-center gap-1 rounded-xl bg-white/80 px-3 py-2 ring-2 transition-shadow',
-        tone,
-        plugged ? 'shadow-md' : 'ring-1',
-      )}
-      data-testid={testId}
-      data-plugged={plugged ? '1' : '0'}
-    >
-      <span className="num font-mono text-sm whitespace-nowrap">{symbol}</span>
-      <AnimatePresence initial={false}>
-        {plugged && (
-          <motion.span
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: d(0.35) }}
-            className="num font-mono text-base font-semibold whitespace-nowrap"
-          >
-            {value}
-          </motion.span>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-const Times = () => (
-  <span className="self-center font-mono text-lg text-muted" aria-hidden>
-    ×
-  </span>
-);
 
 function LayoutFrameView({ m, f, focus }: { m: Model; f: LayoutFrame; focus: WordField | null }) {
   const p = m.plug;

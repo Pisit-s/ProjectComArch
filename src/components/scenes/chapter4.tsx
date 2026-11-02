@@ -4,25 +4,29 @@ import { ArrowDown, ArrowRight, ArrowUp, TriangleAlert } from 'lucide-react';
 import { motion } from 'motion/react';
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { BINARY32, encodeDecimal } from '@/lib/fp';
+import { parseBitsInput } from '@/lib/lesson/ch3-special';
 import {
+  type DecodeFrame,
+  type DecodeScene as DecodeModel,
   type EncodeFrame,
   type EncodeScene as Model,
   type NormalizeView,
+  buildDecodeFrames,
   buildEncodeFrames,
 } from '@/lib/lesson/encode-frames';
 import { caption } from '@/content/lesson/captions';
-import { ENCODE_EXAMPLES } from '@/content/lesson/examples';
+import { DECODE_EXAMPLES, ENCODE_EXAMPLES } from '@/content/lesson/examples';
 import { sectionById } from '@/content/lesson/sections';
 import { UI_CH34 } from '@/content/lesson/ui-ch34';
-import { ScenePlaceholder } from '@/components/lesson/scene-shell';
 import { OperandInput } from '@/components/lesson/operand-input';
 import { StepPlayer } from '@/components/player/step-player';
 import { usePlayerMotion } from '@/components/player/player-speed';
 import { ExampleChips } from '@/components/stage/ch34-chips';
+import { Piece, Times } from '@/components/stage/ch34-formula';
 import { Word32, type WordField } from '@/components/stage/ch34-word';
 import { ExponentTag } from '@/components/stage/exponent-tag';
 import { TimesTwo } from '@/components/stage/times-two';
-import { minus } from '@/components/ui/num';
+import { Num, minus } from '@/components/ui/num';
 import { cn } from '@/lib/utils';
 
 const SPRING = { type: 'spring', stiffness: 420, damping: 36 } as const;
@@ -348,6 +352,139 @@ export function EncodeScene() {
   );
 }
 
+const DEC_FOCUS: Record<DecodeFrame['focus'], WordField | null> = {
+  fields: null,
+  exp: 'exp',
+  sig: 'sig',
+  value: null,
+};
+
+function DecodeFrameView({ m, index }: { m: DecodeModel; index: number }) {
+  const f = m.frames[index];
+  const seen = new Set(m.frames.slice(0, index + 1).map((x) => x.focus));
+  const exp = m.frames.find((x) => x.focus === 'exp')?.params;
+  const sig = m.frames.find((x) => x.focus === 'sig')?.params;
+  const neg = m.fields.sign === '1';
+  return (
+    <div className="space-y-4">
+      <Word32
+        fill={m.fields}
+        focus={DEC_FOCUS[f.focus]}
+        hiddenBit={seen.has('sig')}
+        testId="decode-word"
+      />
+      <div className="flex flex-wrap items-stretch justify-center gap-2">
+        <Piece
+          tone="ring-bit-sign text-bit-sign-ink"
+          plugged
+          symbol={
+            <>
+              (−1)<sup>s</sup>
+            </>
+          }
+          value={
+            <>
+              s = {m.fields.sign} → {neg ? '−' : '+'}
+            </>
+          }
+          testId="decode-sign"
+        />
+        {sig && (
+          <>
+            <Times />
+            <Piece
+              tone="ring-bit-frac text-bit-frac-ink"
+              plugged={seen.has('sig')}
+              symbol="1.significand"
+              value={
+                <>
+                  {sig.sig}
+                  <sub>2</sub>
+                </>
+              }
+              testId="decode-sig"
+            />
+          </>
+        )}
+        {exp && (
+          <>
+            <Times />
+            <Piece
+              tone="ring-bit-exp text-bit-exp-ink"
+              plugged={seen.has('exp')}
+              symbol={
+                <>
+                  2<sup>(Exponent − 127)</sup>
+                </>
+              }
+              value={
+                <>
+                  2<sup>({exp.E} − 127)</sup> = 2<sup>{minus(exp.e)}</sup>
+                </>
+              }
+              testId="decode-exp"
+            />
+          </>
+        )}
+      </div>
+      {f.focus === 'value' && (
+        <motion.p
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={SPRING}
+          className="num text-center font-mono text-xl break-all sm:text-2xl"
+        >
+          <span className="text-muted">= </span>
+          <b className="text-primary" data-testid="decode-value">
+            <Num value={m.value} />
+          </b>
+        </motion.p>
+      )}
+    </div>
+  );
+}
+
+/** Scene 4.2: hex back to a value (P&H 0xC0A00000 = −5). */
 export function DecodeScene() {
-  return <ScenePlaceholder minHeight="22rem" />;
+  const [text, setText] = useState(DECODE_EXAMPLES[0]);
+  const [touched, setTouched] = useState(false);
+  const [last, setLast] = useState<DecodeModel | null>(null);
+  const parsed = useMemo(() => {
+    const r = parseBitsInput(BINARY32, text, true);
+    return r.ok
+      ? { model: buildDecodeFrames(BINARY32, r.bits), error: null }
+      : { model: null, error: r.error };
+  }, [text]);
+  if (parsed.model && parsed.model !== last) setLast(parsed.model);
+  const m = parsed.model ?? last;
+  const set = (v: string) => (setTouched(true), setText(v));
+
+  return (
+    <div className="space-y-3" data-testid="decode">
+      <OperandInput
+        label={UI_CH34.hex}
+        value={text}
+        onChange={set}
+        error={parsed.error}
+        testId="decode-input"
+        className="max-w-xs"
+      />
+      <ExampleChips items={DECODE_EXAMPLES} current={text} onPick={set} testId="decode" />
+      {m && (
+        <StepPlayer
+          key={m.hex}
+          steps={m.frames.map((f) => ({
+            id: f.id,
+            title: f.id,
+            caption: caption(f.captionKey, f.params),
+          }))}
+          label={sceneTitle('decode')}
+          poster={!touched}
+          testId="decode-player"
+          minHeight="14rem"
+          render={(i) => <DecodeFrameView m={m} index={i} />}
+        />
+      )}
+    </div>
+  );
 }

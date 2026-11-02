@@ -5,13 +5,13 @@
 ## งาน
 - [x] ฉาก 3.1 แบ่ง 32 บิต + สูตร (Must) · `LayoutScene` · input ทศนิยมหรือ `0x…` · e2e `chapter3.spec.ts`
 - [x] ฉาก 4.1 แปลงทีละขั้น (Must) · `EncodeScene` + `TimesTwo` · warning ค่าที่เก็บจริงขึ้นทันทีที่ใส่ค่า · e2e `chapter4.spec.ts`
-- [ ] ฉาก 4.2 ถอดกลับ (Should)
+- [x] ฉาก 4.2 ถอดกลับ (Should) · `DecodeScene` · input hex 8 หลัก (มีหรือไม่มี 0x) · ∞ แสดงเป็น +∞
 - [ ] ฉาก 3.2 กดบิตเล่น (Should)
 - [ ] ฉาก 3.3 ค่าพิเศษ (Should)
 - [ ] แถบเทียบ double (Could)
 
 ## ไฟล์ใหม่
-- `src/components/stage/ch34-word.tsx` (แถว 32 บิตแบบเติมทีละส่วน ใช้ทั้งบท 3 และ 4), `ch34-chips.tsx` (chip ตัวอย่าง), `times-two.tsx`
+- `src/components/stage/ch34-word.tsx` (แถว 32 บิตแบบเติมทีละส่วน ใช้ทั้งบท 3 และ 4), `ch34-chips.tsx` (chip ตัวอย่าง), `times-two.tsx`, `ch34-formula.tsx` (ชิ้นของสูตร ใช้ทั้ง 3.1 และ 4.2)
 - `src/lib/lesson/ch3-special.ts` (โซน exponent, ช่วงค่า, เทียบ double, แยก input ทศนิยม/hex) · เป็นไฟล์ใหม่ใน `src/lib/lesson/` นอกรายการใน PARALLEL.md แต่ไม่ชนใคร
 - `tests/unit/lesson/ch34.test.ts`
 

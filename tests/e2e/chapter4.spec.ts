@@ -36,4 +36,18 @@ test.describe('chapter 4: convert', () => {
     await stepToEnd(page, 'encode-player');
     await expect(page.getByTestId('encode-hex')).toHaveText('0x40D00000');
   });
+
+  test('4.2 0xC0A00000 → −5 (P&H)', async ({ page }) => {
+    await openScene(page, 'decode');
+    await stepTo(page, 'decode-player', 'exp');
+    await expect(page.getByTestId('decode-player-caption')).toContainText('129 − 127 = 2');
+    await stepToEnd(page, 'decode-player');
+    await expect(page.getByTestId('decode-value')).toHaveText('−5');
+
+    await page.getByTestId('decode-input').fill('7F800000');
+    await stepToEnd(page, 'decode-player');
+    await expect(page.getByTestId('decode-value')).toHaveText('+∞');
+    await page.getByTestId('decode-input').fill('12');
+    await expect(page.locator('#decode [role=alert]')).toBeVisible();
+  });
 });
