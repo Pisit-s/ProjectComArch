@@ -50,7 +50,7 @@
 ## Phase 8 — ขัดเกลา review 4 รอบ และ PR
 - [x] a11y (axe ไม่มี serious/critical ทั้งหน้า 3 อุปกรณ์), reduced motion (e2e), Lighthouse มือถือ 100/100/100/100 หลังรวมทุกบท, OG image, README, ENGINE, DEPLOY
 - [x] review 4 รอบ (docs/REVIEW.md) · ไล่ PLAN ทีละข้อแล้ว (หัวข้อ 1, 3.6–3.9, 4, 5, 6, 9, 11)
-- [ ] PR `addsub-redesign` → `main`
+- [x] PR `addsub-redesign` → `main`: https://github.com/Pisit-s/ProjectComArch/pull/2 (Pisit merge เอง)
 
 ## บันทึกการตัดสินใจ / ต่างจากแผน
 - adapter เพิ่มจากแผน: `sci-frames.ts` (ฉาก 2.1, 2.2, 5.1) และ `fun-fact.ts` (ฉาก 5.5) · `keys.ts` เป็นรายการ caption key ที่ adapter ส่งออก (test ตรวจว่ามีข้อความครบใน Phase 2)
