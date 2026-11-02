@@ -21,4 +21,6 @@ export const UI_CH34 = {
   double: 'double',
   float: 'float',
   bias: 'bias',
+  realExp: 'เลขชี้กำลังจริง',
+  storedExp: 'Exponent ที่เก็บ',
 } as const;

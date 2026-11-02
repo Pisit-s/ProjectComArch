@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { LIMITS, allBudgets, detailLengths, graphemes } from '@/content/lesson/budget';
 import { CAPTIONS, caption } from '@/content/lesson/captions';
+import { buildFormatFrames } from '@/lib/lesson/format-frames';
 import { buildRoundingScene } from '@/lib/lesson/rounding-frames';
 import { OTHER, TAKEAWAY } from '@/content/lesson/copy';
 import {
@@ -13,7 +14,6 @@ import {
   FP_EXAMPLES,
   INT_ADD_EXAMPLES,
   INT_SUB_EXAMPLES,
-  LAYOUT_EXAMPLES,
   POINT_EXAMPLES,
   ROUND_EXAMPLES,
   SHIFT_EXAMPLES,
@@ -55,8 +55,7 @@ function renderedCaptions(): { key: CaptionKey; text: string }[] {
     }
     buildRoundingScene(F, s)?.frames.forEach((f) => add(f.captionKey, f.params));
   }
-  for (const h of LAYOUT_EXAMPLES)
-    buildLayoutFrames(F, BigInt('0x' + h))?.frames.forEach((f) => add(f.captionKey, f.params));
+  buildFormatFrames(F).frames.forEach((f) => add(f.captionKey));
   for (const t of [...ENCODE_EXAMPLES, ...BITPLAY_EXAMPLES]) {
     const r = encodeDecimal(F, t);
     if (!r.ok) throw new Error();

@@ -8,32 +8,21 @@ import {
   ZONES,
   buildSpecialView,
   doubleCompare,
-  parseBitsInput,
   specialRange,
   zoneOf,
   zoneRange,
 } from '@/lib/lesson/ch3-special';
 import { exponentWindow } from '@/lib/lesson/window';
-import {
-  buildLayoutFrames,
-  type LayoutFrame,
-  type LayoutScene as Model,
-} from '@/lib/lesson/encode-frames';
+import { type FormatFrame, type FormatScene, buildFormatFrames } from '@/lib/lesson/format-frames';
 import { caption } from '@/content/lesson/captions';
-import {
-  BITPLAY_EXAMPLES,
-  LAYOUT_DEFAULT,
-  LAYOUT_EXAMPLES,
-  SPECIAL_EXAMPLES,
-} from '@/content/lesson/examples';
+import { BITPLAY_EXAMPLES, SPECIAL_EXAMPLES } from '@/content/lesson/examples';
 import { sectionById } from '@/content/lesson/sections';
 import { UI_CH34 } from '@/content/lesson/ui-ch34';
-import { OperandInput } from '@/components/lesson/operand-input';
 import { StepPlayer } from '@/components/player/step-player';
 import { usePlayerMotion } from '@/components/player/player-speed';
 import { ExampleChips } from '@/components/stage/ch34-chips';
 import { Piece, Times } from '@/components/stage/ch34-formula';
-import { Word32, type WordField } from '@/components/stage/ch34-word';
+import { Word32 } from '@/components/stage/ch34-word';
 import { ExponentWindow } from '@/components/stage/exponent-window';
 import { Register32 } from '@/components/stage/register32';
 import { Num, minus } from '@/components/ui/num';
@@ -42,107 +31,138 @@ import { cn } from '@/lib/utils';
 const sceneTitle = (id: string): string =>
   sectionById('ieee754').scenes.find((s) => s.id === id)?.title ?? id;
 
-function LayoutFrameView({ m, f, focus }: { m: Model; f: LayoutFrame; focus: WordField | null }) {
-  const p = m.plug;
+/** The real exponent → stored Exponent ruler of the bias (values from the format adapter). */
+function BiasRuler({ ruler, bias }: { ruler: FormatScene['ruler']; bias: number }) {
   const { d } = usePlayerMotion();
   return (
-    <div className="space-y-4">
-      <div className="flex items-baseline justify-between gap-2 text-sm">
-        <span className="text-muted">hex</span>
-        <b className="num font-mono" data-testid="layout-hex">
-          {m.hex}
-        </b>
-      </div>
+    <div
+      className="num grid gap-x-1 gap-y-1 font-mono text-sm"
+      style={{ gridTemplateColumns: `auto repeat(${ruler.length}, minmax(0, 1fr))` }}
+      data-testid="layout-ruler"
+    >
+      <span className="pr-2 font-sans text-xs text-muted">{UI_CH34.realExp}</span>
+      {ruler.map((r) => (
+        <span key={`r${r.real}`} className="text-center">
+          {minus(String(r.real))}
+        </span>
+      ))}
+      <span />
+      {ruler.map((r, k) => (
+        <motion.span
+          key={`a${r.real}`}
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: d(0.3), delay: d(0.15 * k) }}
+          className="text-center text-bit-exp-ink"
+          aria-hidden
+        >
+          ↓ +{bias}
+        </motion.span>
+      ))}
+      <span className="pr-2 font-sans text-xs font-semibold text-bit-exp-ink">
+        {UI_CH34.storedExp}
+      </span>
+      {ruler.map((r, k) => (
+        <motion.b
+          key={`s${r.real}`}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: d(0.3), delay: d(0.15 * k + 0.2) }}
+          className="rounded-md bg-bit-exp/12 text-center text-bit-exp-ink ring-1 ring-bit-exp/40"
+          data-testid="layout-ruler-stored"
+        >
+          {r.stored}
+        </motion.b>
+      ))}
+    </div>
+  );
+}
+
+const EMPTY_WORD = { sign: null, exp: null, sig: null };
+
+function FormatFrameView({ m, f }: { m: FormatScene; f: FormatFrame }) {
+  const { d } = usePlayerMotion();
+  return (
+    <div className="space-y-4" data-testid="layout-frame" data-frame={f.id}>
       <Word32
-        fill={m.fields}
-        colored={{ sign: f.reveal.sign, exp: f.reveal.exp, sig: f.reveal.sig }}
-        focus={focus}
-        hiddenBit={f.plug.sig}
+        fill={EMPTY_WORD}
+        colored={f.shown}
+        focus={f.focus}
+        hiddenBit={f.hidden}
         testId="layout-word"
       />
-      <AnimatePresence initial={false}>
-        {f.reveal.formula && (
+      <AnimatePresence mode="wait" initial={false}>
+        {f.id === 'sign' && (
           <motion.div
+            key="sign"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: d(0.35) }}
+            className="flex justify-center gap-3 font-mono"
+          >
+            {(['0', '1'] as const).map((b) => (
+              <span
+                key={b}
+                className="rounded-xl bg-white/80 px-4 py-2 text-lg ring-1 ring-bit-sign/50"
+              >
+                <b className="text-bit-sign-ink">{b}</b> → {b === '0' ? '+' : '−'}
+              </span>
+            ))}
+          </motion.div>
+        )}
+        {f.ruler && (
+          <motion.div
+            key="ruler"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: d(0.35) }}
+          >
+            <BiasRuler ruler={m.ruler} bias={m.bias} />
+          </motion.div>
+        )}
+        {f.formula && (
+          <motion.div
+            key="formula"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: d(0.4) }}
-            className="space-y-3"
+            className="flex flex-wrap items-stretch justify-center gap-2"
+            data-testid="layout-formula"
           >
-            <div className="flex flex-wrap items-stretch justify-center gap-2">
-              <Piece
-                tone="ring-bit-sign text-bit-sign-ink"
-                plugged={f.plug.sign}
-                symbol={
-                  <>
-                    (−1)<sup>s</sup>
-                  </>
-                }
-                value={
-                  <>
-                    s = {p.s} → {p.s === '1' ? '−' : '+'}
-                  </>
-                }
-                testId="layout-sign"
-              />
-              <Times />
-              <Piece
-                tone="ring-bit-frac text-bit-frac-ink"
-                plugged={f.plug.sig}
-                symbol="1.significand"
-                value={
-                  <>
-                    {p.sigBin}
-                    <sub>2</sub> = {p.sigDec}
-                  </>
-                }
-                testId="layout-sig"
-              />
-              <Times />
-              <Piece
-                tone="ring-bit-exp text-bit-exp-ink"
-                plugged={f.plug.exp}
-                symbol={
-                  <>
-                    2<sup>(Exponent − 127)</sup>
-                  </>
-                }
-                value={
-                  <>
-                    2
-                    <sup>
-                      (<span data-testid="layout-exp">{p.E}</span> − 127)
-                    </sup>{' '}
-                    = 2<sup>{minus(p.e)}</sup>
-                    {p.pow.startsWith('2^') ? '' : ` = ${p.pow}`}
-                  </>
-                }
-                testId="layout-exp-piece"
-              />
-            </div>
-            <AnimatePresence initial={false}>
-              {f.plug.value && (
-                <motion.p
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 420, damping: 36 }}
-                  className="num text-center font-mono text-xl"
-                >
-                  {p.s === '1' ? '−' : '+'}
-                  {p.sigDec} ×{' '}
-                  {p.pow.startsWith('2^') ? (
-                    <>
-                      2<sup>{minus(p.e)}</sup>
-                    </>
-                  ) : (
-                    p.pow
-                  )}{' '}
-                  ={' '}
-                  <b className="text-primary" data-testid="layout-value">
-                    {minus(p.value)}
-                  </b>
-                </motion.p>
-              )}
-            </AnimatePresence>
+            <Piece
+              tone="ring-bit-sign text-bit-sign-ink"
+              plugged={false}
+              symbol={
+                <>
+                  (−1)<sup>s</sup>
+                </>
+              }
+              value={null}
+              testId="layout-sign"
+            />
+            <Times />
+            <Piece
+              tone="ring-bit-frac text-bit-frac-ink"
+              plugged={false}
+              symbol="1.significand"
+              value={null}
+              testId="layout-sig"
+            />
+            <Times />
+            <Piece
+              tone="ring-bit-exp text-bit-exp-ink"
+              plugged={false}
+              symbol={
+                <>
+                  2<sup>(Exponent − 127)</sup>
+                </>
+              }
+              value={null}
+              testId="layout-exp-piece"
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -150,61 +170,22 @@ function LayoutFrameView({ m, f, focus }: { m: Model; f: LayoutFrame; focus: Wor
   );
 }
 
-const FOCUS: Record<string, WordField | null> = { sign: 'sign', exp: 'exp', sig: 'sig' };
-const PLUG_FOCUS: Record<string, WordField | null> = {
-  'plug-sign': 'sign',
-  'plug-exp': 'exp',
-  'plug-sig': 'sig',
-};
-
-/** Scene 3.1: split 32 bits into Sign / Exponent / Significand and plug them into the formula. */
+/** Scene 3.1: what each of the 32 bits is for. No number is read or written yet (3.2, 3.3 do). */
 export function LayoutScene() {
-  const [text, setText] = useState(LAYOUT_DEFAULT);
-  const [touched, setTouched] = useState(false);
-  const [last, setLast] = useState<Model | null>(null);
-  const parsed = useMemo(() => {
-    // reading comes before conversion (3.1 → 3.2): this scene takes hex only
-    const r = parseBitsInput(BINARY32, text, true);
-    if (!r.ok) return { model: null, error: r.error };
-    const m = buildLayoutFrames(BINARY32, r.bits);
-    return m ? { model: m, error: null } : { model: null, error: UI_CH34.normalOnly };
-  }, [text]);
-  if (parsed.model && parsed.model !== last) setLast(parsed.model);
-  const m = parsed.model ?? last;
-  const set = (v: string) => (setTouched(true), setText(v));
-
+  const m = useMemo(() => buildFormatFrames(BINARY32), []);
   return (
     <div className="space-y-3" data-testid="layout">
-      <OperandInput
-        label={UI_CH34.hex}
-        value={text}
-        onChange={set}
-        error={parsed.error}
-        testId="layout-input"
-        className="max-w-xs"
+      <StepPlayer
+        steps={m.frames.map((f) => ({
+          id: f.id,
+          title: f.id,
+          caption: caption(f.captionKey, {}),
+        }))}
+        label={sceneTitle('layout')}
+        testId="layout-player"
+        minHeight="15rem"
+        render={(i) => <FormatFrameView m={m} f={m.frames[i]} />}
       />
-      <ExampleChips items={LAYOUT_EXAMPLES} current={text} onPick={set} testId="layout" />
-      {m && (
-        <StepPlayer
-          key={m.hex}
-          steps={m.frames.map((f) => ({
-            id: f.id,
-            title: f.id,
-            caption: caption(f.captionKey, f.params),
-          }))}
-          label={sceneTitle('layout')}
-          poster={!touched}
-          testId="layout-player"
-          minHeight="17rem"
-          render={(i) => (
-            <LayoutFrameView
-              m={m}
-              f={m.frames[i]}
-              focus={FOCUS[m.frames[i].id] ?? PLUG_FOCUS[m.frames[i].id] ?? null}
-            />
-          )}
-        />
-      )}
     </div>
   );
 }

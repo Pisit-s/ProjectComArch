@@ -17,6 +17,9 @@ const SUP: Record<string, string> = {
   '9': '⁹',
 };
 
+/** Typographic minus for a number that came from a model as text ("-5" → "−5"). */
+export const neg = (s: string | undefined): string => (s ?? '').replace(/^-/, '−');
+
 /** "10²" style power for captions (exponent comes from a model as text). */
 export const pow = (base: number | string, e: string | number): string =>
   `${base}${[...String(e)].map((c) => SUP[c] ?? c).join('')}`;

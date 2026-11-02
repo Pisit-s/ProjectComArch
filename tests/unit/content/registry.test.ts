@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { LAYOUT_EXAMPLES } from '@/content/lesson/examples';
 import { QUIZ } from '@/content/lesson/quiz';
 import { CHAPTERS, LESSONS, SECTIONS, sectionById } from '@/content/lesson/sections';
 import { BINARY32, encodeBits, simulate, toHex } from '@/lib/fp';
@@ -33,12 +32,6 @@ describe('section registry', () => {
     expect(round.decision).toBe('tie-even-up');
     expect(QUIZ['fp-add']!.question).toContain('G = 1, R = 0, S = 0 และ LSB = 1');
     expect(QUIZ['fp-add']!.options[0]).toContain('ปัดขึ้น');
-  });
-
-  it('scene 3.1 hex chips are the bits of 6.5, 3.75, −0.75 and −5', () => {
-    expect(LAYOUT_EXAMPLES.map((h) => '0x' + h)).toEqual(
-      ['6.5', '3.75', '-0.75', '-5'].map((x) => toHex(encodeBits(BINARY32, x)!, 32)),
-    );
   });
 
   it('quiz answers agree with the models', () => {

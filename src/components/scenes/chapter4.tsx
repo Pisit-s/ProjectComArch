@@ -444,7 +444,7 @@ function DecodeFrameView({ m, index }: { m: DecodeModel; index: number }) {
   );
 }
 
-/** Scene 4.2: hex back to a value (P&H 0xC0A00000 = −5). */
+/** Scene 3.3: hex back to a value (first 0x40D00000 = 6.5 from 3.2, then P&H 0xC0A00000 = −5). */
 export function DecodeScene() {
   const [text, setText] = useState(DECODE_EXAMPLES[0]);
   const [touched, setTouched] = useState(false);
