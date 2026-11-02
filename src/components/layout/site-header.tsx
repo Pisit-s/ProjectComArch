@@ -3,6 +3,7 @@ import { Logo } from './logo';
 import { MobileNav } from './mobile-nav';
 import { ChapterPill, ProgressNav } from './progress-nav';
 import { ScrollProgress } from './scroll-progress';
+import { ZoomControl } from './zoom-control';
 
 export function SiteHeader() {
   return (
@@ -17,6 +18,10 @@ export function SiteHeader() {
         <ProgressNav />
         <ChapterPill />
         <div className="ml-auto flex items-center">
+          {/* phones have pinch zoom and little room: there the control lives in the menu */}
+          <div className="hidden sm:flex">
+            <ZoomControl />
+          </div>
           <MobileNav />
         </div>
       </nav>

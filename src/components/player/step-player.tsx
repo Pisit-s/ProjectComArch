@@ -201,7 +201,9 @@ function StepPlayerInner({
       className={cn(
         'flex flex-col gap-3 rounded-2xl focus-visible:outline-2',
         className,
-        presenting && 'fixed inset-0 z-[70] overflow-y-auto rounded-none bg-ice-50 p-4 sm:p-8',
+        // presenting: the whole player sits in the middle of the screen (safe: never cut off the top)
+        presenting &&
+          'fixed inset-0 z-[70] justify-center-safe overflow-y-auto rounded-none bg-ice-50 p-4 sm:p-8',
       )}
     >
       {stepBar && <StepBar active={step?.bigStep ?? 0} />}
@@ -210,6 +212,7 @@ function StepPlayerInner({
         className="glass-solid relative overflow-hidden rounded-2xl p-3 ring-1 ring-foreground/10 sm:p-5"
         // presentation shows one scene at a time: no reserved height (it grows with the root font)
         style={{ minHeight: presenting ? undefined : minHeight }}
+        data-stage
         data-testid={`${testId}-stage`}
       >
         {render(p.index)}
@@ -219,6 +222,7 @@ function StepPlayerInner({
             onClick={toggle}
             className="absolute inset-0 grid place-items-center bg-white/55 transition-colors hover:bg-white/40 [@media(hover:none)]:bg-white/65"
             aria-label={`${UI.play} ${label}`}
+            data-present-keep
             data-testid={`${testId}-poster`}
           >
             <span className="grid h-20 w-20 place-items-center rounded-full bg-primary text-white shadow-xl ring-8 ring-primary/15">

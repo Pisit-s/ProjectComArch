@@ -1,3 +1,4 @@
+import { ZOOM_BOOT } from '@/components/layout/zoom-control';
 import { Analytics } from '@vercel/analytics/next';
 import type { Metadata, Viewport } from 'next';
 import { Chakra_Petch, IBM_Plex_Sans_Thai, JetBrains_Mono } from 'next/font/google';
@@ -56,11 +57,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
+      // the zoom boot script may set style.zoom before React hydrates
+      suppressHydrationWarning
       lang="th"
       data-theme="comkrub"
       className={`${chakraPetch.variable} ${plexSansThai.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <script dangerouslySetInnerHTML={{ __html: ZOOM_BOOT }} />
         <MotionProvider>
           <LiquidBackground />
           <GlassPointer />

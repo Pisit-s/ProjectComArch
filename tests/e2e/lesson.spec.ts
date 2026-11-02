@@ -113,3 +113,32 @@ test.describe('narrow phone (360px)', () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 });
+
+test.describe('zoom buttons', () => {
+  test('+ and − scale the whole page like browser zoom, and the choice is kept', async ({
+    page,
+    isMobile,
+  }) => {
+    await page.goto('/');
+    const html = page.locator('html');
+    // wide screens: in the header · phones: inside the menu
+    const z = isMobile ? 'zoom-menu' : 'zoom';
+    const open = async () => {
+      if (isMobile) await page.getByRole('button', { name: /เมนู/ }).first().click();
+    };
+    await open();
+    await page.getByTestId(`${z}-in`).click();
+    await expect(page.getByTestId(`${z}-level`)).toHaveText('110%');
+    await expect(html).toHaveAttribute('style', /zoom: 1\.1/);
+    await page.reload();
+    await expect(html).toHaveAttribute('style', /zoom: 1\.1/);
+    await open();
+    await expect(page.getByTestId(`${z}-level`)).toHaveText('110%');
+    await page.getByTestId(`${z}-out`).click();
+    await page.getByTestId(`${z}-out`).click();
+    await expect(page.getByTestId(`${z}-level`)).toHaveText('90%');
+    await page.getByTestId(`${z}-level`).click();
+    await expect(page.getByTestId(`${z}-level`)).toHaveText('100%');
+    expect(await html.evaluate((h) => h.style.zoom)).toBe('');
+  });
+});

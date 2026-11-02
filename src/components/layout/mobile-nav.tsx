@@ -6,6 +6,7 @@ import { UI } from '@/content/lesson/copy';
 import { CHAPTERS } from '@/content/lesson/sections';
 import { cn } from '@/lib/utils';
 import { useActiveSection } from './use-active-section';
+import { ZoomControl } from './zoom-control';
 
 /** Phone/tablet menu: daisyUI drawer from the right listing every chapter. */
 export function MobileNav() {
@@ -55,7 +56,8 @@ export function MobileNav() {
           aria-label={UI.menu}
           className="glass-raised flex min-h-dvh w-[min(20rem,84vw)] flex-col gap-2 bg-white/95 p-4 pt-[max(1rem,env(safe-area-inset-top))]"
         >
-          <div className="mb-1 flex items-center justify-end">
+          <div className="mb-1 flex items-center justify-between">
+            <ZoomControl testId="zoom-menu" />
             <button
               type="button"
               className="btn btn-circle h-11 w-11 btn-ghost"

@@ -218,6 +218,7 @@ export function HwWire({
   dashed = false,
   chip,
   chipOffset = [0, 0],
+  chipAt,
   junction = false,
 }: {
   id: string;
@@ -229,6 +230,7 @@ export function HwWire({
   /** Value shown on the wire (from the frame). */
   chip?: string;
   chipOffset?: [number, number];
+  chipAt?: [number, number];
   junction?: boolean;
 }) {
   const reduce = useReducedMotion();
@@ -239,7 +241,7 @@ export function HwWire({
   const head = (a: number) => `${ex - 7 * Math.cos(ang + a)} ${ey - 7 * Math.sin(ang + a)}`;
   // chip sits halfway along the middle segment, never on a block it points into
   const k = Math.max(1, Math.floor(points.length / 2));
-  const mid = [
+  const mid = chipAt ?? [
     (points[k - 1][0] + points[k][0]) / 2 + chipOffset[0],
     (points[k - 1][1] + points[k][1]) / 2 + chipOffset[1],
   ];
