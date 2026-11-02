@@ -98,4 +98,57 @@ export const UI = {
   presenting: 'กำลังนำเสนอ',
   vocab: 'คำศัพท์',
   quiz: 'คำถามเช็ก',
+  stepAlign: 'Align',
+  stepAdd: 'บวก/ลบ',
+  stepNorm: 'Normalize',
+  stepRound: 'ปัดเศษ',
+  stepOf: 'ขั้น',
+  sceneLabel: 'ภาพเคลื่อนไหว',
+} as const;
+
+/** Explanation shown after tapping one bit of a register. */
+export const BIT_INFO = {
+  bit: 'บิตที่',
+  value: 'ค่า',
+  bits: 'บิต',
+  sign: '0 = ค่าบวก, 1 = ค่าลบ · ตอนนี้เป็น',
+  positive: 'ค่าบวก',
+  negative: 'ค่าลบ',
+  expPos: 'ตำแหน่ง',
+  expAdds: 'ใน field Exponent · บิตนี้เพิ่ม',
+  expTail: 'ให้ค่า Exponent',
+  fracPos: 'ตำแหน่งที่',
+  fracWeight: 'หลังจุด น้ำหนัก',
+  fracOf: 'ของ Significand',
+  fracAdds: 'เพิ่มค่า',
+  fracTail: 'ให้ผลลัพธ์',
+  special: 'ค่านี้เป็นค่าพิเศษ บิตนี้จึงไม่ได้บอกขนาดของค่า',
+  close: 'ปิดคำอธิบายบิต',
+} as const;
+
+/** A scene that crashed (error boundary). */
+export const TOOL_ERROR = 'ภาพนี้มีปัญหา ลองรีเฟรชหน้า';
+
+/** Input errors (from the engine parser kinds). */
+export const INPUT_ERRORS: Record<string, string> = {
+  empty: 'กรุณาพิมพ์ตัวเลข',
+  comma: 'ใช้จุด (.) เป็นจุดทศนิยม ไม่ใช้ลูกน้ำ (,)',
+  'too-long': 'ตัวเลขยาวเกินไป',
+  'exponent-range': 'เลขยกกำลังใหญ่เกินไป',
+  invalid: 'รูปแบบตัวเลขไม่ถูกต้อง เช่น 6.5, -0.75, 1e-8',
+  hex: 'ใส่ hex 8 หลัก เช่น C0A00000',
+  range: 'ต้องอยู่ในช่วงที่เก็บได้',
+};
+
+export const NOT_FOUND = {
+  title: 'ไม่พบหน้านี้',
+  body: 'ลิงก์อาจพิมพ์ผิดหรือหน้าถูกย้ายแล้ว บทเรียนทั้งหมดอยู่ในหน้าเดียว',
+  home: 'ไปหน้าบทเรียน',
+} as const;
+
+export const ERROR_PAGE = {
+  title: 'หน้านี้มีปัญหา',
+  body: 'เกิดข้อผิดพลาดระหว่างแสดงหน้า ลองโหลดใหม่อีกครั้ง',
+  retry: 'ลองอีกครั้ง',
+  home: 'ไปหน้าบทเรียน',
 } as const;

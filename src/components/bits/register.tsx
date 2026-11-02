@@ -6,6 +6,7 @@ import { BINARY32, type FloatFormat, bitMeaning, toBinaryString, toHex, width } 
 import { fmt } from '@/lib/display';
 import { cn } from '@/lib/utils';
 import { Num, Pow } from '@/components/ui/num';
+import { BIT_INFO } from '@/content/lesson/copy';
 import { BitCell } from './bit-cell';
 import { FIELD_STYLE, type FieldKind } from './field-style';
 
@@ -100,7 +101,9 @@ export function Register({
     >
       <span className={cn('text-xs font-semibold', FIELD_STYLE[field].text)}>
         {field === 'sign' ? 'S' : FIELD_STYLE[field].label}
-        <span className="ml-1 font-normal text-muted">{to - from} บิต</span>
+        <span className="ml-1 font-normal text-muted">
+          {to - from} {BIT_INFO.bits}
+        </span>
       </span>
       <div
         className={cn(
@@ -179,32 +182,37 @@ export function BitInfo({
       />
       <div className="min-w-0 flex-1 space-y-0.5">
         <p className="font-semibold">
-          บิตที่ {m.bitNumber} ·{' '}
-          <span className={FIELD_STYLE[field].text}>{FIELD_STYLE[field].label}</span> · ค่า {m.bit}
+          {BIT_INFO.bit} {m.bitNumber} ·{' '}
+          <span className={FIELD_STYLE[field].text}>{FIELD_STYLE[field].label}</span> ·{' '}
+          {BIT_INFO.value} {m.bit}
         </p>
         {m.field === 'sign' && (
-          <p>0 = ค่าบวก, 1 = ค่าลบ · ตอนนี้เป็น{m.bit ? 'ค่าลบ' : 'ค่าบวก'}</p>
+          <p>
+            {BIT_INFO.sign}
+            {m.bit ? BIT_INFO.negative : BIT_INFO.positive}
+          </p>
         )}
         {m.field === 'exp' && (
           <p>
-            ตำแหน่ง <Pow exp={m.position} /> = {2 ** m.position} ใน field Exponent · บิตนี้เพิ่ม{' '}
-            <b className="num font-mono">{m.expContribution}</b> ให้ค่า Exponent
+            {BIT_INFO.expPos} <Pow exp={m.position} /> = {2 ** m.position} {BIT_INFO.expAdds}{' '}
+            <b className="num font-mono">{m.expContribution}</b> {BIT_INFO.expTail}
           </p>
         )}
         {m.field === 'frac' && (
           <p>
-            ตำแหน่งที่ {m.position} หลังจุด น้ำหนัก <Pow exp={-m.position} /> ของ Significand
+            {BIT_INFO.fracPos} {m.position} {BIT_INFO.fracWeight} <Pow exp={-m.position} />{' '}
+            {BIT_INFO.fracOf}
             {m.valueContribution && m.scaleExponent !== null ? (
               <>
                 {' '}
-                · เพิ่มค่า <Pow exp={-m.position} /> × <Pow exp={m.scaleExponent} /> ={' '}
+                · {BIT_INFO.fracAdds} <Pow exp={-m.position} /> × <Pow exp={m.scaleExponent} /> ={' '}
                 <b>
                   <Num value={fmt(m.valueContribution, 12)} />
                 </b>{' '}
-                ให้ผลลัพธ์
+                {BIT_INFO.fracTail}
               </>
             ) : (
-              ' · ค่านี้เป็นค่าพิเศษ บิตนี้จึงไม่ได้บอกขนาดของค่า'
+              ` · ${BIT_INFO.special}`
             )}
           </p>
         )}
@@ -213,7 +221,7 @@ export function BitInfo({
         type="button"
         onClick={onClose}
         className="btn -mt-1 -mr-1 btn-circle btn-ghost btn-sm"
-        aria-label="ปิดคำอธิบายบิต"
+        aria-label={BIT_INFO.close}
       >
         <X className="h-4 w-4" aria-hidden />
       </button>

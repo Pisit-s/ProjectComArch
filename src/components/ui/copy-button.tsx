@@ -2,6 +2,7 @@
 
 import { Check, Link as LinkIcon } from 'lucide-react';
 import { useState } from 'react';
+import { UI } from '@/content/lesson/copy';
 import { cn } from '@/lib/utils';
 
 /** Copies the current page URL (share link). */
@@ -18,7 +19,7 @@ export function CopyLinkButton({ className }: { className?: string }) {
           await navigator.clipboard.writeText(url);
         } catch {
           // clipboard blocked (e.g. insecure context): fall back to a prompt the user can copy from
-          window.prompt('คัดลอกลิงก์นี้', url);
+          window.prompt(UI.copyLink, url);
         }
         setDone(true);
         setTimeout(() => setDone(false), 1800);
@@ -29,7 +30,7 @@ export function CopyLinkButton({ className }: { className?: string }) {
       ) : (
         <LinkIcon className="h-4 w-4" aria-hidden />
       )}
-      <span aria-live="polite">{done ? 'คัดลอกแล้ว' : 'คัดลอกลิงก์'}</span>
+      <span aria-live="polite">{done ? UI.copied : UI.copyLink}</span>
     </button>
   );
 }

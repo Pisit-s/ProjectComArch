@@ -37,7 +37,7 @@ export const FIELD_STYLE: Record<
     border: 'border-bit-frac',
     text: 'text-bit-frac-ink',
     chip: 'bg-bit-frac',
-    label: 'Fraction',
+    label: 'Significand',
     short: 'F',
   },
   hidden: {
