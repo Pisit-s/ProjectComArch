@@ -5,6 +5,7 @@ import { OpDetail, OpWorked } from '@/components/content/worked-example';
 import { ChapterLayout, Section, Summary } from '@/components/layout/chapter-layout';
 import { FpSimulator } from '@/components/tools/fp-simulator';
 import { ToolBoundary } from '@/components/tools/tool-boundary';
+import { TopicLink } from '@/components/topic/topic-link';
 import { chapterBySlug } from '@/content/chapters';
 import { DIV_EXAMPLES, MUL_EXAMPLES } from '@/content/examples';
 
@@ -111,6 +112,12 @@ export default function MulDivPage() {
           การคูณแบบ shift-and-add: ทุกบิต 1 ของตัวคูณ (<Term k="multiplicand" />) ให้{' '}
           <Term k="partialProduct" /> หนึ่งแถว คือตัวตั้งเลื่อนไปตามตำแหน่งของบิตนั้น แล้วบวกทุกแถว
         </p>
+        <Callout tone="info" title="ฮาร์ดแวร์คูณแบบเดียวกับจำนวนเต็ม">
+          <p>
+            การคูณ Significand ใช้ shift-and-add แบบเดียวกับการคูณจำนวนเต็มใน MIPS
+            ต่างกันแค่ความยาวบิต ดูฮาร์ดแวร์ทำงานทีละรอบได้ในหัวข้อ <TopicLink id="multiply" />
+          </p>
+        </Callout>
       </Section>
 
       <Section id="mul-example" title="ตัวอย่าง M3 แบบละเอียด: 6.5 × 2.75">
@@ -146,6 +153,12 @@ export default function MulDivPage() {
           <Term k="dividend">ตัวหาร</Term> ให้ลบแล้วได้บิตผลหาร 1 ไม่งั้นได้ 0
           แล้วเลื่อนเศษไปทางซ้าย 1 บิต
         </p>
+        <Callout tone="info" title="ฮาร์ดแวร์หารแบบเดียวกับจำนวนเต็ม">
+          <p>
+            การหารยาวของ Significand คือการลองลบทีละรอบแบบเดียวกับการหารจำนวนเต็มใน MIPS
+            ดูฮาร์ดแวร์ทำงานทีละรอบได้ในหัวข้อ <TopicLink id="divide" />
+          </p>
+        </Callout>
       </Section>
 
       <Section id="div-example" title="ตัวอย่าง D3 แบบละเอียด: 1 ÷ 3">

@@ -10,7 +10,7 @@
 - [x] 6. หน้า "กำลังพัฒนา": `ComingSoon` + `comingSoonMetadata` (noindex) + `src/app/{multiply,divide,mips}/page.tsx` (ทำก่อนขั้นที่ 5 ดูบันทึก)
 - [x] 7. การนำทาง: header (`NavLinks` หัวข้อ 4 อัน + จุดเทา/title กำลังพัฒนา + active ตาม prefix), drawer (หัวข้อ + บท FP ซ้อนใต้เมื่ออยู่ใน FP, พื้นทึบ), footer (หัวข้อจาก registry), sitemap (ready เท่านั้น) · `tests/e2e/hub.spec.ts` ใหม่ + `site.spec.ts` ปรับตามเมนูใหม่ (48 tests ผ่านบน pixel7 + desktop)
 - [x] 8. โครงร่วมสำหรับทีม: tokens 6.1 ใน `globals.css` + `FieldKind` 11 ตัว, `BitRow` (+ `bit-format.ts`), `LessonLayout` (`ChapterLayout` เรียกใช้ หน้า FP เหมือนเดิม), `TalkingPoints`, `SelfCheck`, `OpenInSim` + `mips-example-ids.ts`, `src/components/hw/` (`HwDiagram`, `HwRegister`, `HwAlu`, `HwControl`, `HwWire`), glossary แยกโฟลเดอร์ (`arith.ts` 25 คำ), หน้า `/dev/kit` · unit test `tests/unit/topics/shared.test.ts`
-- [ ] 9. ลิงก์ข้ามหัวข้อ
+- [x] 9. ลิงก์ข้ามหัวข้อ: callout ในบทที่ 5 (การคูณ Significand → `/multiply`, การหารยาว → `/divide`) ผ่าน `TopicLink` (ใช้สถานะจาก registry · ยังไม่พร้อมเป็นข้อความ "(กำลังพัฒนา)" ไม่มีลิงก์)
 - [ ] 10. ทีม: CI, PR template, TEAM.md, DEPLOY.md
 - [ ] 11. ทดสอบ
 - [ ] 12. Review 3 รอบ + PR
