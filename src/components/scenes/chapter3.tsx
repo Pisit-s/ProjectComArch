@@ -3,7 +3,16 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useState } from 'react';
 import { BINARY32, encodeBits } from '@/lib/fp';
-import { buildSpecialView, parseBitsInput } from '@/lib/lesson/ch3-special';
+import {
+  type ZoneId,
+  ZONES,
+  buildSpecialView,
+  doubleCompare,
+  parseBitsInput,
+  specialRange,
+  zoneOf,
+  zoneRange,
+} from '@/lib/lesson/ch3-special';
 import { exponentWindow } from '@/lib/lesson/window';
 import {
   buildLayoutFrames,
@@ -11,10 +20,14 @@ import {
   type LayoutScene as Model,
 } from '@/lib/lesson/encode-frames';
 import { caption } from '@/content/lesson/captions';
-import { BITPLAY_EXAMPLES, LAYOUT_DEFAULT, LAYOUT_EXAMPLES } from '@/content/lesson/examples';
+import {
+  BITPLAY_EXAMPLES,
+  LAYOUT_DEFAULT,
+  LAYOUT_EXAMPLES,
+  SPECIAL_EXAMPLES,
+} from '@/content/lesson/examples';
 import { sectionById } from '@/content/lesson/sections';
 import { UI_CH34 } from '@/content/lesson/ui-ch34';
-import { ScenePlaceholder } from '@/components/lesson/scene-shell';
 import { OperandInput } from '@/components/lesson/operand-input';
 import { StepPlayer } from '@/components/player/step-player';
 import { usePlayerMotion } from '@/components/player/player-speed';
@@ -24,6 +37,7 @@ import { Word32, type WordField } from '@/components/stage/ch34-word';
 import { ExponentWindow } from '@/components/stage/exponent-window';
 import { Register32 } from '@/components/stage/register32';
 import { Num, minus } from '@/components/ui/num';
+import { cn } from '@/lib/utils';
 
 const sceneTitle = (id: string): string =>
   sectionById('ieee754').scenes.find((s) => s.id === id)?.title ?? id;
@@ -248,6 +262,102 @@ export function BitPlayScene() {
   );
 }
 
+const ZONE_FLEX: Record<ZoneId, number> = { zone0: 1, zoneNormal: 3, zone255: 1 };
+
+/** Float against double: bar widths follow the bit counts (pixel layout only). */
+function DoubleCompare() {
+  const c = doubleCompare();
+  const row = (name: string, e: string, f: string, b: string, total: number) => (
+    <div className="space-y-1">
+      <p className="flex justify-between text-xs">
+        <b>{name}</b>
+        {total < 100 && (
+          <span className="num font-mono text-muted">
+            1 + {e} + {f} · {UI_CH34.bias} {b}
+          </span>
+        )}
+      </p>
+      <div className="flex h-5 overflow-hidden rounded-md" style={{ width: `${total}%` }}>
+        <span className="bg-bit-sign" style={{ flex: 1 }} />
+        <span className="bg-bit-exp" style={{ flex: Number(e) }} />
+        <span className="bg-bit-frac" style={{ flex: Number(f) }} />
+      </div>
+    </div>
+  );
+  return (
+    <div
+      className="space-y-2 rounded-xl bg-white/70 p-3 ring-1 ring-line"
+      data-testid="double-compare"
+    >
+      {row(UI_CH34.float, c.e32, c.f32, c.b32, 50)}
+      {row(UI_CH34.double, c.e64, c.f64, c.b64, 100)}
+      <p className="text-sm">{caption('double.compare', c)}</p>
+    </div>
+  );
+}
+
+/** Scene 3.3: the three exponent zones and the bit patterns of the slides. */
 export function SpecialScene() {
-  return <ScenePlaceholder minHeight="22rem" />;
+  const [hex, setHex] = useState(SPECIAL_EXAMPLES[3]);
+  const v = useMemo(() => buildSpecialView(BINARY32, BigInt('0x' + hex)), [hex]);
+  const range = useMemo(() => specialRange(BINARY32), []);
+  const zoneHexes = SPECIAL_EXAMPLES.filter((h) => zoneOf(BINARY32, BigInt('0x' + h)) === v.zone);
+  return (
+    <div className="space-y-3" data-testid="special">
+      <div className="flex gap-1.5" role="group" aria-label={UI_CH34.zones}>
+        {ZONES.map((z) => {
+          const on = z.id === v.zone;
+          return (
+            <button
+              key={z.id}
+              type="button"
+              aria-pressed={on}
+              onClick={() =>
+                setHex(
+                  SPECIAL_EXAMPLES.find((h) => zoneOf(BINARY32, BigInt('0x' + h)) === z.id) ?? hex,
+                )
+              }
+              style={{ flex: ZONE_FLEX[z.id] }}
+              className={cn(
+                'btn h-auto min-h-14 min-w-0 flex-col gap-0 rounded-xl px-2 py-1.5',
+                on ? 'btn-primary' : 'bg-white/80 ring-1 ring-line',
+              )}
+              data-testid={`special-${z.id}`}
+            >
+              <span className={cn('text-xs font-normal', on ? 'text-white/85' : 'text-muted')}>
+                Exponent
+              </span>
+              <span className="num font-mono text-base">{zoneRange(BINARY32, z.id)}</span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="min-h-6 text-base" aria-live="polite" data-testid="special-caption">
+        {caption(ZONES.find((z) => z.id === v.zone)!.captionKey)}
+      </p>
+      <ExampleChips
+        items={zoneHexes.map((h) => `0x${h}`)}
+        current={v.hex}
+        onPick={(t) => setHex(t.slice(2))}
+        testId="special"
+      />
+      <div className="glass-solid space-y-3 rounded-2xl p-3 ring-1 ring-foreground/10 sm:p-5">
+        <Register32 bits={v.bits} name="special-reg" className="bg-white/60" />
+        <p className="num flex flex-wrap items-baseline justify-between gap-2 font-mono">
+          <span className="text-sm text-muted">
+            Exponent = <b className="text-bit-exp-ink">{v.E}</b>
+          </span>
+          <b className="text-xl text-primary" data-testid="special-value">
+            <Num value={v.value} />
+          </b>
+        </p>
+        {v.zone === 'zoneNormal' && (
+          <p className="text-sm text-muted" data-testid="special-range">
+            {caption('special.range', range)}
+          </p>
+        )}
+      </div>
+      <DoubleCompare />
+    </div>
+  );
 }

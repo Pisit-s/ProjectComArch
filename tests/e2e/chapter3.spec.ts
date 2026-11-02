@@ -35,4 +35,18 @@ test.describe('chapter 3: IEEE 754', () => {
     await page.getByTestId('bitplay-chip').first().click();
     await expect(page.getByTestId('bitplay-hex')).toHaveText('0x3F800000');
   });
+
+  test('3.3 exponent zones load the slide examples', async ({ page }) => {
+    await openScene(page, 'special');
+    await expect(page.getByTestId('special-range')).toContainText('3.4028235e+38');
+    await page.getByTestId('special-zone255').click();
+    await expect(page.getByTestId('special-caption')).toContainText('255');
+    await expect(page.getByTestId('special-value')).toHaveText('+∞');
+    await page.getByTestId('special-chip').last().click();
+    await expect(page.getByTestId('special-value')).toHaveText('NaN');
+    await page.getByTestId('special-zone0').click();
+    await page.getByTestId('special-chip').nth(2).click();
+    await expect(page.getByTestId('special-value')).toContainText('1.40129846');
+    await expect(page.getByTestId('double-compare')).toContainText('1023');
+  });
 });

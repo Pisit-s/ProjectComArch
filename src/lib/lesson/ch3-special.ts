@@ -6,6 +6,7 @@ import {
   bias,
   classify,
   encodeDecimal,
+  exactDecimal,
   expFieldMax,
   fieldsOf,
   fracMask,
@@ -41,9 +42,9 @@ export function zoneRange(fmt: FloatFormat, zone: ZoneId): string {
   return `1–${max - 1}`;
 }
 
-/** Engine value text with ∞ for infinities. */
+/** Stored value (exact, cut at 9 significant digits with "…") with ∞ for infinities. */
 export function valueText(fmt: FloatFormat, bits: bigint): string {
-  const s = shortestDecimal(fmt, bits);
+  const s = exactDecimal(fmt, bits, { maxSignificant: 9 });
   if (s === 'Infinity') return '+∞';
   if (s === '-Infinity') return '−∞';
   return s;

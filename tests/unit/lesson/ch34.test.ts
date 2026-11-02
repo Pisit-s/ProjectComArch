@@ -122,7 +122,16 @@ describe('special zones (3.3)', () => {
   });
   it('values come from the engine', () => {
     const v = SPECIAL_EXAMPLES.map((h) => buildSpecialView(F, BigInt('0x' + h)).value);
-    expect(v).toEqual(['0', '-0', '1e-45', '1.1754944e-38', '3.4028235e+38', '+∞', '−∞', 'NaN']);
+    expect(v).toEqual([
+      '0',
+      '-0',
+      '1.40129846…e-45',
+      '1.17549435…e-38',
+      '3.40282346…e+38',
+      '+∞',
+      '−∞',
+      'NaN',
+    ]);
   });
   it('range and double captions fit the budget', () => {
     const r = specialRange(F);

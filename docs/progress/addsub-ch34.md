@@ -7,8 +7,8 @@
 - [x] ฉาก 4.1 แปลงทีละขั้น (Must) · `EncodeScene` + `TimesTwo` · warning ค่าที่เก็บจริงขึ้นทันทีที่ใส่ค่า · e2e `chapter4.spec.ts`
 - [x] ฉาก 4.2 ถอดกลับ (Should) · `DecodeScene` · input hex 8 หลัก (มีหรือไม่มี 0x) · ∞ แสดงเป็น +∞
 - [x] ฉาก 3.2 กดบิตเล่น (Should) · `BitPlayScene` + `ExponentWindow` (เส้น log 5 ช่วง เลื่อนทีละช่วงเมื่อ exponent เปลี่ยน) · ค่า 0, subnormal, ∞, NaN ไม่มีช่วง: ขึ้น caption ของโซน exponent แทน
-- [ ] ฉาก 3.3 ค่าพิเศษ (Should)
-- [ ] แถบเทียบ double (Could)
+- [x] ฉาก 3.3 ค่าพิเศษ (Should) · `SpecialScene` · ปุ่ม 3 โซน + chip ตัวอย่างจากสไลด์หน้า 16–17 · ค่าแสดงแบบ exact ตัดที่ 9 หลัก + "…" (ไม่ใช้ shortest เพราะ 0x00000001 จะกลายเป็น 1e-45 ซึ่งไม่ใช่ค่าที่เก็บจริง)
+- [x] แถบเทียบ double (Could) · ใต้ฉาก 3.3 · ความยาวแท่งตามจำนวนบิต (32 : 64)
 
 ## ไฟล์ใหม่
 - `src/components/stage/ch34-word.tsx` (แถว 32 บิตแบบเติมทีละส่วน ใช้ทั้งบท 3 และ 4), `ch34-chips.tsx` (chip ตัวอย่าง), `times-two.tsx`, `ch34-formula.tsx` (ชิ้นของสูตร ใช้ทั้ง 3.1 และ 4.2)
