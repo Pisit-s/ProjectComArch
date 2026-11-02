@@ -27,11 +27,16 @@ export function fullWindow(fracBits: number): BitWindow {
   return { mode: 'full', columns, hidden: 0 };
 }
 
+const COMPACT_MAX = 14;
+
 /** Tail when the scene rounds or shifts far (the interesting bits sit at the end). */
 export function chooseWindow(scene: FpScene): BitWindow {
   const FRAC = scene.fracBits;
   const rounds = scene.frames.some((f) => f.decision && f.decision !== 'exact');
-  if (rounds || scene.shift > 8) {
+  let low = FRAC; // always show at least the hidden bit
+  for (const f of scene.frames) for (const r of f.rows) low = Math.min(low, lowestSetBit(r.value));
+  // compact must fit a 390px phone: at most the 14 columns of the tail window
+  if (rounds || scene.shift > 8 || FRAC + 2 - low > COMPACT_MAX) {
     // carry, hidden bit, first 2 significand bits ... last 6 significand bits, then G R S
     const columns: Column[] = [
       FRAC + 1,
@@ -51,8 +56,6 @@ export function chooseWindow(scene: FpScene): BitWindow {
     ];
     return { mode: 'tail', columns, hidden: FRAC - GRS - 8 };
   }
-  let low = FRAC; // always show at least the hidden bit
-  for (const f of scene.frames) for (const r of f.rows) low = Math.min(low, lowestSetBit(r.value));
   const columns: Column[] = [];
   for (let c = FRAC + 1; c >= low; c--) columns.push(c);
   // significand columns between the last shown one and G

@@ -58,7 +58,7 @@ export function decideRounding(
 
 /**
  * Round and pack the exact value  P * 2^(-pFrac) * 2^e  (P >= 0), plus a sticky bit for
- * any non-zero tail that was already dropped (division remainder, encode remainder).
+ * any non-zero tail that was already dropped (alignment sticky, encode remainder).
  * Round to nearest, ties to even. Underflow denormalizes from the full-width P before rounding.
  */
 export function roundPack(

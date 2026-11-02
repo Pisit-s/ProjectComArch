@@ -91,7 +91,8 @@ function ResultCard({ scene, testId }: { scene: FpScene; testId: string }) {
       <p className="num flex flex-wrap items-baseline gap-x-3 font-mono text-lg">
         <b data-testid={`${testId}-hex`}>{r.hex}</b>
         <span>
-          {r.inexact ? '≈' : '='} <b data-testid={`${testId}-value`}>{r.value}</b>
+          {r.inexact && r.stored !== null ? '≈' : '='}{' '}
+          <b data-testid={`${testId}-value`}>{r.value}</b>
         </span>
       </p>
     </div>
@@ -114,7 +115,7 @@ export function FpFrameView({
   if (f.stage === 'pack' || f.stage === 'special') {
     return (
       <div className="space-y-4">
-        {f.stage === 'pack' && f.rows.length === 1 && (
+        {f.stage === 'pack' && f.rows.length === 1 && scene.result.stored !== null && (
           <BitTrack
             rows={f.rows}
             fracBits={scene.fracBits}
