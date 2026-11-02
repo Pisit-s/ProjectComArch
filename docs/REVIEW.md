@@ -1,3 +1,5 @@
+> ประวัติระยะที่ 1 (Floating-Point) · งานระยะที่ 2 ดู docs/progress/
+
 # Review notes
 
 ## Phase 2 — design system + StepPlayer (30 ต.ค. 2569)

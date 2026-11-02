@@ -1,7 +1,7 @@
 import type { Op } from '@/lib/fp/simulate';
 
 /**
- * Inputs of every worked example (PLAN.md appendix C). Only inputs live here; bits, hex and
+ * Inputs of every worked example (docs/plans/stage1-floating-point.md appendix C). Only inputs live here; bits, hex and
  * stored values are always computed by the engine. Golden tests import these inputs and check
  * the expected bits typed in tests/unit/fp/golden.test.ts.
  */

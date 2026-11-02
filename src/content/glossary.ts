@@ -1,4 +1,4 @@
-/** Terms used across the site (PLAN.md 7.9). `Term` shows the meaning the first time a term appears. */
+/** Terms used across the site (docs/plans/stage1-floating-point.md 7.9). `Term` shows the meaning the first time a term appears. */
 export const GLOSSARY = {
   bit: { term: 'บิต (bit)', meaning: 'หลักหนึ่งหลักของเลขฐานสอง มีค่าได้แค่ 0 หรือ 1' },
   place: {

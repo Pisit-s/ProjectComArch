@@ -1,5 +1,5 @@
 /**
- * Everything about the site that may change later lives here (PLAN.md 2.1).
+ * Everything about the site that may change later lives here (docs/plans/stage1-floating-point.md 2.1).
  * Assumed values are marked with the question number in docs/QUESTIONS.md.
  */
 export const site = {

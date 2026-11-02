@@ -1,5 +1,5 @@
 /**
- * Long oracle run: >= 1,000,000 binary32 cases against Math.fround (PLAN.md 4.5).
+ * Long oracle run: >= 1,000,000 binary32 cases against Math.fround (docs/plans/stage1-floating-point.md 4.5).
  * Run with `npm run test:long`.
  */
 import fc from 'fast-check';

@@ -1,3 +1,5 @@
+> ประวัติระยะที่ 1 (Floating-Point) · งานระยะที่ 2 ดู docs/progress/
+
 # รายงานสุดท้าย Binary Lab
 
 30 ต.ค. 2569 · branch `main` (push แล้ว) · ยังไม่ได้ deploy (Pisit deploy เองตาม `docs/DEPLOY.md`)
