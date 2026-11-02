@@ -1,6 +1,6 @@
 'use client';
 
-import { Maximize2, Minimize2 } from 'lucide-react';
+import { Check, Maximize2, Minimize2, TriangleAlert } from 'lucide-react';
 import { type ReactNode, useMemo, useState } from 'react';
 import { BINARY32, type Op, simulate } from '@/lib/fp';
 import { chooseWindow, fullWindow } from '@/lib/lesson/bit-window';
@@ -54,28 +54,59 @@ export function fpSteps(scene: FpScene): PlayerStep[] {
 const isAlign = (f: FpFrame) => f.stage === 'align' || f.stage === 'alignFast';
 
 /** Chips above the track: the one number this frame is about. */
-function FrameChips({ frame }: { frame: FpFrame }) {
-  const chip = (label: ReactNode, value: ReactNode, cls = 'text-ink') => (
-    <span className="inline-flex items-baseline gap-1.5 rounded-full bg-white/80 px-3 py-1 text-sm ring-1 ring-line">
+function FrameChips({ frame, scene }: { frame: FpFrame; scene: FpScene }) {
+  const chip = (label: ReactNode, value: ReactNode, cls = 'text-ink', testId?: string) => (
+    <span
+      className="inline-flex items-baseline gap-1.5 rounded-full bg-white/80 px-3 py-1 text-sm ring-1 ring-line"
+      data-testid={testId}
+    >
       <span className="text-muted">{label}</span>
       <b className={cn('num font-mono', cls)}>{value}</b>
     </span>
   );
   if (frame.stage === 'compare') return chip('d', frame.params.d, 'text-bit-exp-ink');
-  if (frame.stage === 'normalize' && frame.normalize && frame.normalize.direction !== 'none') {
-    return chip(
-      frame.normalize.direction === 'right' ? '→' : '←',
-      frame.normalize.amount,
-      'text-primary',
+  if (frame.stage === 'normalize' && frame.normalize) {
+    const n = frame.normalize;
+    // the small exponent check of the storyboard: still inside 1..254 after normalizing
+    const inRange = !scene.frames.some((f) => f.stage === 'overflow' || f.stage === 'underflow');
+    return (
+      <span className="flex flex-wrap gap-1.5">
+        {n.direction !== 'none' &&
+          chip(n.direction === 'right' ? '→' : '←', n.amount, 'text-primary')}
+        {inRange && (
+          <span
+            className="inline-flex items-center gap-1 rounded-full bg-success/10 px-3 py-1 text-sm text-success ring-1 ring-success/30"
+            data-testid="exp-ok"
+          >
+            <Check className="h-3.5 w-3.5" aria-hidden />
+            <span className="num font-mono">
+              2<sup>{n.expAfter}</sup>
+            </span>
+          </span>
+        )}
+      </span>
+    );
+  }
+  if (frame.stage === 'overflow' || frame.stage === 'underflow') {
+    return (
+      <span
+        className="inline-flex items-center gap-1.5 rounded-full bg-warning/10 px-3 py-1 text-sm font-semibold text-warning ring-1 ring-warning/30"
+        data-testid="range-warning"
+      >
+        <TriangleAlert className="h-4 w-4" aria-hidden />
+        {frame.stage}
+      </span>
     );
   }
   if (frame.grs) {
+    const up = frame.decision === 'up' || frame.decision === 'tie-even-up';
     return (
       <span className="flex flex-wrap gap-1.5" data-testid="grs-chips">
         {chip('LSB', frame.grs.lsb, 'text-bit-frac-ink')}
         {chip('G', frame.grs.g, 'text-bit-grs-ink')}
         {chip('R', frame.grs.r, 'text-bit-grs-ink')}
         {chip('S', frame.grs.s, 'text-bit-grs-ink')}
+        {up && chip('LSB', '+1', 'text-primary', 'round-plus-one')}
       </span>
     );
   }
@@ -131,7 +162,7 @@ export function FpFrameView({
   return (
     <div className="space-y-3">
       <div className="flex min-h-8 flex-wrap items-center justify-between gap-2">
-        <FrameChips frame={f} />
+        <FrameChips frame={f} scene={scene} />
         {f.stage === 'sub' && <MiniAlu binvert={1} carryIn={1} active className="w-36 sm:w-44" />}
       </div>
       <div className={cn(full && 'scroll-x -mx-1 px-1 pb-2')}>
@@ -141,6 +172,8 @@ export function FpFrameView({
           window={full ? fullWindow(scene.fracBits) : chooseWindow(scene)}
           focusRow={moving >= 0 ? moving : undefined}
           bucket={isAlign(f)}
+          carries={f.carries}
+          expFocus={f.stage === 'compare'}
           lens={f.decision ? { row: 0, decision: f.decision } : undefined}
           className={cn(full ? 'w-max [--cell:1.15rem]' : 'mx-auto w-max max-w-full')}
           testId={`${testId}-track`}

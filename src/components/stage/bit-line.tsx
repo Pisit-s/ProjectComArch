@@ -1,5 +1,6 @@
 'use client';
 
+import { useStageSpring } from '@/components/player/player-speed';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { FIELD_STYLE } from '@/components/bits/field-style';
@@ -91,11 +92,12 @@ export function BitLine({
 }
 
 export function BinaryPoint({ id }: { id?: string }) {
+  const spring = useStageSpring();
   return (
     <motion.span
       layout={id ? 'position' : undefined}
       layoutId={id}
-      transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+      transition={spring}
       className="font-bold text-primary"
     >
       .

@@ -1,10 +1,9 @@
 'use client';
 
+import { useStageDuration, useStageSpring } from '@/components/player/player-speed';
 import { motion } from 'motion/react';
 import type { RoundLine as RoundLineModel } from '@/lib/lesson/round-line';
 import { cn } from '@/lib/utils';
-
-const SPRING = { type: 'spring', stiffness: 260, damping: 30 } as const;
 
 /** Exact position in [0, 1] as a Number, only for placing pixels. */
 const toUnit = (pos: RoundLineModel['pos']): number =>
@@ -30,6 +29,8 @@ export function RoundLine({
   className?: string;
   testId?: string;
 }) {
+  const SPRING = useStageSpring(0.6);
+  const draw = useStageDuration(0.5);
   const L = 24;
   const R = 296;
   const x = L + (R - L) * toUnit(line.pos);
@@ -101,7 +102,7 @@ export function RoundLine({
           className="stroke-primary"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: 1 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
+          transition={{ duration: draw, ease: 'easeOut' }}
         />
       )}
     </svg>

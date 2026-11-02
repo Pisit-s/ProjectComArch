@@ -78,6 +78,8 @@ export interface FpFrame {
     expAfter: number;
   };
   special?: SpecialRule;
+  /** Addition only: bit i is set when a carry comes into column i (fixed point, like the rows). */
+  carries?: bigint;
 }
 
 export interface FpScene {
@@ -303,6 +305,8 @@ export function buildFpFrames(
     stage: sigAdd.op === '+' ? 'add' : 'sub',
     rows: [big, aligned, sum],
     captionKey: sigAdd.op === '+' ? 'fp.add' : 'fp.sub',
+    carries:
+      sigAdd.op === '+' ? (big.value + aligned.value) ^ big.value ^ aligned.value : undefined,
     params: {
       a: sigText(big.value, FRAC),
       b: sigText(aligned.value, FRAC),

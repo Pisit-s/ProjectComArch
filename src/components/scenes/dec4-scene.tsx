@@ -1,5 +1,6 @@
 'use client';
 
+import { useStageSpring } from '@/components/player/player-speed';
 import { motion } from 'motion/react';
 import { buildDec4Frames } from '@/lib/lesson/sci-frames';
 import { caption } from '@/content/lesson/captions';
@@ -9,7 +10,6 @@ import { StepPlayer } from '@/components/player/step-player';
 import { ExponentTag } from '@/components/stage/exponent-tag';
 import { cn } from '@/lib/utils';
 
-const SPRING = { type: 'spring', stiffness: 420, damping: 36 } as const;
 /** Digit places shown: 10^1 down to 10^-5. */
 const POWERS = [1, 0, -1, -2, -3, -4, -5];
 /** Places that fit in the 4-digit store of a normalized number (x.xxx). */
@@ -47,6 +47,7 @@ const TONE: Record<Tone, string> = {
 };
 
 function DigitRow({ row, index }: { row: DigitRowSpec; index: number }) {
+  const SPRING = useStageSpring();
   const digits = places(row.text);
   const gridRow = index + 2;
   return (
