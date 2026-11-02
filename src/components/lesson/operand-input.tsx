@@ -1,7 +1,7 @@
 'use client';
 
 import { useId } from 'react';
-import { PARSE_ERROR_TEXT } from '@/content/step-text';
+import { INPUT_ERRORS } from '@/content/lesson/copy';
 import { cn } from '@/lib/utils';
 
 export function OperandInput({
@@ -26,7 +26,7 @@ export function OperandInput({
 }) {
   const id = useId();
   const msgId = `${id}-msg`;
-  const message = error ? (PARSE_ERROR_TEXT[error] ?? error) : hint;
+  const message = error ? (INPUT_ERRORS[error] ?? error) : hint;
   return (
     <fieldset className={cn('fieldset min-w-0', className)}>
       <label htmlFor={id} className="fieldset-legend pb-1 text-sm font-semibold text-ink">

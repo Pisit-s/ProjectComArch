@@ -2,6 +2,7 @@
 
 import { TriangleAlert } from 'lucide-react';
 import { Component, type ReactNode } from 'react';
+import { TOOL_ERROR } from '@/content/lesson/copy';
 
 /** One broken tool never takes the whole page down (docs/plans/stage1-floating-point.md 7.1). */
 export class ToolBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -16,7 +17,7 @@ export class ToolBoundary extends Component<{ children: ReactNode }, { failed: b
       return (
         <div role="alert" className="alert alert-error">
           <TriangleAlert className="h-5 w-5" aria-hidden />
-          <span>เครื่องมือนี้มีปัญหา ลองรีเฟรชหน้า</span>
+          <span>{TOOL_ERROR}</span>
         </div>
       );
     }
