@@ -56,15 +56,17 @@ export function SiteFooter() {
                   <li key={r}>{r}</li>
                 ))}
               </ul>
-              <a
-                href={site.githubUrl}
-                className="mt-3 inline-flex link items-center gap-1.5 text-sm text-ink/80 link-hover"
-                rel="noreferrer"
-                target="_blank"
-              >
-                <FolderGit2 className="h-4 w-4" aria-hidden />
-                โค้ดบน GitHub
-              </a>
+              {site.githubUrl && (
+                <a
+                  href={site.githubUrl}
+                  className="mt-3 inline-flex link items-center gap-1.5 text-sm text-ink/80 link-hover"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  <FolderGit2 className="h-4 w-4" aria-hidden />
+                  โค้ดบน GitHub
+                </a>
+              )}
             </div>
           </div>
         </div>

@@ -52,10 +52,35 @@ export default async function OpengraphImage() {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-        <div style={{ width: 20, height: 64, background: '#D55E00', borderRadius: 6 }} />
-        <div style={{ width: 34, height: 64, background: '#009E73', borderRadius: 6 }} />
-        <div style={{ width: 40, height: 64, background: '#2563EB', borderRadius: 6 }} />
-        <div style={{ fontSize: 92, marginLeft: 12 }}>{site.name}</div>
+        <div
+          style={{
+            width: 96,
+            height: 112,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#2563EB',
+            borderRadius: 24,
+          }}
+        >
+          <div
+            style={{
+              width: 76,
+              height: 92,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 4,
+              background: '#FFFFFF',
+              borderRadius: 14,
+            }}
+          >
+            <div style={{ width: 11, height: 62, background: '#D55E00', borderRadius: 4 }} />
+            <div style={{ width: 21, height: 62, background: '#009E73', borderRadius: 4 }} />
+            <div style={{ width: 21, height: 62, background: '#2563EB', borderRadius: 4 }} />
+          </div>
+        </div>
+        <div style={{ fontSize: 104, marginLeft: 12 }}>{site.name}</div>
       </div>
       <div style={{ fontSize: 44, marginTop: 18, color: '#2563EB' }}>{site.ogSubtitle}</div>
       <div style={{ display: 'flex', gap: 3, marginTop: 48 }}>

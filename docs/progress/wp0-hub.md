@@ -3,7 +3,7 @@
 
 ## งาน (ตาม PLAN.md หัวข้อ 7)
 - [x] 1. เตรียม: branch `wp0-hub` · แผน (`PLAN.md`, `docs/plans/`) ถูก commit ไว้บน `main` แล้วใน 6d87a64 จึงไม่ต้อง commit ซ้ำ · `CLAUDE.md` = ภาคผนวก B · ไฟล์ progress 4 ไฟล์ · บรรทัดประวัติระยะที่ 1 · comment อ้าง `PLAN.md` → `docs/plans/stage1-floating-point.md`
-- [ ] 2. เปลี่ยนชื่อเป็น comkrub
+- [x] 2. เปลี่ยนชื่อเป็น comkrub: site.ts ตามภาคผนวก C, githubUrl null + footer ซ่อนลิงก์, package name, ธีม daisyUI `comkrub`, โลโก้ชิปใหม่ (`LogoMark`) + `FpMark` (3 แถบเดิม), icon, OG, README
 - [ ] 3. Topic registry
 - [ ] 4. ย้าย route ของ Floating-Point + redirect
 - [ ] 5. หน้าแรกใหม่
@@ -61,3 +61,5 @@
 ## บันทึกการตัดสินใจ / ต่างจากแผน
 - ขั้นที่ 1: ไฟล์แผนถูก commit บน `main` แล้ว (6d87a64 "ระยะที่ 2 comkrub") ก่อนสร้าง branch จึงไม่มี commit `docs: stage 2 plan for comkrub` แยกบน branch นี้
 - `@source not '../../docs'` มีอยู่แล้วใน `globals.css` ตั้งแต่ระยะที่ 1
+- ขั้นที่ 2: `package-lock.json` แก้เฉพาะชื่อ (2 บรรทัด) แทน `npm install --package-lock-only` เพราะ npm 11.13 ในเครื่องนี้เติม entry ของ `@tailwindcss/oxide-wasm32-wasi` เพิ่ม 60 กว่าบรรทัดที่ไม่เกี่ยว
+- ขั้นที่ 2: รูป 3 แถบเดิมแยกเป็น `FpMark` ใน `logo.tsx` (ไอคอนหัวข้อ Floating-Point) ส่วน `LogoMark` เป็นโลโก้ชิปของเว็บ

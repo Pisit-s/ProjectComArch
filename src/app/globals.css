@@ -8,7 +8,7 @@
   logs: false;
 }
 @plugin 'daisyui/theme' {
-  name: 'binarylab';
+  name: 'comkrub';
   default: true;
   prefersdark: false;
   color-scheme: light;
