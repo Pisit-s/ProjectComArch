@@ -1,2 +1,21 @@
 /** Short labels used only by this branch's scenes (each at most 20 graphemes). */
-export const UI_CH12 = {} as const;
+export const UI_CH12 = {
+  bits4: '4 บิต',
+  bits8: '8 บิต',
+  width: 'จำนวนบิต',
+  carry: 'ทด',
+  sum: 'ผล',
+  carryOut: 'ทดออก',
+  range: (max: number) => `ใส่ 0 ถึง ${max}`,
+  overflow: 'overflow',
+  ok: 'ถูกต้อง',
+  seam: 'รอยต่อ',
+  shiftBy: 'เลื่อนขวา',
+  places: 'ตำแหน่ง',
+  lost: 'บิตที่หลุด',
+  output: 'output',
+  notNormalized: 'ยังไม่ normalized',
+  normalized: 'normalized',
+  toChapter5: 'ดูในบทที่ 5',
+  code: 'โค้ด C',
+} as const;
