@@ -8,16 +8,23 @@ import {
   type IntSubScene as SubModel,
   buildIntAddFrames,
   buildIntSubFrames,
+  buildWheelFrames,
 } from '@/lib/lesson/int-frames';
 import { caption } from '@/content/lesson/captions';
 import { UI } from '@/content/lesson/copy';
-import { INT_ADD_EXAMPLES, INT_SUB_EXAMPLES, type IntExample } from '@/content/lesson/examples';
+import {
+  INT_ADD_EXAMPLES,
+  INT_SUB_EXAMPLES,
+  type IntExample,
+  WHEEL_EXAMPLES,
+} from '@/content/lesson/examples';
 import { sectionById } from '@/content/lesson/sections';
 import { UI_CH12 } from '@/content/lesson/ui-ch12';
 import { ScenePlaceholder } from '@/components/lesson/scene-shell';
 import { StepPlayer } from '@/components/player/step-player';
 import { CarryArc } from '@/components/stage/carry-arc';
 import { MiniAlu } from '@/components/stage/mini-alu';
+import { NumberWheel, minus } from '@/components/stage/number-wheel';
 import { cn } from '@/lib/utils';
 
 // Owner: addsub-ch12 (docs/PARALLEL.md).
@@ -564,8 +571,70 @@ export function IntSubScene() {
   );
 }
 
+/* ------------------------------------------------------------------------------------------ */
+/* 1.3 overflow wheel                                                                         */
+/* ------------------------------------------------------------------------------------------ */
+
+const signedText = (n: number) => (n < 0 ? `(${minus(n)})` : String(n));
+
+/** Scene 1.3: walk around the 4-bit wheel; crossing the seam is an overflow (slide w03c 4-10). */
 export function OverflowScene() {
-  return <ScenePlaceholder minHeight="26rem" />;
+  // the overflow case 4 + 5 of slide w03c page 8 first: this scene is about the seam
+  const [pick, setPick] = useState(4);
+  const [touched, setTouched] = useState(false);
+  const [a, b] = WHEEL_EXAMPLES[pick];
+  const m = useMemo(() => buildWheelFrames(a, b, '+'), [a, b]);
+  const slotOf = (v: number) => m.slots.findIndex((s) => s.value === v);
+  const from = slotOf(m.frames[1].pin);
+  const steps = m.frames.map((f) => ({
+    id: f.id,
+    title: f.id,
+    caption: caption(f.captionKey, f.params),
+  }));
+  return (
+    <div className="space-y-3" data-testid="overflow">
+      <Chips>
+        {WHEEL_EXAMPLES.map(([x, y], k) => (
+          <Chip
+            key={`${x}/${y}`}
+            on={k === pick}
+            onClick={() => (setTouched(true), setPick(k))}
+            testId="overflow-chip"
+          >
+            {signedText(x)} + {signedText(y)}
+          </Chip>
+        ))}
+      </Chips>
+      <StepPlayer
+        key={`${a}|${b}`}
+        steps={steps}
+        label={sceneTitle('overflow')}
+        poster={!touched}
+        testId="overflow-player"
+        minHeight="20rem"
+        render={(i) => {
+          const f = m.frames[i];
+          return (
+            <NumberWheel
+              slots={m.slots}
+              max={m.max}
+              from={from}
+              to={slotOf(f.pin)}
+              walk={f.walk}
+              showPin={i > 0}
+              status={f.overflow === null ? null : f.overflow ? 'overflow' : 'ok'}
+              okLabel={UI_CH12.ok}
+              overflowLabel={UI_CH12.overflow}
+              emphasizeRange={i === 0}
+            />
+          );
+        }}
+      />
+      <p className="px-1 text-sm text-muted" data-testid="overflow-rule">
+        {caption('int.wheel.rule')}
+      </p>
+    </div>
+  );
 }
 
 export function ShiftScene() {
