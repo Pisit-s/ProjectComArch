@@ -32,7 +32,8 @@ export function ComingSoon({ id }: { id: TopicId }) {
           {t.title}
         </h1>
         <p className="mt-2 text-lg text-ink/80">
-          หัวข้อนี้ทีมกำลังพัฒนาอยู่ จะเปิดให้เรียนเร็ว ๆ นี้
+          หัวข้อนี้ทีมกำลังพัฒนาอยู่ จะเปิดให้เรียน{' '}
+          <span className="whitespace-nowrap">เร็ว ๆ นี้</span>
         </p>
         <p className="mt-3 max-w-[64ch] text-ink/80">{t.blurb}</p>
 

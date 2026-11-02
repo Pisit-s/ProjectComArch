@@ -30,9 +30,13 @@ export function FpSubnav() {
   const rowRef = useRef<HTMLUListElement>(null);
 
   // keep the active pill in view on narrow screens
+  // scroll only the row sideways: scrollIntoView would also move the page (WebKit jumps to the
+  // top), which breaks links to #anchors such as /floating-point/mul-div#simulator
   useEffect(() => {
-    const el = rowRef.current?.querySelector<HTMLElement>('[aria-current="page"]');
-    el?.scrollIntoView({ block: 'nearest', inline: 'center' });
+    const row = rowRef.current;
+    const el = row?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!row || !el) return;
+    row.scrollLeft = el.offsetLeft - (row.clientWidth - el.offsetWidth) / 2;
   }, [pathname]);
 
   return (
@@ -73,7 +77,7 @@ export function FpSubnav() {
       <nav aria-label="บทของ Floating-Point" className="mt-2">
         <ul
           ref={rowRef}
-          className="-mx-4 flex snap-x [scrollbar-width:none] gap-1.5 overflow-x-auto px-4 pb-1 [&::-webkit-scrollbar]:hidden"
+          className="relative -mx-4 flex snap-x [scrollbar-width:none] gap-1.5 overflow-x-auto px-4 pb-1 [&::-webkit-scrollbar]:hidden"
         >
           {FP_PAGES.map((p) => {
             const active = p.href === pathname;

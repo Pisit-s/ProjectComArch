@@ -50,6 +50,12 @@ for (const path of PAGES) {
     page.on('pageerror', (e) => errors.push(e.message));
     await page.goto(path);
     await page.waitForLoadState('networkidle');
+    // entrance fades change contrast while they run; measure the settled page
+    await page.waitForFunction(() =>
+      document
+        .getAnimations()
+        .every((a) => a.playState !== 'running' || a.effect?.getTiming().iterations === Infinity),
+    );
     const result = await new AxeBuilder({ page }).analyze();
     const bad = result.violations
       .filter((v) => v.impact === 'serious' || v.impact === 'critical')

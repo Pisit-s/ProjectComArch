@@ -13,7 +13,7 @@
    - เปิด Reduce Motion (iOS: Settings → Accessibility → Motion) แล้วลองเปลี่ยนขั้น
    - เปิด share link ของ Lab จาก LINE
 6. หลังต่อแล้ว ทุก push เข้า `main` = deploy production อัตโนมัติ · branch อื่น/PR = preview URL
-7. ถ้าชื่อโปรเจกต์บน Vercel ไม่ใช่ `binary-lab` หรือต่อ domain เอง (เช่น `float.mypisit.com`: Settings → Domains → Add → ตั้ง CNAME ตามที่ Vercel บอก) ให้แก้ `siteUrl` ใน `src/lib/site.ts` ให้ตรง URL จริง (ใช้กับ OG image, sitemap, robots) แล้ว push (คำถาม Q4)
+7. ถ้าเปลี่ยนชื่อโปรเจกต์บน Vercel หรือต่อ domain เอง (เช่น `float.mypisit.com`: Settings → Domains → Add → ตั้ง CNAME ตามที่ Vercel บอก) ให้แก้ `siteUrl` ใน `src/lib/site.ts` ให้ตรง URL จริง (ใช้กับ OG image, sitemap, robots) แล้ว push (คำถาม Q4)
 
 ## เปิด Web Analytics (ทำครั้งเดียว)
 โค้ดใส่ `<Analytics />` ไว้แล้ว (Q9) แต่ต้องเปิดที่ Vercel ก่อนถึงจะเริ่มนับ: Project → แท็บ **Analytics** → **Enable** → redeploy หนึ่งครั้ง (Deployments → ⋯ → Redeploy) · ดูจำนวนผู้เข้าชมได้ที่แท็บ Analytics (ข้อมูลไม่ระบุตัวตน ไม่ใช้ cookie)

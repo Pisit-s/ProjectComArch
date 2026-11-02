@@ -108,6 +108,12 @@ for (const path of ['/', ...SOON.map((t) => t.href), '/dev/kit']) {
     // /dev/kit exists only in dev; in a production build it is a 404 by design
     if (path === '/dev/kit' && res?.status() === 404) return;
     await page.waitForLoadState('networkidle');
+    // entrance fades change contrast while they run; measure the settled page
+    await page.waitForFunction(() =>
+      document
+        .getAnimations()
+        .every((a) => a.playState !== 'running' || a.effect?.getTiming().iterations === Infinity),
+    );
     const result = await new AxeBuilder({ page }).analyze();
     const bad = result.violations
       .filter((v) => v.impact === 'serious' || v.impact === 'critical')
@@ -116,3 +122,12 @@ for (const path of ['/', ...SOON.map((t) => t.href), '/dev/kit']) {
     expect(errors).toEqual([]);
   });
 }
+
+test('chapter pills keep the page at a #anchor', async ({ page }) => {
+  await page.goto('/floating-point/mul-div#simulator');
+  await page.waitForLoadState('networkidle');
+  await expect(page.locator('#simulator-h')).toBeInViewport();
+  await expect(
+    page.getByRole('navigation', { name: 'บทของ Floating-Point' }).locator('[aria-current="page"]'),
+  ).toHaveAttribute('href', '/floating-point/mul-div');
+});
