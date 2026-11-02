@@ -1,6 +1,6 @@
 # comkrub
 
-เว็บสื่อการสอนวิชา Computer Architecture เรื่องเดียว: **การบวกและการลบเลข Floating-Point** (IEEE 754 single precision) เป็นหน้าเดียว เลื่อนลงทีละบท ภาพเคลื่อนไหวเยอะ ข้อความน้อย ทุกขั้นกดเล่นได้
+เว็บสื่อการสอนรายวิชา Computer Architecture เรื่องเดียว: **การบวกและการลบเลข Floating-Point** (IEEE 754 single precision) เป็นหน้าเดียว เลื่อนลงทีละบท ภาพเคลื่อนไหวเยอะ ข้อความน้อย ทุกขั้นกดเล่นได้
 
 1. บวกและลบเลขฐานสอง (ทบทวนจาก Digital: full adder, two's complement, overflow, shift)
 2. เลขทศนิยมในโปรแกรม (`int` กับ `float` ในภาษา C, scientific notation)
