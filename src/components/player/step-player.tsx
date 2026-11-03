@@ -9,17 +9,19 @@ import {
   Presentation,
   RotateCcw,
 } from 'lucide-react';
-import { useReducedMotion } from 'motion/react';
+import { LayoutGroup, MotionConfig, useReducedMotion } from 'motion/react';
 import {
   type KeyboardEvent,
   type ReactNode,
   useEffect,
   useEffectEvent,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { ZOOM_EVENT } from '@/components/layout/zoom-control';
 import { StepBar } from '@/components/stage/step-bar';
 import { UI } from '@/content/lesson/copy';
 import { cn } from '@/lib/utils';
@@ -94,6 +96,17 @@ function StepPlayerInner({
   const [started, setStarted] = useState(!poster || autoPlay || initialStep > 0);
   const [whyOpen, setWhyOpen] = useState(false);
   const step = steps[p.index];
+  // the frame and the caption keep the biggest size they have had: stepping never makes the
+  // picture or the controls jump
+  const [frameRef, frameMin] = useGrowOnly<HTMLDivElement>(presenting);
+  const [captionRef, captionMin] = useGrowOnly<HTMLDivElement>(presenting);
+  // presenting: every frame is drawn once off screen, so the frame box starts at its final size
+  const measureRef = useRef<HTMLDivElement>(null);
+  const captionMeasureRef = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState<{ w: number; h: number; c: number; gen: number } | null>(null);
+  const measuring = presenting && box?.gen !== frameMin.gen;
+  const boxW = presenting ? Math.max(box?.w ?? 0, frameMin.w) : 0;
+  const boxH = Math.max(presenting ? (box?.h ?? 0) : 0, frameMin.h);
 
   const notify = useEffectEvent((i: number) => onStepChange?.(i));
   useEffect(() => {
@@ -159,7 +172,8 @@ function StepPlayerInner({
     else return;
     e.preventDefault();
   });
-  useEffect(() => {
+  // layout effect: the big root font is in place before the frames are measured below
+  useLayoutEffect(() => {
     if (!presenting) return;
     const root = document.documentElement;
     const prevFont = root.style.fontSize;
@@ -182,6 +196,19 @@ function StepPlayerInner({
       if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
     };
   }, [presenting]);
+
+  useLayoutEffect(() => {
+    const el = measureRef.current;
+    if (!measuring || !el) return;
+    const frames = Array.from(el.children) as HTMLElement[];
+    const w = Math.max(...frames.map((c) => cssSize(c).w));
+    // full-width parts (number lines, circuits) grow taller in the wider box: measure them there
+    for (const c of frames) c.style.minWidth = `${w}px`;
+    const h = Math.max(...frames.map((c) => cssSize(c).h));
+    const captions = Array.from(captionMeasureRef.current?.children ?? []) as HTMLElement[];
+    const c = Math.max(0, ...captions.map((x) => cssSize(x).h));
+    setBox({ w, h, c, gen: frameMin.gen });
+  }, [measuring, frameMin.gen]);
 
   const region = (
     <section
@@ -209,20 +236,51 @@ function StepPlayerInner({
       {stepBar && <StepBar active={step?.bigStep ?? 0} />}
 
       <div
-        className="glass-solid relative overflow-hidden rounded-2xl p-3 ring-1 ring-foreground/10 sm:p-5"
+        className={cn(
+          'glass-solid relative overflow-hidden rounded-2xl p-3 ring-1 ring-foreground/10 sm:p-5',
+          // presenting: the stage takes the rest of the screen, the frame sits in its middle
+          presenting && 'flex flex-1 flex-col justify-center-safe',
+        )}
         // presentation shows one scene at a time: no reserved height (it grows with the root font)
         style={{ minHeight: presenting ? undefined : minHeight }}
         data-stage
         data-testid={`${testId}-stage`}
       >
-        {render(p.index)}
+        {/* presenting: the frame is one block in the middle of the screen; its size only grows,
+            so every step draws at the same place */}
+        <div
+          ref={frameRef}
+          className={cn(presenting && 'mx-auto w-fit max-w-full')}
+          style={{ minWidth: boxW || undefined, minHeight: boxH || undefined }}
+          data-frame
+          data-testid={`${testId}-frame`}
+        >
+          {render(p.index)}
+        </div>
+        {measuring && (
+          <div
+            ref={measureRef}
+            className="invisible absolute inset-x-0 top-0 px-3 sm:px-5"
+            aria-hidden
+            inert
+          >
+            <MotionConfig reducedMotion="always">
+              <PlayerSpeedContext.Provider value={{ speed: p.speed, reduced: true }}>
+                {steps.map((s, i) => (
+                  <LayoutGroup key={s.id} id={`${captionId}-m${i}`}>
+                    <div className="w-fit max-w-full">{render(i)}</div>
+                  </LayoutGroup>
+                ))}
+              </PlayerSpeedContext.Provider>
+            </MotionConfig>
+          </div>
+        )}
         {!started && (
           <button
             type="button"
             onClick={toggle}
             className="absolute inset-0 grid place-items-center bg-white/55 transition-colors hover:bg-white/40 [@media(hover:none)]:bg-white/65"
             aria-label={`${UI.play} ${label}`}
-            data-present-keep
             data-testid={`${testId}-poster`}
           >
             <span className="grid h-20 w-20 place-items-center rounded-full bg-primary text-white shadow-xl ring-8 ring-primary/15">
@@ -232,20 +290,21 @@ function StepPlayerInner({
         )}
       </div>
 
-      <div className="min-h-[3.25rem] px-1">
-        <p
-          id={captionId}
-          aria-live="polite"
-          className="text-[1.05rem] leading-relaxed font-medium text-ink"
-          data-testid={`${testId}-caption`}
-        >
+      <div
+        ref={captionRef}
+        className="relative min-h-[3.25rem] px-1"
+        style={{
+          minHeight: presenting ? Math.max(box?.c ?? 0, captionMin.h) || undefined : undefined,
+        }}
+      >
+        <p id={captionId} aria-live="polite" className={CAPTION} data-testid={`${testId}-caption`}>
           {step?.caption}
           {step?.detail && (
             <button
               type="button"
               onClick={() => setWhyOpen((o) => !o)}
               aria-expanded={whyOpen}
-              className="ml-2 inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 align-middle text-sm font-semibold text-secondary hover:bg-primary/15"
+              className={cn(WHY, 'hover:bg-primary/15')}
               data-testid={`${testId}-why`}
             >
               {UI.why}
@@ -259,6 +318,22 @@ function StepPlayerInner({
           >
             {step.detail}
           </p>
+        )}
+        {/* presenting: the longest caption sets the height, so the stage never changes size */}
+        {measuring && (
+          <div
+            ref={captionMeasureRef}
+            className="invisible absolute inset-x-0 top-0 px-1"
+            aria-hidden
+            inert
+          >
+            {steps.map((s) => (
+              <p key={s.id} className={CAPTION}>
+                {s.caption}
+                {s.detail && <span className={WHY}>{UI.why}</span>}
+              </p>
+            ))}
+          </div>
         )}
       </div>
 
@@ -299,6 +374,57 @@ function StepPlayerInner({
       )}
     </PlayerSpeedContext.Provider>
   );
+}
+
+const CAPTION = 'text-[1.05rem] leading-relaxed font-medium text-ink';
+const WHY =
+  'ml-2 inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 align-middle text-sm font-semibold text-secondary';
+
+/** Border-box size in CSS pixels (page zoom left out), rounded up so a minimum never cuts. */
+function cssSize(el: HTMLElement) {
+  const cs = getComputedStyle(el);
+  return { w: Math.ceil(parseFloat(cs.width)), h: Math.ceil(parseFloat(cs.height)) };
+}
+
+/**
+ * Remembers the biggest size an element has had (it never shrinks back between steps).
+ * Starts again when presentation mode toggles, the window width changes or the page zoom changes.
+ */
+function useGrowOnly<T extends HTMLElement>(mode: boolean) {
+  const ref = useRef<T>(null);
+  const [gen, setGen] = useState(0);
+  const [min, setMin] = useState({ w: 0, h: 0, mode, gen });
+  if (min.mode !== mode || min.gen !== gen) setMin({ w: 0, h: 0, mode, gen });
+
+  useEffect(() => {
+    let width = window.innerWidth;
+    const onResize = () => {
+      // phones fire resize when the address bar slides; only a new width counts
+      if (window.innerWidth === width) return;
+      width = window.innerWidth;
+      setGen((g) => g + 1);
+    };
+    const onZoom = () => setGen((g) => g + 1);
+    window.addEventListener('resize', onResize);
+    window.addEventListener(ZOOM_EVENT, onZoom);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener(ZOOM_EVENT, onZoom);
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const { w, h } = cssSize(el);
+      setMin((m) => (w > m.w || h > m.h ? { ...m, w: Math.max(m.w, w), h: Math.max(m.h, h) } : m));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [mode, gen]);
+
+  return [ref, min] as const;
 }
 
 function Controls({

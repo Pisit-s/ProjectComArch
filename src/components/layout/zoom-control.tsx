@@ -14,12 +14,13 @@ export const ZOOM_KEY = 'comkrub-zoom';
  */
 export const ZOOM_BOOT = `try{var z=parseFloat(localStorage.getItem('${ZOOM_KEY}'));if(z>0&&z!==1)document.documentElement.style.zoom=String(z)}catch(e){}`;
 
-const EVENT = 'comkrub-zoom';
+/** Fired on window whenever the page zoom changes. */
+export const ZOOM_EVENT = 'comkrub-zoom';
 
 function apply(z: number) {
   document.documentElement.style.zoom = z === 1 ? '' : String(z);
   // the header and the phone menu each have a control: keep both in step
-  window.dispatchEvent(new Event(EVENT));
+  window.dispatchEvent(new Event(ZOOM_EVENT));
   try {
     if (z === 1) localStorage.removeItem(ZOOM_KEY);
     else localStorage.setItem(ZOOM_KEY, String(z));
@@ -38,10 +39,10 @@ export function ZoomControl({ testId = 'zoom' }: { testId?: string }) {
       setZoom(Number.isFinite(z) && z > 0 ? z : 1);
     };
     const id = requestAnimationFrame(read);
-    window.addEventListener(EVENT, read);
+    window.addEventListener(ZOOM_EVENT, read);
     return () => {
       cancelAnimationFrame(id);
-      window.removeEventListener(EVENT, read);
+      window.removeEventListener(ZOOM_EVENT, read);
     };
   }, []);
   const at = ZOOM_STEPS.findIndex((s) => s >= zoom - 0.001);
