@@ -31,6 +31,16 @@ test.describe('single-page lesson', () => {
     await expect(page.getByTestId(`section-${target.id}`)).toBeInViewport();
   });
 
+  test('the video at the end loads the player only after a tap', async ({ page }) => {
+    await page.goto('/#video');
+    await expect(page.getByTestId('video-frame')).toHaveCount(0);
+    await page.getByTestId('video-play').click();
+    await expect(page.getByTestId('video-frame')).toHaveAttribute(
+      'src',
+      /youtube-nocookie\.com\/embed\/jlHLlNzZQKI/,
+    );
+  });
+
   test('unknown path shows the 404 page', async ({ page }) => {
     const res = await page.goto('/no-such-page');
     expect(res?.status()).toBe(404);
