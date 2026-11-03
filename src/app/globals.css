@@ -253,13 +253,6 @@
     animation: tb-glow 0.9s ease-out both;
   }
 
-  /* presentation mode: every part of a frame sits in the middle of the stage */
-  [data-presenting='1'] [data-stage] > :not([data-present-keep]) {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
   /* presentation mode (projector): bits big enough to read from the back of the room */
   /* presenting the circuit: the diagram fills the screen height on the left, the bits and
      values of the step sit on the right */
