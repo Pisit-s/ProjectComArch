@@ -77,6 +77,13 @@ export const SUMMARY: { text: string; back: SectionId; icon: SummaryIcon }[] = [
   },
 ];
 
+/** Video at the end of the page (YouTube; the player loads only after a tap). */
+export const VIDEO = {
+  id: 'jlHLlNzZQKI',
+  title: 'วิดีโอประกอบบทเรียน',
+  play: 'เล่นวิดีโอ',
+} as const;
+
 export const FOOTER = {
   about:
     'comkrub · สื่อการสอนวิชา Computer Architecture เรื่องการบวกและลบเลข Floating-Point · คำนวณทุกอย่างใน browser',
